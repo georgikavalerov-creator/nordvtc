@@ -1,0 +1,93 @@
+import { Resend } from "resend";
+import { SITE } from "./site";
+import { euro } from "./pricing";
+import { getSiteSettings } from "./content";
+
+const esc = (s: string) =>
+  s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
+
+export type BookingMail = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  originLabel: string;
+  destLabel: string;
+  pickupAtLocal: string; // déjà formaté en français
+  passengers: number;
+  luggage: number;
+  childSeat: boolean;
+  flight: string | null;
+  notes: string | null;
+  priceCents: number;
+  paidCents: number;
+  orderUrl?: string;
+};
+
+async function send(to: string, subject: string, html: string) {
+  const key = process.env.RESEND_API_KEY;
+  if (!key) return; // e-mails désactivés tant que la clé n'est pas renseignée
+  const resend = new Resend(key);
+  await resend.emails.send({
+    from: process.env.MAIL_FROM ?? `${SITE.name} <onboarding@resend.dev>`,
+    to,
+    subject,
+    html,
+  });
+}
+
+export async function sendBookingEmails(b: BookingMail) {
+  const rest = Math.max(0, b.priceCents - b.paidCents);
+  const phone = (await getSiteSettings()).driverPhone || process.env.DRIVER_PHONE || "";
+  const lines = `
+    <p><strong>Trajet</strong><br>${esc(b.originLabel)} → ${esc(b.destLabel)}</p>
+    <p><strong>Prise en charge</strong><br>${esc(b.pickupAtLocal)}</p>
+    <p><strong>Passagers</strong> ${b.passengers} · <strong>Bagages</strong> ${b.luggage}${b.childSeat ? " · siège enfant demandé" : ""}</p>
+    ${b.flight ? `<p><strong>Vol / train</strong> ${esc(b.flight)}</p>` : ""}
+    <p><strong>Prix du trajet</strong> ${euro(b.priceCents)}<br><strong>Déjà réglé en ligne</strong> ${euro(b.paidCents)}<br><strong>Reste à régler à bord</strong> ${euro(rest)}</p>
+  `;
+  await send(
+    b.email,
+    `Réservation confirmée — ${SITE.name}`,
+    `<div style="font-family:Georgia,serif;max-width:560px">
+      <h2>Votre réservation est confirmée</h2>
+      <p>Bonjour ${esc(b.name)}, merci pour votre confiance.</p>
+      ${lines}
+      <p>Référence : <code>${esc(b.id.slice(0, 8))}</code>${b.orderUrl ? ` · <a href="${esc(b.orderUrl)}">Votre bon de commande</a>` : ""}</p>
+      <p>Pour toute modification, répondez à ce message${phone ? ` ou appelez le ${esc(phone)}` : ""}.</p>
+    </div>`,
+  );
+  const notify = process.env.MAIL_NOTIFY_TO;
+  if (notify) {
+    await send(
+      notify,
+      `Nouvelle réservation — ${b.originLabel} → ${b.destLabel}`,
+      `<div style="font-family:system-ui">
+        <h3>Nouvelle réservation payée</h3>
+        <p><strong>${esc(b.name)}</strong> — ${esc(b.phone)} — ${esc(b.email)}</p>
+        ${lines}
+        ${b.notes ? `<p><strong>Notes</strong><br>${esc(b.notes)}</p>` : ""}
+        <p>Référence : ${esc(b.id)}</p>
+      </div>`,
+    );
+  }
+}
+
+export async function sendCancellationEmails(b: { id: string; name: string; email: string; originLabel: string; destLabel: string; pickupAtLocal: string; refundedCents: number; keptCents: number }) {
+  const money = b.refundedCents > 0
+    ? `<p>Un remboursement de <strong>${euro(b.refundedCents)}</strong> a été émis sur votre moyen de paiement (délai bancaire : quelques jours ouvrés).</p>`
+    : b.keptCents > 0
+      ? `<p>L'annulation intervient moins de 24 h avant la prise en charge : l'acompte de ${euro(b.keptCents)} reste acquis, conformément aux conditions générales de vente.</p>`
+      : "";
+  const trip = `<p>${esc(b.originLabel)} → ${esc(b.destLabel)}<br>${esc(b.pickupAtLocal)}</p>`;
+  await send(b.email, `Réservation annulée — ${SITE.name}`,
+    `<div style="font-family:system-ui;max-width:560px"><h2>Votre réservation est annulée</h2><p>Bonjour ${esc(b.name)},</p>${trip}${money}<p>Référence : <code>${esc(b.id.slice(0, 8))}</code></p></div>`);
+  const notify = process.env.MAIL_NOTIFY_TO;
+  if (notify) await send(notify, `Annulation client — ${b.originLabel} → ${b.destLabel}`,
+    `<div style="font-family:system-ui"><h3>Annulation par le client</h3><p>${esc(b.name)} — ${esc(b.email)}</p>${trip}<p>Remboursé : ${euro(b.refundedCents)} · conservé : ${euro(b.keptCents)}</p><p>Réf. ${esc(b.id)}</p></div>`);
+}
+
+export async function sendInvoiceEmail(b: { name: string; email: string; number: string; url: string }) {
+  await send(b.email, `Votre facture ${b.number} — ${SITE.name}`,
+    `<div style="font-family:system-ui;max-width:560px"><h2>Merci pour votre trajet</h2><p>Bonjour ${esc(b.name)}, votre facture n° ${esc(b.number)} est disponible : <a href="${esc(b.url)}">ouvrir la facture</a> (imprimable / PDF).</p></div>`);
+}
