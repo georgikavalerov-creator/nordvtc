@@ -57,32 +57,44 @@ export default function PasswordMeter({ value, onLeaked }: { value: string; onLe
   }, [value]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const msg = [
-    "Choisissez une phrase : 4 mots simples valent mieux qu'un mot compliqué.",
-    "Beaucoup trop court : à craquer en un instant.",
-    "Mieux, mais encore faible. Continuez : chaque caractère compte.",
-    `Presque ! Encore ${TARGET - len} caractère${TARGET - len > 1 ? "s" : ""} pour un coffre-fort.`,
-    "Coffre-fort verrouillé 🔒 Excellent mot de passe.",
+    "Le taxi attend son premier caractère… 🚕",
+    "Panne sèche ⛽ : même une trottinette irait plus loin.",
+    "Ça roule… mais en 2 CV. Appuyez sur l'accélérateur !",
+    `Plus que ${TARGET - len} caractère${TARGET - len > 1 ? "s" : ""} avant Paris 🗼 Vous y êtes presque !`,
+    "Arrivé à Paris sans bouchon ! Mot de passe béton 🎉",
   ][level];
-  const closed = level === 4;
+  const police = leaked > 0;
+  const arrived = level === 4 && !police;
+  const moving = len > 0 && !arrived && !police;
+  // La voiture ne dépasse pas le palier atteint : sa position reste cohérente avec le message.
+  const pos = arrived ? 1 : Math.min(progress, [0, 0.3, 0.6, 0.92][Math.min(level, 3)]);
   return (
-    <div className={`pwm lv${level}`} aria-live="polite">
-      <div className="pwm-vault" aria-hidden="true">
-        <svg viewBox="0 0 64 72" width="64" height="72">
-          <path className="shackle" d="M20 32V22a12 12 0 0 1 24 0v10" fill="none" strokeWidth="6" strokeLinecap="round" style={{ transform: `translateY(${closed ? 0 : -9}px)` }} />
-          <rect className="body" x="10" y="32" width="44" height="34" rx="8" />
-          <circle cx="32" cy="46" r="4.5" fill="#fff" />
-          <rect x="30" y="48" width="4" height="9" rx="2" fill="#fff" />
-        </svg>
-        {closed && <span className="spark" />}
+    <div className={`pwm lv${level}${police ? " police" : ""}${moving ? " moving" : ""}`} aria-live="polite">
+      <div className="pwm-road" aria-hidden="true">
+        <span>🏠</span>
+        <div className="pwm-lane">
+          <span className="pwm-car" style={{ left: `calc(${pos * 100}% - ${pos * 36}px)` }}>
+            {police && <span className="pwm-siren">🚨</span>}
+            {arrived && <span className="pwm-bubble" key="honk">POUET !</span>}
+            {moving && <span className="pwm-puff">💨</span>}
+            <span className={`pwm-car-i${len === 0 ? " idle" : ""}`}>{police ? "🚓" : "🚕"}</span>
+          </span>
+          {arrived && (
+            <span className="pwm-confetti" key="confetti">
+              {Array.from({ length: 16 }, (_, i) => (
+                <i key={i} style={{ ["--dx" as string]: `${((i % 8) - 3.5) * 22}px`, ["--dy" as string]: `${-30 - (i % 4) * 16}px`, ["--r" as string]: `${i * 83}deg`, ["--h" as string]: String((i * 47) % 360), animationDelay: `${(i % 5) * 40}ms` }} />
+              ))}
+            </span>
+          )}
+        </div>
+        <span className={arrived ? "pwm-paris hop" : "pwm-paris"}>🗼</span>
       </div>
       <div className="pwm-main">
-        <div className="pwm-chain" aria-hidden="true">
-          {Array.from({ length: TARGET }, (_, i) => <i key={i} className={i < len ? "on" : ""} style={{ transitionDelay: `${Math.min(i, 8) * 12}ms` }} />)}
-        </div>
-        <p className="pwm-msg"><strong>{msg}</strong></p>
+        <p className="pwm-msg"><strong>{police ? "🚓 Contrôle de police ! Ce mot de passe est fiché : changez de véhicule." : msg}</strong></p>
         {len > 0 && <p className="pwm-time">Temps pour le casser : <strong key={label}>{label}</strong> <span className="muted">· {len} caractère{len > 1 ? "s" : ""}</span></p>}
-        {leaked > 0 && <p className="error" role="alert">Ce mot de passe apparaît dans des fuites de données ({new Intl.NumberFormat("fr-FR").format(leaked)} fois). Choisissez-en un autre.</p>}
-        {len > 0 && len < TARGET && <p className="muted pwm-tip">Astuce : « croissant chaud lille matin » est plus solide que « Xk9!pQ ».</p>}
+        {police && <p className="error" role="alert">Il apparaît dans des fuites de données ({new Intl.NumberFormat("fr-FR").format(leaked)} fois). Choisissez-en un autre.</p>}
+        {len === 0 && <p className="muted pwm-tip">Astuce : 4 mots simples valent mieux qu'un mot compliqué.</p>}
+        {len > 0 && len < TARGET && !police && <p className="muted pwm-tip">Astuce : « croissant chaud lille matin » est plus solide que « Xk9!pQ ».</p>}
         <span className="sr-only">{Math.round(progress * 100)} % de la longueur recommandée</span>
       </div>
     </div>

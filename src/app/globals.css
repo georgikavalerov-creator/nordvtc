@@ -1173,22 +1173,36 @@ p.field-error { margin: -4px 0 0; }
 .cancel-box { margin-top: 8px; padding: 14px 16px; border: 2px solid #c62828; border-radius: 14px; background: #fff; display: grid; gap: 8px; width: 100%; }
 .cancel-box p { margin: 0; }
 
-/* ── Mot de passe : coffre-fort animé ── */
-.pwm { --c: #9a9a9a; display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: center; padding: 14px; border: 1.5px solid #e4e4e4; border-radius: 14px; background: #fff; transition: border-color .4s; }
-.pwm.lv1 { --c: #e53935; } .pwm.lv2 { --c: #f08c00; } .pwm.lv3 { --c: #1f5eff; } .pwm.lv4 { --c: #12a150; }
+/* ── Mot de passe : road trip en taxi jusqu'à Paris ── */
+.pwm { --c: #9a9a9a; display: grid; gap: 12px; padding: 14px; border: 1.5px solid #e4e4e4; border-radius: 14px; background: #fff; transition: border-color .4s; }
+.pwm.lv1 { --c: #e53935; } .pwm.lv2 { --c: #f08c00; } .pwm.lv3 { --c: #1f5eff; } .pwm.lv4 { --c: #12a150; } .pwm.police { --c: #e53935; }
 .pwm:not(.lv0) { border-color: var(--c); }
-.pwm-vault { position: relative; width: 64px; height: 72px; }
-.pwm-vault .body { fill: var(--c); transition: fill .4s; }
-.pwm-vault .shackle { stroke: var(--c); transition: stroke .4s, transform .6s cubic-bezier(.34, 1.56, .64, 1); }
-.pwm.lv4 .pwm-vault svg { animation: vaultPop .6s cubic-bezier(.34, 1.56, .64, 1); }
-.pwm.lv1 .pwm-vault svg, .pwm.lv2 .pwm-vault svg { animation: vaultShake .5s; }
-@keyframes vaultPop { 0% { transform: scale(.85); } 60% { transform: scale(1.15); } 100% { transform: scale(1); } }
-@keyframes vaultShake { 20% { transform: rotate(-4deg); } 60% { transform: rotate(4deg); } }
-.pwm-vault .spark { position: absolute; inset: -6px; border-radius: 50%; border: 2px solid var(--c); opacity: 0; animation: ring .9s ease-out; }
-@keyframes ring { from { transform: scale(.6); opacity: .9; } to { transform: scale(1.5); opacity: 0; } }
-.pwm-chain { display: grid; grid-template-columns: repeat(16, 1fr); gap: 3px; }
-.pwm-chain i { height: 10px; border-radius: 6px; background: #ececec; transform: scaleY(.6); transition: background .3s, transform .35s cubic-bezier(.34, 1.56, .64, 1); }
-.pwm-chain i.on { background: var(--c); transform: scaleY(1.25); }
+.pwm-road { padding-top: 14px; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 8px; font-size: 1.4rem; line-height: 1; }
+.pwm-lane { position: relative; height: 44px; border-radius: 10px; background: #2b2f36; }
+.pwm-lane::before { content: ""; position: absolute; left: 6px; right: 6px; top: 50%; height: 3px; transform: translateY(-50%); background: repeating-linear-gradient(90deg, #fff 0 14px, transparent 14px 28px); opacity: .5; }
+.pwm.moving .pwm-lane::before { animation: roadMove .5s linear infinite; }
+@keyframes roadMove { to { background-position-x: -28px; } }
+.pwm-car { position: absolute; top: 50%; width: 36px; margin-top: -19px; font-size: 1.7rem; line-height: 38px; text-align: center; transition: left .5s cubic-bezier(.34, 1.3, .64, 1); }
+.pwm-car-i { display: inline-block; transform: scaleX(-1); }
+.pwm-car-i.idle { animation: idle 1.6s ease-in-out infinite; }
+@keyframes idle { 50% { transform: scaleX(-1) translateY(-2px); } }
+.pwm.lv1 .pwm-car-i { animation: skid .45s; }
+.pwm.lv2 .pwm-car-i { animation: bump .4s; }
+.pwm.lv4:not(.police) .pwm-car-i { animation: hop .7s cubic-bezier(.34, 1.56, .64, 1); }
+@keyframes skid { 20% { transform: scaleX(-1) rotate(-10deg) translateX(3px); } 60% { transform: scaleX(-1) rotate(8deg) translateX(-3px); } }
+@keyframes bump { 40% { transform: scaleX(-1) translateY(-5px); } }
+@keyframes hop { 0% { transform: scaleX(-1) scale(.8); } 50% { transform: scaleX(-1) translateY(-8px) scale(1.2); } 100% { transform: scaleX(-1); } }
+.pwm-puff { position: absolute; right: 100%; top: 0; font-size: 1rem; opacity: 0; animation: puff .7s ease-out infinite; }
+@keyframes puff { from { opacity: .9; transform: translateX(6px) scale(.6); } to { opacity: 0; transform: translateX(-14px) scale(1.3); } }
+.pwm-bubble { position: absolute; bottom: 100%; left: 50%; margin-bottom: 2px; transform: translateX(-70%); background: #12a150; color: #fff; font: 800 .7rem/1 system-ui, sans-serif; padding: 5px 8px; border-radius: 10px; white-space: nowrap; animation: bubble .5s cubic-bezier(.34, 1.56, .64, 1); }
+@keyframes bubble { from { transform: translateX(-70%) scale(0); } }
+.pwm-siren { position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); font-size: 1rem; animation: siren .5s steps(2) infinite; }
+@keyframes siren { 50% { filter: hue-rotate(200deg); transform: translateX(-50%) scale(1.25); } }
+.pwm-confetti { position: absolute; right: 18px; top: 4px; width: 0; height: 0; pointer-events: none; }
+.pwm-confetti i { position: absolute; width: 7px; height: 10px; border-radius: 2px; background: hsl(var(--h) 90% 55%); animation: confetti 1s ease-out forwards; }
+@keyframes confetti { to { transform: translate(var(--dx), var(--dy)) rotate(var(--r)); opacity: 0; } }
+.pwm-paris.hop { animation: hop2 .8s cubic-bezier(.34, 1.56, .64, 1); }
+@keyframes hop2 { 40% { transform: scale(1.4) rotate(-8deg); } }
 .pwm-msg, .pwm-time, .pwm-tip { margin: 6px 0 0; font-size: .88rem; }
 .pwm-time strong { color: var(--c); display: inline-block; animation: tick .35s; }
 @keyframes tick { from { transform: translateY(5px); opacity: 0; } }
