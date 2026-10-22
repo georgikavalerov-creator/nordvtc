@@ -25,16 +25,25 @@ export type BookingMail = {
   trackUrl?: string;
 };
 
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
 async function send(to: string, subject: string, html: string) {
   const key = process.env.RESEND_API_KEY;
   if (!key) return; // e-mails désactivés tant que la clé n'est pas renseignée
   const resend = new Resend(key);
-  await resend.emails.send({
-    from: process.env.MAIL_FROM ?? `${SITE.name} <onboarding@resend.dev>`,
-    to,
-    subject,
-    html,
-  });
+  // Resend renvoie { error } sans lever d'exception : on la journalise, et on retente (limite de débit, erreur passagère).
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    const { error } = await resend.emails.send({
+      from: process.env.MAIL_FROM ?? `${SITE.name} <onboarding@resend.dev>`,
+      to,
+      subject,
+      html,
+    });
+    if (!error) return;
+    console.error(`mail:${subject}:essai ${attempt}`, JSON.stringify(error));
+    if (attempt === 3) throw new Error(`Envoi e-mail impossible : ${error.message}`);
+    await sleep(900 * attempt);
+  }
 }
 
 export async function sendBookingEmails(b: BookingMail) {
@@ -47,6 +56,8 @@ export async function sendBookingEmails(b: BookingMail) {
     ${b.flight ? `<p><strong>Vol / train</strong> ${esc(b.flight)}</p>` : ""}
     <p><strong>Prix du trajet</strong> ${euro(b.priceCents)}<br><strong>Déjà réglé en ligne</strong> ${euro(b.paidCents)}<br><strong>Reste à régler à bord</strong> ${euro(rest)}</p>
   `;
+  let customerError: unknown = null;
+  try {
   await send(
     b.email,
     `Réservation confirmée — ${SITE.name}`,
@@ -59,8 +70,10 @@ export async function sendBookingEmails(b: BookingMail) {
       <p>Pour toute modification, répondez à ce message${phone ? ` ou appelez le ${esc(phone)}` : ""}.</p>
     </div>`,
   );
+  } catch (e) { customerError = e; } // la notification au chauffeur part quand même
   const notify = process.env.MAIL_NOTIFY_TO;
   if (notify) {
+    await sleep(700);
     await send(
       notify,
       `Nouvelle réservation — ${b.originLabel} → ${b.destLabel}`,
@@ -73,6 +86,7 @@ export async function sendBookingEmails(b: BookingMail) {
       </div>`,
     );
   }
+  if (customerError) throw customerError;
 }
 
 export async function sendCancellationEmails(b: { id: string; name: string; email: string; originLabel: string; destLabel: string; pickupAtLocal: string; refundedCents: number; keptCents: number }) {
