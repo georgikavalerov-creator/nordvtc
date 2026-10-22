@@ -2361,7 +2361,7 @@ html:not(.in-app) .btn-arrow:active::after, html:not(.in-app) .quick-btn:active:
 
 /* Accueil : plus d'espace vide sous l'en-tête, le contenu démarre tout de suite */
 .hero.cine { justify-content: flex-start; }
-.hero.cine > .wrap { padding-top: 26px; }
+.hero.cine > .wrap { padding-top: 18px; }
 .hero.cine .cine-frame { display: none; }
 @media (max-width: 900px) { .hero.cine > .wrap { padding-top: 22px; } }
 @media (max-width: 560px) { .hero.cine > .wrap { padding-top: 18px; } }
@@ -2374,3 +2374,43 @@ html:not(.in-app) .btn-arrow:active::after, html:not(.in-app) .quick-btn:active:
 .chat-msg.is-pending { opacity: .7; }
 .chat-status { display: block; margin-top: 2px; text-align: right; font-size: .68rem; font-weight: 600; letter-spacing: .01em; opacity: .85; }
 .chat-status.is-read { opacity: 1; }
+
+/* ── Ajustements multi-écrans (Fold plié 280 px → écrans 2560 px) ── */
+/* Bouton « inverser » : centré pile sur la hauteur des champs (ordinateur, tablette) */
+.bk-route { align-items: end; }
+.bk-swap { align-self: end; margin-bottom: calc((var(--bk-field-h, 52px) - 40px) / 2); }
+/* Textes longs dans les champs : points de suspension plutôt qu'un mot coupé */
+.bk input, .quick-field input { text-overflow: ellipsis; }
+/* Vol / train + siège enfant : alignés en bas, libellé sur une ligne */
+.bk-opts { align-items: end; }
+.bk-opts .tf-label .muted { white-space: nowrap; }
+.bk-opts .date-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+/* Lisibilité des petits textes */
+.brand .brand-tag { font-size: max(.6rem, 9px); }
+.cine-stats small { font-size: max(.62rem, 10px); }
+
+@media (max-width: 560px) {
+  /* Champs empilés : le bouton se place au centre, entre départ et arrivée, sans rien recouvrir */
+  .bk-route { gap: 6px; }
+  .bk-swap { order: 1; justify-self: center; align-self: center; margin: 0 !important; width: 40px; height: 40px; }
+  .bk-swap svg { transform: none; }
+  .bk-opts { grid-template-columns: 1fr; }
+  .brand .brand-tag { font-size: 9px; letter-spacing: .2em; }
+  .hero.cine .cine-grid { display: none; }
+}
+@media (max-width: 400px) {
+  /* Barre de paiement : texte au-dessus, bouton pleine largeur (plus rien d'écrasé) */
+  .bk-bar { flex-wrap: wrap; gap: 8px; }
+  .bk-price { flex: 1 1 100%; }
+  .bk-bar .btn { flex: 1 1 100%; min-width: 0; width: 100% !important; }
+}
+@media (max-width: 340px) {
+  /* Galaxy Fold plié et très petits écrans */
+  .wrap { padding: 0 12px; }
+  .form.bk { padding: 14px 12px 0; }
+  .bk-bar { margin: 0 -12px; padding-left: 12px; padding-right: 12px; }
+  .bk-4 { grid-template-columns: 1fr; }
+  .cine-stats { display: none; }
+  .hero.cine > .wrap { padding-bottom: 40px; }
+  .btn { padding-left: 18px; padding-right: 18px; }
+}
