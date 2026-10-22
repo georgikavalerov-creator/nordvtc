@@ -12,10 +12,10 @@ export const metadata: Metadata = {
 // Règles d'attente et de retard : modifier ici si besoin.
 const WAIT = {
   addressMin: 15, // attente gratuite à une adresse
-  flightMin: 45, // après l'atterrissage réel
+  flightMin: 25, // après l'atterrissage réel
   trainMin: 20, // après l'arrivée réelle du train
   eurPer15: "7,50 €", // par quart d'heure entamé au-delà
-  noShowMin: 45, // sans nouvelles du client au-delà de l'attente gratuite
+  noShowMin: 15, // sans nouvelles du client au-delà de l'attente gratuite
   driverLateMin: 20, // retard du chauffeur ouvrant droit à annulation remboursée
 };
 
