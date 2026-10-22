@@ -2082,7 +2082,7 @@ html body .btn.is-pressed::before, html body .btn:active::before { transform: tr
 /* ---------- Bloc « Un prix fixé… » : mots qui s'allument au défilement (sans section collante, sans flou) ---------- */
 /* Uniquement opacité + transform (composités par le GPU) : effet visible, coût quasi nul. */
 .statement { height: auto !important; }
-.statement-inner { position: relative !important; top: auto !important; height: auto !important; padding: clamp(56px, 11vh, 120px) 24px !important; }
+.statement-inner { position: relative !important; top: auto !important; height: auto !important; padding: clamp(36px, 7vh, 72px) 24px !important; }
 .fx-on .statement .big-words .w {
   --k: clamp(0, calc((var(--p, 1) * 2.3 - var(--i) / var(--n)) * 4.5), 1);
   display: inline-block; opacity: calc(.13 + var(--k) * .87); filter: none !important;
