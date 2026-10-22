@@ -18,6 +18,44 @@ export type ServiceContent = {
 };
 
 export const CONTENT: Record<string, ServiceContent> = {
+  "aeroport-bruxelles-zaventem": {
+    metaTitle: "VTC Lille aéroport Bruxelles-Zaventem : prix fixé",
+    metaDescription: "Chauffeur privé de Lille à l'aéroport de Bruxelles-Zaventem : trajet direct jusqu'au terminal, suivi de vol, prix fixé avant la course.",
+    summary: "De Lille à Brussels Airport sans train ni correspondance : prise en charge à domicile, dépose au terminal, et au retour un chauffeur qui suit votre vol. Prix fixé avant le départ.",
+    tags: ["Direct jusqu'au terminal", "Suivi de vol", "Prix fixé d'avance"],
+    sections: [
+      { title: "Pourquoi partir de Zaventem", body: ["Brussels Airport dessert de nombreuses destinations long-courrier et européennes. Depuis Lille, la voiture avec chauffeur est le moyen le plus simple de s'y rendre avec des bagages : pas de changement à Bruxelles-Midi, pas de navette."] },
+      { title: "Au retour", body: ["Indiquez votre numéro de vol à la réservation. Le chauffeur suit l'heure réelle d'atterrissage et vous attend en salle d'arrivée ; l'attente liée au retard du vol ne vous est pas facturée."] },
+    ],
+    facts: [
+      { label: "Distance depuis Lille", value: "environ 125 km" },
+      { label: "Durée habituelle", value: "1 h 30 à 1 h 45" },
+      { label: "Prix", value: "dès 321 € depuis Lille, fixé avant de confirmer" },
+      { label: "Paiement", value: "acompte en ligne, solde à bord" },
+    ],
+    moreFaq: [
+      { q: "Le prix change-t-il s'il y a des bouchons sur le ring de Bruxelles ?", a: "Non : le prix est fixé à la réservation et ne bouge plus, quelle que soit la circulation." },
+    ],
+  },
+  "lille-cote-opale": {
+    metaTitle: "VTC Lille Le Touquet, Côte d'Opale : prix fixé",
+    metaDescription: "Chauffeur privé de Lille au Touquet-Paris-Plage, à Boulogne, Wimereux ou Calais : trajet direct, bagages compris, prix annoncé avant la course.",
+    summary: "Le Touquet, Wimereux, Boulogne ou Calais : un trajet direct depuis Lille avec vos bagages, jusqu'à votre hôtel ou votre location. Prix fixé avant le départ, retour à la date de votre choix.",
+    tags: ["Le Touquet, Boulogne, Calais", "Aller-retour", "Prix fixé d'avance"],
+    sections: [
+      { title: "Un week-end à la mer sans voiture", body: ["Pas besoin de prendre votre voiture ni de chercher à vous garer : votre chauffeur vous dépose devant votre hôtel ou votre location et revient vous chercher le jour du retour."] },
+      { title: "Ferry et Eurotunnel à Calais", body: ["Pour une traversée vers l'Angleterre, indiquez le terminal et l'heure de départ : le trajet est prévu avec une marge adaptée aux contrôles."] },
+    ],
+    facts: [
+      { label: "Distance Lille - Le Touquet", value: "environ 150 km" },
+      { label: "Durée habituelle", value: "1 h 45 à 2 h" },
+      { label: "Prix", value: "dès 373 € depuis Lille, fixé avant de confirmer" },
+      { label: "Paiement", value: "acompte en ligne, solde à bord" },
+    ],
+    moreFaq: [
+      { q: "Peut-on s'arrêter en route ?", a: "Oui, une courte pause est possible sur un long trajet ; pour un arrêt à une adresse précise, indiquez-le dans les précisions de la réservation." },
+    ],
+  },
   "aeroport-lille-lesquin": {
     metaTitle: "VTC aéroport Lille-Lesquin : prix fixé",
     metaDescription:

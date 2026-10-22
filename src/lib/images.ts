@@ -25,6 +25,8 @@ export const SERVICE_PIC: Record<string, Pic> = {
   "gare-lille-europe": { src: "/img/svc-lille-europe.webp", alt: "Gare de Lille-Europe vue depuis le boulevard", pos: "50% 45%" },
   "lille-paris": { src: "/img/dest-paris.webp", alt: "La tour Eiffel et la Seine sous un arc-en-ciel", pos: "50% 62%" },
   "lille-bruxelles": { src: "/img/dest-bruxelles.webp", alt: "La Grand-Place de Bruxelles illuminée au crépuscule", pos: "50% 45%" },
+  "aeroport-bruxelles-zaventem": { src: "/img/dest-zaventem.webp", alt: "Tapis roulant dans l'aéroport de Bruxelles-Zaventem", pos: "50% 50%" },
+  "lille-cote-opale": { src: "/img/dest-touquet.webp", alt: "Dunes et plage du Touquet-Paris-Plage", pos: "50% 50%" },
   "aeroport-roissy-cdg": { src: "/img/dest-cdg.webp", alt: "Avions Air France sur le tarmac du terminal 2 de Paris-Charles-de-Gaulle", pos: "45% 60%" },
   mariage: { src: "/img/svc-mariage.webp", alt: "Bouquet de roses blanches de la mariée", pos: "50% 45%" },
   "mise-a-disposition": { src: "/img/lille.webp", alt: "Grand'Place de Lille et sa grande roue, de nuit", pos: "50% 55%" },

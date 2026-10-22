@@ -128,6 +128,31 @@ export const SERVICES: Service[] = [
     ],
   },
   {
+    slug: "aeroport-bruxelles-zaventem",
+    kind: "route",
+    category: "Aéroports",
+    label: "Aéroport de Bruxelles-Zaventem",
+    h1: "Transfert privé de Lille à l'aéroport de Bruxelles-Zaventem",
+    metaTitle: "VTC Lille aéroport Bruxelles-Zaventem : prix fixé",
+    metaDescription: "Chauffeur privé de Lille à l'aéroport de Bruxelles-Zaventem : trajet direct jusqu'au terminal, suivi de vol, prix fixé avant la course.",
+    from: "Lille",
+    to: "Aéroport de Bruxelles-National, Zaventem",
+    intro: [
+      "Brussels Airport, à Zaventem, propose bien plus de destinations que Lille-Lesquin. Votre chauffeur vous y conduit directement depuis chez vous, sans train ni correspondance, avec vos bagages.",
+      "Pour un retour, indiquez votre numéro de vol : le chauffeur suit l'heure réelle d'atterrissage et vous attend en salle d'arrivée.",
+    ],
+    points: [
+      "Trajet direct de porte à porte, sans correspondance",
+      "Dépose au départ des vols, accueil à l'arrivée",
+      "Suivi du vol au retour, attente gratuite incluse",
+      "Prix fixé avant de confirmer, péages et carburant compris",
+    ],
+    faq: [
+      { q: "Combien de temps faut-il entre Lille et Zaventem ?", a: "Comptez environ 1 h 30 à 1 h 45 hors circulation dense autour de Bruxelles. Pour un vol, prévoyez d'arriver à l'aéroport 2 à 3 heures avant le décollage." },
+      { q: "Faut-il une pièce d'identité ?", a: "Oui, comme pour tout vol et tout passage en Belgique : emportez votre carte d'identité ou votre passeport en cours de validité." },
+    ],
+  },
+  {
     slug: "lille-paris",
     kind: "route",
     category: "Longue distance",
@@ -233,6 +258,31 @@ export const SERVICES: Service[] = [
         q: "Puis-je ajouter un arrêt ?",
         a: "Contactez-nous avant la réservation pour organiser un arrêt intermédiaire.",
       },
+    ],
+  },
+  {
+    slug: "lille-cote-opale",
+    kind: "route",
+    category: "Longue distance",
+    label: "Lille ↔ Le Touquet et Côte d'Opale",
+    h1: "Chauffeur privé de Lille au Touquet et sur la Côte d'Opale",
+    metaTitle: "VTC Lille Le Touquet, Côte d'Opale : prix fixé",
+    metaDescription: "Chauffeur privé de Lille au Touquet-Paris-Plage, à Boulogne, Wimereux ou Calais : trajet direct, bagages compris, prix annoncé avant la course.",
+    from: "Lille",
+    to: "Le Touquet-Paris-Plage",
+    intro: [
+      "Un week-end au Touquet, un séjour à Wimereux ou un départ depuis Calais : votre chauffeur vous emmène directement de votre porte à votre hôtel ou à votre location, avec vos bagages.",
+      "Le prix est fixé avant de partir, quel que soit le trafic sur l'A25 ou l'A16. Pensez à l'aller-retour : le retour peut être réservé à une autre date, et depuis une autre adresse.",
+    ],
+    points: [
+      "Le Touquet, Berck, Boulogne-sur-Mer, Wimereux, Calais…",
+      "Trajet direct, sans changement de train",
+      "Aller-retour réservable à des dates différentes",
+      "Prix fixé avant de confirmer, péages compris",
+    ],
+    faq: [
+      { q: "Combien de temps pour aller de Lille au Touquet ?", a: "Environ 1 h 45 à 2 h de route selon la circulation. Le calculateur affiche la durée estimée pour votre adresse exacte." },
+      { q: "Pouvez-vous aussi me déposer à Calais pour le ferry ou l'Eurotunnel ?", a: "Oui : indiquez le terminal comme adresse d'arrivée et l'heure de votre traversée ; le chauffeur prévoit une marge suffisante." },
     ],
   },
   {
