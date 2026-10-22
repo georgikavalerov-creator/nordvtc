@@ -4,6 +4,7 @@ import Link from "next/link";
 import { SERVICE_PIC, srcSetOf } from "@/lib/images";
 import { notFound } from "next/navigation";
 import BookingForm from "@/components/BookingForm";
+import WhenNear from "@/components/WhenNear";
 import JsonLd from "@/components/JsonLd";
 import { SERVICES, getService } from "@/lib/services";
 import { CONTENT } from "@/lib/service-content";
@@ -130,7 +131,9 @@ export default async function ServicePage({ params }: Props) {
             {s.kind === "route" ? (
               <>
                 <h2 style={{ fontSize: "1.4rem" }}>Calculez votre prix et réservez</h2>
+                <WhenNear minHeight={900}>
                 <BookingForm initialFrom={s.from} initialTo={s.to} />
+                </WhenNear>
               </>
             ) : (
               <div className="ticket">

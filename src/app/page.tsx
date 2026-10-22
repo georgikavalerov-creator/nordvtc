@@ -131,8 +131,8 @@ export default function Home() {
       </section>
 
       <CineMount target="cine-hero" />
-      <CineMount target="cine-story" />
-      <MapMount target="cine-story" />
+      <CineMount target="cine-story" near />
+      <MapMount target="cine-story" near />
 
       <TrustBar />
 

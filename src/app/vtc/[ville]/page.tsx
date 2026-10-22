@@ -3,6 +3,7 @@ import RatingBadge from "@/components/RatingBadge";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import BookingForm from "@/components/BookingForm";
+import WhenNear from "@/components/WhenNear";
 import JsonLd from "@/components/JsonLd";
 import OnBoard from "@/components/OnBoard";
 import { SERVICES } from "@/lib/services";
@@ -145,7 +146,9 @@ export default async function VillePage({ params }: Props) {
           </div>
           <div className="sticky-col">
             <h2 style={{ fontSize: "1.4rem" }}>Votre prix {v.fromName}, tout de suite</h2>
+            <WhenNear minHeight={900}>
             <BookingForm initialFrom={v.query} initialTo={airport.to} />
+            </WhenNear>
           </div>
         </div>
       </section>

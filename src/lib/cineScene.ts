@@ -31,7 +31,7 @@ export function mountCine(root) {
 
   function build() {
     const r = canvas.getBoundingClientRect();
-    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    dpr = Math.min(window.devicePixelRatio || 1, coarse || window.innerWidth < 700 ? 1.5 : 2); // mobile : 1,5× (deux fois moins de pixels que 2×, libellés toujours nets)
     W = Math.max(1, Math.round(r.width * dpr));
     H = Math.max(1, Math.round(r.height * dpr));
     canvas.width = W; canvas.height = H;
@@ -54,7 +54,7 @@ export function mountCine(root) {
       }
       return pts;
     });
-    const N = coarse || r.width < 700 ? 300 : 1100; // moins de particules sur mobile : animation fluide sans saturer le processeur
+    const N = coarse || r.width < 700 ? 190 : 1100; // moins de particules sur mobile : animation fluide sans saturer le processeur
     parts = [];
     for (let i = 0; i < N; i++) {
       const rr = Math.random() < 0.62 ? 0 : Math.random() < 0.5 ? 1 : 2;
@@ -177,8 +177,8 @@ export function mountCine(root) {
   function frame(now) {
     raf = 0;
     if (!visible) return;
-    // Téléphones : 30 images/s suffisent et soulagent le processeur (batterie, réactivité).
-    if (coarse && now - last < 32) { raf = requestAnimationFrame(frame); return; }
+    // Téléphones : 24 images/s suffisent et soulagent le processeur (batterie, réactivité).
+    if (coarse && now - last < 41) { raf = requestAnimationFrame(frame); return; }
     last = now;
     draw(now);
     if (!reduce) raf = requestAnimationFrame(frame);

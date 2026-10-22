@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { mountMap } from "@/lib/mapScene";
 
 // Carte animée de la métropole lilloise (trajet A → B au défilement).
-export default function MapMount({ target }: { target: string }) {
+export default function MapMount({ target, near = false }: { target: string; near?: boolean }) {
   useEffect(() => {
     const el = document.getElementById(target);
     if (!el) return;
@@ -13,9 +13,16 @@ export default function MapMount({ target }: { target: string }) {
     const start = () => { if (!cancelled) stop = mountMap(el) ?? undefined; };
     const w = window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number };
     const go = () => (w.requestIdleCallback ? w.requestIdleCallback(start, { timeout: 1500 }) : window.setTimeout(start, 300));
-    if (document.readyState === "complete") go();
-    else window.addEventListener("load", go, { once: true });
-    return () => { cancelled = true; window.removeEventListener("load", go); stop?.(); };
-  }, [target]);
+    // near : rien n'est préparé (ni téléchargé) avant que le bloc approche de l'écran.
+    let io: IntersectionObserver | undefined;
+    const arm = () => {
+      if (!near || !("IntersectionObserver" in window)) return go();
+      io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { io?.disconnect(); go(); } }, { rootMargin: "150% 0px" });
+      io.observe(el);
+    };
+    if (document.readyState === "complete") arm();
+    else window.addEventListener("load", arm, { once: true });
+    return () => { cancelled = true; window.removeEventListener("load", arm); io?.disconnect(); stop?.(); };
+  }, [target, near]);
   return null;
 }
