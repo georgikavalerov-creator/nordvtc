@@ -11,12 +11,14 @@ const bad = (error: string, status = 400) => NextResponse.json({ error }, { stat
 export async function GET(req: Request) {
   if (!dbConfigured()) return bad("Indisponible", 503);
   const u = new URL(req.url);
-  if (!allow(`chat-poll:${clientIp(req)}`, 60, 60_000)) return bad("Trop de requêtes", 429);
+  if (!allow(`chat-poll:${clientIp(req)}`, 120, 60_000)) return bad("Trop de requêtes", 429);
   const t = await threadFor(u.searchParams.get("id"), u.searchParams.get("token"));
   if (!t) return bad("Discussion introuvable", 404);
   const after = Math.max(0, Number(u.searchParams.get("after")) || 0);
-  const messages = await messagesAfter(t.id, after);
-  if (u.searchParams.get("seen") === "1") await db().from("chat_threads").update({ visitor_seen_at: new Date().toISOString() }).eq("id", t.id);
+  const [messages] = await Promise.all([
+    messagesAfter(t.id, after),
+    u.searchParams.get("seen") === "1" ? db().from("chat_threads").update({ visitor_seen_at: new Date().toISOString() }).eq("id", t.id) : null,
+  ]);
   return NextResponse.json({ messages, hasEmail: !!t.visitor_email, adminSeenAt: t.admin_seen_at ?? null }, { headers: H });
 }
 

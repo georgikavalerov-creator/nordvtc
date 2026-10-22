@@ -52,15 +52,17 @@ export default function ChatPanel({ open, onClose, raised, anchor }: { open: boo
     } catch { /* hors ligne */ }
   }, []);
 
-  // Fenêtre ouverte : nouvelles réponses toutes les 4 s (pause si l'onglet est en arrière-plan).
+  // Fenêtre ouverte : nouvelles réponses toutes les 2 s (pause si l'onglet est en arrière-plan).
   useEffect(() => {
     if (!open) return;
     poll(lastId);
-    const t = window.setInterval(() => { if (!document.hidden) poll(lastIdRef.current); }, 4000);
+    const t = window.setInterval(() => { if (!document.hidden) poll(lastIdRef.current); }, 2000);
+    const onVis = () => { if (!document.hidden) poll(lastIdRef.current); };
+    document.addEventListener("visibilitychange", onVis);
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     window.addEventListener("keydown", onKey);
     window.setTimeout(() => inputRef.current?.focus(), 60);
-    return () => { window.clearInterval(t); window.removeEventListener("keydown", onKey); };
+    return () => { window.clearInterval(t); window.removeEventListener("keydown", onKey); document.removeEventListener("visibilitychange", onVis); };
   }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
   const lastIdRef = useRef(0);
   lastIdRef.current = lastId;
@@ -82,7 +84,8 @@ export default function ChatPanel({ open, onClose, raised, anchor }: { open: boo
       const d = await r.json();
       if (!r.ok) { setErr(d.error || "Message non envoyé."); setMsgs((m) => m.filter((x) => x.id !== tmp.id)); setText(message); return; }
       if (!s && d.id) { saveChat({ id: d.id, token: d.token, seen: 0 }); if (email) setHasEmail(true); else setAskEmail(true); }
-      await poll(lastIdRef.current);
+      if (d.message) { setMsgs((m) => m.some((x) => x.id === d.message.id) ? m.filter((x) => x.id !== tmp.id) : m.map((x) => (x.id === tmp.id ? d.message : x))); }
+      else await poll(lastIdRef.current);
     } catch { setErr("Pas de connexion : réessayez."); setMsgs((m) => m.filter((x) => x.id !== tmp.id)); setText(message); } finally { setSending(false); }
   }
 

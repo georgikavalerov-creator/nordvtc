@@ -37,7 +37,7 @@ export default async function Messages({ searchParams }: { searchParams: Promise
   const visitorHere = cur && Date.now() - new Date(cur.visitor_seen_at).getTime() < 60_000;
   return (
     <AdminPage title="Messages du site">
-      <AutoRefresh every={6000} max={600} />
+      <AutoRefresh every={2500} max={1440} />
       <div className="adm-chat">
         <aside className="adm-threads">
           <p className="muted" style={{ margin: "0 0 8px", fontSize: ".85rem" }}>

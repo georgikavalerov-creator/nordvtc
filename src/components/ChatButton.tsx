@@ -29,6 +29,14 @@ export default function ChatButton() {
     return () => window.removeEventListener("resize", onResize);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Préchargement discret de la fenêtre de discussion (ouverture instantanée au clic)
+  useEffect(() => {
+    const go = () => { import("./ChatPanel"); };
+    const w = window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number };
+    const id = w.requestIdleCallback ? w.requestIdleCallback(go, { timeout: 6000 }) : window.setTimeout(go, 4000);
+    return () => { if (!w.requestIdleCallback) window.clearTimeout(id); };
+  }, []);
+
   // Lien « Reprendre la discussion » reçu par e-mail : ?chat=<id>.<clé>
   useEffect(() => {
     const p = new URLSearchParams(location.search).get("chat");
@@ -58,8 +66,10 @@ export default function ChatButton() {
       } catch { /* hors ligne */ }
     };
     const first = window.setTimeout(check, 2500);
-    const t = window.setInterval(check, 30_000);
-    return () => { stop = true; window.clearTimeout(first); window.clearInterval(t); };
+    const t = window.setInterval(check, 15_000);
+    const onVis = () => { if (!document.hidden) check(); };
+    document.addEventListener("visibilitychange", onVis);
+    return () => { stop = true; window.clearTimeout(first); window.clearInterval(t); document.removeEventListener("visibilitychange", onVis); };
   }, [open]);
 
   // Nombre de réponses non lues dans le titre de l'onglet

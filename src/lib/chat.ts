@@ -1,4 +1,5 @@
 import { createHash, createHmac, randomBytes, timingSafeEqual } from "node:crypto";
+import { after } from "next/server";
 import { db } from "@/lib/supabase";
 import { SITE } from "@/lib/site";
 import { sendChatNotice, sendChatReplyNotice } from "@/lib/mail";
@@ -50,12 +51,11 @@ export async function addVisitorMessage(t: Thread, body: string) {
   const { data, error } = await db().from("chat_messages").insert({ thread_id: t.id, sender: "visitor", body }).select("*").single();
   if (error || !data) return { error: "Message non envoyé, réessayez." };
   const now = new Date().toISOString();
-  await db().from("chat_threads").update({ last_visitor_at: now, visitor_seen_at: now, closed: false }).eq("id", t.id);
-  // Alerte e-mail au chauffeur à chaque message du client (l'anti-abus limite déjà à 8 messages par minute).
-  {
-    await db().from("chat_threads").update({ notified_at: now }).eq("id", t.id);
+  // Réponse immédiate au visiteur : la mise à jour de la conversation et l'e-mail au chauffeur partent après.
+  after(async () => {
+    await db().from("chat_threads").update({ last_visitor_at: now, visitor_seen_at: now, closed: false, notified_at: now }).eq("id", t.id);
     await sendChatNotice({ threadId: t.id, name: t.visitor_name, email: t.visitor_email, page: t.page, body, url: `${SITE.url}/admin/messages?t=${t.id}` }).catch((e) => console.error("chat mail", e));
-  }
+  });
   return { message: data as ChatMsg };
 }
 
@@ -73,9 +73,9 @@ export async function adminReply(threadId: string, body: string) {
   const now = new Date().toISOString();
   await db().from("chat_threads").update({ last_admin_at: now, admin_seen_at: now }).eq("id", threadId);
   const away = Date.now() - new Date(t.visitor_seen_at).getTime() > 90_000;
-  if (away && t.visitor_email) {
+  if (away && t.visitor_email) after(async () => {
     await sendChatReplyNotice({ threadId, email: t.visitor_email, name: t.visitor_name, body, url: `${SITE.url}/?chat=${threadId}.${resumeKey(threadId)}` }).catch((e) => console.error("chat reply mail", e));
-  }
+  });
   return { ok: true };
 }
 
