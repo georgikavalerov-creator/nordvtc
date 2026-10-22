@@ -38,6 +38,14 @@ export default function ManualForm({ mode = "booking", action = createManualBook
         <label>Passagers<input type="number" name="passengers" min={1} max={8} defaultValue={1} /></label>
         <label>Bagages<input type="number" name="luggage" min={0} max={20} defaultValue={0} /></label>
       </div>
+      <details>
+        <summary style={{ cursor: "pointer" }}>Ajouter un retour (autre date possible)</summary>
+        <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", marginTop: 10 }}>
+          <label>Date du retour<input type="date" name="ret_date" /></label>
+          <label>Heure du retour<input type="time" name="ret_time" /></label>
+        </div>
+        <small className="muted">Crée une seconde réservation (trajet inverse). Prix identique si vous en avez fixé un, sinon calculé.</small>
+      </details>
       <label>Vol / train (facultatif)<input name="flight" placeholder="AF1234" /></label>
       <label className="inline"><input type="checkbox" name="child_seat" /> <span>Siège enfant</span></label>
       <label>Remarque du client<textarea name="notes" style={{ minHeight: 60 }} /></label>

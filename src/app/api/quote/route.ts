@@ -12,6 +12,7 @@ const schema = z.object({
   origin: point,
   dest: point,
   time: z.string().regex(/^\d{2}:\d{2}$/).optional(),
+  returnTime: z.string().regex(/^\d{2}:\d{2}$/).optional(),
   promo: z.string().max(40).optional(),
   email: z.string().max(200).optional(),
 });
@@ -22,7 +23,7 @@ export async function POST(req: Request) {
   }
   const parsed = schema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: "Données invalides" }, { status: 400 });
-  const { origin, dest, time, promo, email } = parsed.data;
+  const { origin, dest, time, returnTime, promo, email } = parsed.data;
   try {
     const [pricing, route] = await Promise.all([getPricing(), routeSummary(origin, dest)]);
     if (route.distanceM / 1000 > pricing.maxDistanceKm) {
@@ -41,7 +42,8 @@ export async function POST(req: Request) {
       if (r.ok) { promoOut = { code: r.code, discountCents: r.discountCents, label: r.label }; quote = { ...applyDiscount(quote, r.discountCents, pricing) }; }
       else promoOut = { error: r.error };
     }
-    return NextResponse.json({ quote, promo: promoOut, depositPct: pricing.depositPct, minLeadHours: pricing.minLeadHours });
+    const returnQuote = returnTime ? computeQuote(route.distanceM, route.durationS, Number(returnTime.slice(0, 2)), pricing) : undefined;
+    return NextResponse.json({ quote, returnQuote, promo: promoOut, depositPct: pricing.depositPct, minLeadHours: pricing.minLeadHours });
   } catch (e) {
     console.error("quote", e);
     return NextResponse.json({ error: "Calcul du prix indisponible pour le moment" }, { status: 503 });

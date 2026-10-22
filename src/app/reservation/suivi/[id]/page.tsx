@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import AutoRefresh from "@/components/AutoRefresh";
 import CancelTrip from "@/components/CancelTrip";
 import { cancelPolicy, fmtDate, STATUS } from "@/lib/account";
-import { docPath, verifyTrack } from "@/lib/docsign";
+import { docPath, trackPath, verifyTrack } from "@/lib/docsign";
 import { euro } from "@/lib/pricing";
 import { db, dbConfigured } from "@/lib/supabase";
 import { getSiteSettings } from "@/lib/content";
@@ -21,10 +21,13 @@ export default async function Suivi({ params, searchParams }: Props) {
   if (!/^[0-9a-f-]{36}$/.test(id) || !verifyTrack(id, k) || !dbConfigured()) notFound();
   const { data: b } = await db()
     .from("bookings")
-    .select("id,status,origin_label,dest_label,pickup_at,passengers,luggage,flight,child_seat,price_cents,paid_cents,customer_name")
+    .select("id,group_id,is_return,status,origin_label,dest_label,pickup_at,passengers,luggage,flight,child_seat,price_cents,paid_cents,customer_name")
     .eq("id", id)
     .maybeSingle();
   if (!b || b.status === "expired") notFound();
+  const { data: sibs } = b.group_id
+    ? await db().from("bookings").select("id,is_return,pickup_at,status").eq("group_id", b.group_id).neq("id", b.id).neq("status", "expired")
+    : { data: null };
   const st = STATUS[b.status] ?? { label: b.status, cls: "" };
   const rest = Math.max(0, b.price_cents - b.paid_cents);
   const pending = b.status === "pending_payment";
@@ -33,7 +36,7 @@ export default async function Suivi({ params, searchParams }: Props) {
   return (
     <section className="section">
       <div className="wrap" style={{ maxWidth: 680 }}>
-        <span className="eyebrow">Ma réservation</span>
+        <span className="eyebrow">{b.is_return ? "Ma réservation · retour" : "Ma réservation"}</span>
         <h1 style={{ fontSize: "clamp(1.8rem,5vw,2.6rem)" }}>Bonjour {b.customer_name.split(" ")[0]}</h1>
         {pending && (
           <>
@@ -58,6 +61,11 @@ export default async function Suivi({ params, searchParams }: Props) {
             Réglé en ligne : {euro(b.paid_cents)}{b.status === "confirmed" && rest > 0 ? ` · reste ${euro(rest)} à régler à bord` : ""}
           </p>
         </article>
+        {sibs?.map((x) => (
+          <p key={x.id} className="notice" style={{ marginTop: 10 }}>
+            {x.is_return ? "Trajet retour" : "Trajet aller"} : {fmtDate(x.pickup_at)} · <Link href={trackPath(x.id)}>voir le suivi</Link>
+          </p>
+        ))}
         <div className="btn-row">
           {["confirmed", "completed"].includes(b.status) && (
             <Link href={docPath("bon", b.id)} className="btn">Bon de commande</Link>

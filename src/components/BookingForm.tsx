@@ -40,6 +40,10 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
   const [accept, setAccept] = useState(false);
 
   const [quote, setQuote] = useState<Quote | null>(null);
+  const [returnQuote, setReturnQuote] = useState<Quote | null>(null);
+  const [wantReturn, setWantReturn] = useState(false);
+  const [retDate, setRetDate] = useState("");
+  const [retTime, setRetTime] = useState("");
   const [quoteErr, setQuoteErr] = useState("");
   const [loadingQuote, setLoadingQuote] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -48,7 +52,7 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
   const [step, setStep] = useState<1 | 2>(1);
   const [showNotes, setShowNotes] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
-  const [errors, setErrors] = useState<{ origin?: string; dest?: string; when?: string }>({});
+  const [errors, setErrors] = useState<{ origin?: string; dest?: string; when?: string; ret?: string }>({});
   const [swapKey, setSwapKey] = useState(0);
   const [showPromo, setShowPromo] = useState(false);
   const [showPro, setShowPro] = useState(false);
@@ -78,6 +82,7 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
         }
         if (d.date && d.date >= today()) setDate(d.date);
         if (d.time) setTime(d.time);
+        if (d.wantReturn) { setWantReturn(true); if (d.retDate && d.retDate >= today()) setRetDate(d.retDate); if (d.retTime) setRetTime(d.retTime); }
         if (d.passengers) setPassengers(d.passengers);
         if (typeof d.luggage === "number") setLuggage(d.luggage);
         if (d.flight) setFlight(d.flight);
@@ -97,10 +102,10 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
     try {
       sessionStorage.setItem(
         "nvtc-booking",
-        JSON.stringify({ origin, dest, date, time, passengers, luggage, flight, childSeat, name, phone, email }),
+        JSON.stringify({ origin, dest, date, time, wantReturn, retDate, retTime, passengers, luggage, flight, childSeat, name, phone, email }),
       );
     } catch {}
-  }, [origin, dest, date, time, passengers, luggage, flight, childSeat, name, phone, email]);
+  }, [origin, dest, date, time, wantReturn, retDate, retTime, passengers, luggage, flight, childSeat, name, phone, email]);
 
   useEffect(() => {
     if (!origin || !dest) {
@@ -118,6 +123,7 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
         origin: { lat: origin.lat, lng: origin.lng },
         dest: { lat: dest.lat, lng: dest.lng },
         time: time || undefined,
+        returnTime: wantReturn && retTime ? retTime : undefined,
         promo: promoApplied || undefined,
         email: email || undefined,
       }),
@@ -127,6 +133,7 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
         if (off) return;
         if (ok) {
           setQuote(data.quote);
+          setReturnQuote(data.returnQuote ?? null);
           track("Prix affiché");
           if (promoApplied) {
             if (data.promo && "discountCents" in data.promo) { setPromoInfo(data.promo); setPromoMsg(""); }
@@ -143,7 +150,7 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
     return () => {
       off = true;
     };
-  }, [origin, dest, time, promoApplied]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [origin, dest, time, retTime, wantReturn, promoApplied]); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -169,6 +176,7 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
           phone,
           email,
           notes: notes || undefined,
+          returnTrip: wantReturn ? { date: retDate, time: retTime } : undefined,
           payMode,
           promo: promoInfo?.code,
           billingCompany: showPro ? company || undefined : undefined,
@@ -189,7 +197,11 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
     setSubmitting(false);
   }
 
-  const rest = quote ? quote.priceCents - (payMode === "full" ? quote.fullCents : quote.depositCents) : 0;
+  const withReturn = wantReturn && !!returnQuote;
+  const totalPrice = quote ? quote.priceCents + (withReturn ? returnQuote!.priceCents : 0) : 0;
+  const totalDeposit = quote ? quote.depositCents + (withReturn ? returnQuote!.depositCents : 0) : 0;
+  const totalFull = quote ? quote.fullCents + (withReturn ? returnQuote!.fullCents : 0) : 0;
+  const rest = quote ? totalPrice - (payMode === "full" ? totalFull : totalDeposit) : 0;
 
   function swap() {
     setOrigin(dest);
@@ -205,6 +217,10 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
       if (!origin) e.origin = "Choisissez l'adresse de départ dans la liste.";
       if (!dest) e.dest = "Choisissez l'adresse d'arrivée dans la liste.";
       if (!date || !time) e.when = !date && !time ? "Indiquez la date et l'heure de prise en charge." : !date ? "Indiquez la date." : "Indiquez l'heure.";
+      if (wantReturn) {
+        if (!retDate || !retTime) e.ret = "Indiquez la date et l'heure du retour.";
+        else if (date && time && `${retDate}T${retTime}` <= `${date}T${time}`) e.ret = "Le retour doit être après l'aller.";
+      }
       setErrors(e);
       if (Object.keys(e).length) {
         requestAnimationFrame(() => {
@@ -213,6 +229,7 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
           if (!e.origin && !e.dest) formRef.current?.querySelector<HTMLInputElement>(date ? '.tf input' : 'input[type="date"]')?.focus();
           else formRef.current?.querySelector<HTMLInputElement>('input[aria-invalid="true"]')?.focus();
         });
+        if (e.ret && !e.origin && !e.dest && !e.when) requestAnimationFrame(() => formRef.current?.querySelector<HTMLElement>(".ret-error")?.scrollIntoView({ behavior: "smooth", block: "center" }));
         return;
       }
       if (!quote) return setError(loadingQuote ? "Un instant : le prix est en cours de calcul." : quoteErr || "Le prix n'est pas encore calculé.");
@@ -308,6 +325,24 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
             <span>Siège enfant ou rehausseur</span>
           </label>
         </div>
+        <label className={`toggle${wantReturn ? " on" : ""}`} style={{ marginTop: 6 }}>
+          <input type="checkbox" checked={wantReturn} onChange={(e) => { setWantReturn(e.target.checked); if (e.target.checked && !retDate) setRetDate(date); setErrors((x) => ({ ...x, ret: undefined })); }} />
+          <span>Prévoir aussi le retour (autre date possible)</span>
+        </label>
+        {wantReturn && (
+          <div className="bk-grid bk-2" style={{ marginTop: 8 }}>
+            <label>
+              Date du retour
+              <input type="date" required min={date || today()} value={retDate} onChange={(e) => { setRetDate(e.target.value); setErrors((x) => ({ ...x, ret: undefined })); }} />
+            </label>
+            <div className="tf-label">
+              Heure du retour
+              <TimeField value={retTime} invalid={!!errors.ret && !retTime} onChange={(v) => { setRetTime(v); setErrors((x) => ({ ...x, ret: undefined })); }} />
+            </div>
+          </div>
+        )}
+        {errors.ret && <p className="field-error ret-error" role="alert">{errors.ret}</p>}
+        {wantReturn && origin && dest && <p className="muted" style={{ margin: "6px 0 0", fontSize: ".85rem" }}>Retour : {dest.label} → {origin.label}</p>}
       </div>
 
       <div className="bk-pane" hidden={step !== 2}>
@@ -315,6 +350,9 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
           <div>
             <strong>{origin?.label ?? initialFrom} → {dest?.label ?? initialTo}</strong>
             <span className="muted">{shortDate} à {time} · {passengers} pers. · {luggage} bag.</span>
+            {wantReturn && retDate && retTime && (
+              <span className="muted">Retour : {new Date(retDate + "T12:00:00").toLocaleDateString("fr-FR", { weekday: "short", day: "numeric", month: "short" })} à {retTime}</span>
+            )}
           </div>
           <button type="button" className="linklike" onClick={() => goStep(1)}>Modifier</button>
         </div>
@@ -364,14 +402,14 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
             <label className="radio-card">
               <input type="radio" name="pay" checked={payMode === "deposit"} onChange={() => setPayMode("deposit")} />
               <span>
-                <strong>Acompte {eur(quote.depositCents)}</strong>
-                <span className="muted">Reste {eur(quote.priceCents - quote.depositCents)} à bord</span>
+                <strong>Acompte {eur(totalDeposit)}</strong>
+                <span className="muted">Reste {eur(totalPrice - totalDeposit)} à bord</span>
               </span>
             </label>
             <label className="radio-card">
               <input type="radio" name="pay" checked={payMode === "full"} onChange={() => setPayMode("full")} />
               <span>
-                <strong>Total {eur(quote.fullCents)}</strong>
+                <strong>Total {eur(totalFull)}</strong>
                 <span className="muted">Rien à régler à bord</span>
               </span>
             </label>
@@ -407,9 +445,11 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
           {loadingQuote && <span className="skel" aria-label="Calcul du prix en cours"><i /><i /></span>}
           {!loadingQuote && quote && (
             <>
-              <strong>{eur(quote.priceCents)}</strong>
+              <strong>{eur(totalPrice)}</strong>
               <small>
-                {quote.distanceKm} km · ~{quote.durationMin} min{quote.night ? " · nuit incluse" : ""}
+                {withReturn
+                  ? `Aller ${eur(quote.priceCents)} + retour ${eur(returnQuote!.priceCents)} · ${quote.distanceKm} km`
+                  : `${quote.distanceKm} km · ~${quote.durationMin} min${quote.night ? " · nuit incluse" : ""}`}
               </small>
             </>
           )}
