@@ -462,7 +462,9 @@ a.card.svc:hover .big-ico { transform: rotate(-6deg) scale(1.06); }
 [data-fx] { --enter: 1; --p: .5; --leave: 0; --s: 1; }
 
 /* Entrée de page */
-.page-enter { animation: pageIn .55s cubic-bezier(.2,.8,.2,1) both; }
+.page-enter { animation: none; }
+/* Fondu d'entrée seulement lors d'un changement de page dans le site : au premier chargement, la page s'affiche immédiatement (meilleur LCP). */
+html.nav-ready .page-enter:not([data-seen]) { animation: pageIn .55s cubic-bezier(.2,.8,.2,1) both; }
 @keyframes pageIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
 
 /* Hero : le texte s'élève et s'efface, le billet recule en profondeur */

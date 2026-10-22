@@ -5,6 +5,9 @@ import { track } from "@/lib/track";
 // Mesure de conversion sans cookie : clics sur les boutons de réservation et d'appel.
 export default function CtaTracker() {
   useEffect(() => {
+    // Après le premier affichage : les pages suivantes (navigation interne) auront leur fondu d'entrée.
+    document.querySelectorAll(".page-enter").forEach((el) => el.setAttribute("data-seen", ""));
+    document.documentElement.classList.add("nav-ready");
     const onClick = (e: MouseEvent) => {
       const a = (e.target as Element | null)?.closest?.("a");
       if (!a) return;
