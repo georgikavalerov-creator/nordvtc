@@ -2471,3 +2471,17 @@ a.card.svc:hover .chip.chip-color { background: #fff; color: inherit; transform:
 .reassure-phone { text-align: center; }
 .brand .brand-tag { font-size: 10px; }
 @media (max-width: 560px) { .brand .brand-tag { font-size: 10px; letter-spacing: .16em; } }
+
+/* Trajets les plus demandés (mobile) : toutes les cartes à la même taille, titre sur 2 lignes max */
+@media (max-width: 999px) {
+  .hero-dests li { display: flex; }
+  .hero-dests a { flex: 1; min-width: 0; height: 66px; box-sizing: border-box; }
+  .hero-dests .hd-txt b { font-size: .86rem; line-height: 1.18; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .hero-dests .hd-txt small { font-size: .8rem; }
+}
+/* Bloc 2 : l'invitation à défiler se place tout en haut du bloc (elle ne coupe plus la carte) */
+.story-hint { top: 16px; }
+@media (max-width: 900px) { .story-hint { top: 12px; } }
+/* Bouton « Voir mon prix » de fin d'animation : plus d'air au-dessus de la barre de progression */
+.chap .btn { margin-bottom: 26px; }
+@media (max-width: 900px) { .chap .btn { margin-top: 12px; margin-bottom: 30px; } }
