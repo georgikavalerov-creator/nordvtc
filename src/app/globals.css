@@ -1946,3 +1946,8 @@ html.in-app .site-header .burger span, html.in-app .site-header button span { ba
 html.in-app .btn.btn-arrow, html.in-app .btn.quick-btn { background: var(--app-navy); }
 html.in-app .btn.btn-arrow::before, html.in-app .btn.quick-btn::before { display: none; }
 html.in-app .hero.cine h1 { color: var(--app-navy); }
+
+/* Suivi de réservation : boutons de même taille, en colonnes égales */
+.btn-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin-top: 18px; align-items: stretch; }
+.btn-row .btn { width: 100%; justify-content: center; text-align: center; box-sizing: border-box; }
+.btn-row .cancel-box { grid-column: 1 / -1; }

@@ -3,12 +3,12 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { cancelBooking } from "@/app/compte/(espace)/actions";
 
-export default function CancelTrip({ id, refundLabel, keptLabel, action }: { id: string; refundLabel: string | null; keptLabel: string | null; action?: () => Promise<{ ok?: boolean; error?: string }> }) {
+export default function CancelTrip({ id, refundLabel, keptLabel, action, full = false }: { id: string; refundLabel: string | null; keptLabel: string | null; full?: boolean; action?: () => Promise<{ ok?: boolean; error?: string }> }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [err, setErr] = useState("");
   const [pending, start] = useTransition();
-  if (!open) return <button type="button" className="btn small ghost" onClick={() => setOpen(true)}>Annuler ce trajet</button>;
+  if (!open) return <button type="button" className={`btn ghost${full ? "" : " small"}`} onClick={() => setOpen(true)}>Annuler ce trajet</button>;
   return (
     <div className="cancel-box" role="alertdialog" aria-label="Confirmer l'annulation">
       <p><strong>Annuler ce trajet ?</strong></p>

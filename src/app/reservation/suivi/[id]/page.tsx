@@ -58,16 +58,17 @@ export default async function Suivi({ params, searchParams }: Props) {
             Réglé en ligne : {euro(b.paid_cents)}{b.status === "confirmed" && rest > 0 ? ` · reste ${euro(rest)} à régler à bord` : ""}
           </p>
         </article>
-        <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 18, alignItems: "flex-start" }}>
+        <div className="btn-row">
           {["confirmed", "completed"].includes(b.status) && (
             <Link href={docPath("bon", b.id)} className="btn">Bon de commande</Link>
           )}
-          <Link href="/contact" className="btn ghost">Modifier ma réservation</Link>
+          <Link href="/contact" className="btn ghost">Modifier mon trajet</Link>
           {b.status === "confirmed" && pol.canCancel && (
             <CancelTrip
               id={b.id}
               refundLabel={pol.refundCents > 0 ? euro(pol.refundCents) : null}
               keptLabel={pol.keptCents > 0 ? euro(pol.keptCents) : null}
+              full
               action={cancelByLink.bind(null, b.id, k as string)}
             />
           )}
