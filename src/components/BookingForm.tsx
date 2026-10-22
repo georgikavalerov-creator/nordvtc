@@ -385,7 +385,7 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
       </div>
 
       <div className="bk-pane">
-        <h3 className="bk-sub">Vos coordonnées</h3>
+        <h2 className="bk-sub">Vos coordonnées</h2>
         <div className="bk-grid bk-2">
           <label>
             Nom et prénom

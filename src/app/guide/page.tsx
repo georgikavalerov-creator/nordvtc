@@ -28,7 +28,7 @@ export default async function GuidePage() {
           {posts.map((p) => (
             <Link key={p.slug} href={`/guide/${p.slug}`} className="card">
               <span className="tag">{p.tag}</span>
-              <h3>{p.title}</h3>
+              <h2 className="g-card-t">{p.title}</h2>
               <p className="muted" style={{ marginBottom: 12 }}>{p.description.slice(0, 130).trim()}…</p>
               <small className="muted">{fmtDate(p.date)} · {p.minutes} min de lecture</small>
               <br />
