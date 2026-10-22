@@ -52,3 +52,33 @@ export async function routeSummary(
     durationS: sections.reduce((s, x) => s + x.summary.duration, 0),
   };
 }
+
+/** Estimation des péages (€) de l'itinéraire, ou null si le service ne les fournit pas. Voiture, tarif le plus bas par péage. */
+export async function tollCostEur(
+  from: { lat: number; lng: number },
+  to: { lat: number; lng: number },
+): Promise<number | null> {
+  try {
+    const url = new URL("https://router.hereapi.com/v8/routes");
+    url.searchParams.set("transportMode", "car");
+    url.searchParams.set("origin", `${from.lat},${from.lng}`);
+    url.searchParams.set("destination", `${to.lat},${to.lng}`);
+    url.searchParams.set("return", "summary,tolls");
+    url.searchParams.set("currency", "EUR");
+    url.searchParams.set("apiKey", KEY());
+    const res = await fetch(url, { cache: "no-store" });
+    if (!res.ok) { console.error("here tolls", res.status); return null; }
+    type Fare = { price?: { value?: number; currency?: string; convertedPrice?: { value?: number; currency?: string } } };
+    const data = (await res.json()) as { routes?: { sections: { tolls?: { fares?: Fare[] }[] }[] }[] };
+    let total = 0;
+    for (const s of data.routes?.[0]?.sections ?? []) {
+      for (const t of s.tolls ?? []) {
+        const vals = (t.fares ?? [])
+          .map((f) => (f.price?.convertedPrice?.currency === "EUR" ? f.price.convertedPrice.value : f.price?.currency === "EUR" ? f.price.value : undefined))
+          .filter((v): v is number => typeof v === "number");
+        if (vals.length) total += Math.min(...vals);
+      }
+    }
+    return Math.round(total * 100) / 100;
+  } catch (e) { console.error("here tolls", e); return null; }
+}

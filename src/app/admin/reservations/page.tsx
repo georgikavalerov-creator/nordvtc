@@ -6,6 +6,8 @@ import { RefundForm } from "../Forms";
 import CalButtons from "../CalButtons";
 import { saveBookingMeta, setStatus } from "../actions";
 import { STATUS, euro, fmtDT, type Booking } from "../lib";
+import { tollCostEur } from "@/lib/here";
+import { fuelCostEur, getCosts } from "@/lib/costs";
 
 export const metadata: Metadata = { title: "Administration · Réservations", robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
@@ -28,6 +30,18 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ q
     rows = (data as Booking[]) ?? [];
   } else err = "Supabase n'est pas configuré.";
   if (q) rows = rows.filter((b) => [b.customer_name, b.customer_email, b.customer_phone, b.origin_label, b.dest_label, b.id].join(" ").toLowerCase().includes(q));
+
+  // Frais estimés (péages + carburant) pour les trajets confirmés ou terminés (les 25 premiers affichés).
+  const costs = await getCosts();
+  const est = new Map<string, { toll: number | null; fuel: number }>();
+  await Promise.all(
+    rows.filter((b) => b.status === "confirmed" || b.status === "completed").slice(0, 25).map(async (b) => {
+      const x = b as unknown as { origin_lat: number; origin_lng: number; dest_lat: number; dest_lng: number; distance_m: number };
+      const toll = await tollCostEur({ lat: x.origin_lat, lng: x.origin_lng }, { lat: x.dest_lat, lng: x.dest_lng });
+      est.set(b.id, { toll, fuel: fuelCostEur(x.distance_m, costs) });
+    }),
+  );
+  const eur2 = (n: number) => new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" }).format(n);
 
   return (
     <AdminPage title="Réservations" actions={<><a className="btn small" href="/admin/reservations/nouvelle">+ Nouvelle réservation</a><a className="btn ghost small" href="/admin/export?type=reservations">Exporter (CSV)</a></>}>
@@ -75,6 +89,16 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ q
                   <p className="muted" style={{ margin: "6px 0" }}>
                     Prix {euro(b.price_cents)} · réglé {euro(b.paid_cents)}{b.refunded_cents ? ` · remboursé ${euro(b.refunded_cents)}` : ""} · reste {euro(left)}
                   </p>
+                  {est.get(b.id) && (() => {
+                    const e = est.get(b.id)!;
+                    const margin = b.price_cents / 100 - e.fuel - (e.toll ?? 0);
+                    return (
+                      <p className="notice" style={{ margin: "8px 0" }}>
+                        Frais estimés : carburant ~{eur2(e.fuel)} · péages {e.toll === null ? "indisponibles" : `~${eur2(e.toll)}`}
+                        {" "}→ marge brute ~{eur2(margin)}
+                      </p>
+                    );
+                  })()}
                   <p className="muted" style={{ margin: 0, fontSize: ".8rem" }}>Réf. {b.id.slice(0, 8)}</p>
                   {b.status !== "pending_payment" && <div style={{ marginTop: 10 }}><CalButtons b={b as never} /></div>}
                   {(b.status === "confirmed" || b.status === "completed") && (

@@ -55,6 +55,14 @@ export async function savePricing(_: { error?: string; ok?: boolean } | undefine
   return { ok: true };
 }
 
+export async function saveCosts(form: FormData) {
+  if (!(await isAdmin())) redirect("/admin");
+  const p = z.object({ fuelLPer100: z.coerce.number().min(0).max(40), fuelPricePerL: z.coerce.number().min(0).max(5) }).safeParse(Object.fromEntries(form));
+  if (!p.success) return;
+  await db().from("settings").upsert({ key: "costs", value: p.data, updated_at: new Date().toISOString() });
+  revalidatePath("/admin");
+}
+
 const statusSchema = z.object({
   id: z.string().uuid(),
   status: z.enum(["confirmed", "completed", "cancelled"]),

@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { db, dbConfigured, getPricing } from "@/lib/supabase";
 import { euro } from "@/lib/pricing";
 import PricingForm from "../PricingForm";
-import { createPromo, togglePromo } from "../actions";
+import { createPromo, togglePromo, saveCosts } from "../actions";
+import { getCosts } from "@/lib/costs";
 import { AdminPage } from "../gate";
 
 export const metadata: Metadata = { title: "Administration · Tarifs", robots: { index: false, follow: false } };
@@ -10,6 +11,7 @@ export const dynamic = "force-dynamic";
 
 export default async function Page() {
   const pricing = await getPricing();
+  const costs = await getCosts();
   const { data: promos } = dbConfigured() ? await db().from("promo_codes").select("*").order("created_at", { ascending: false }) : { data: [] };
   const fmt = (iso: string) => new Intl.DateTimeFormat("fr-FR", { timeZone: "Europe/Paris", dateStyle: "short" }).format(new Date(iso));
   return (
@@ -19,6 +21,16 @@ export default async function Page() {
           <h2 style={{ fontSize: "1.4rem" }}>Tarifs et acompte</h2>
           <p className="muted">Modifiez les valeurs ci-dessous : elles s'appliquent immédiatement au calculateur et aux nouvelles réservations.</p>
           {dbConfigured() ? <PricingForm pricing={pricing} /> : <p className="notice">Connectez Supabase pour modifier les tarifs depuis cette page.</p>}
+        </div>
+
+        <div>
+          <h2 style={{ fontSize: "1.4rem" }}>Frais estimés (carburant)</h2>
+          <p className="muted">Sert uniquement à estimer ta marge dans « Réservations » (carburant + péages). Les péages viennent de l'itinéraire réel.</p>
+          <form action={saveCosts} className="form" style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", alignItems: "end" }}>
+            <label>Consommation (L/100 km)<input name="fuelLPer100" type="number" step="0.1" min="0" defaultValue={costs.fuelLPer100} required /></label>
+            <label>Prix du carburant (€/L)<input name="fuelPricePerL" type="number" step="0.01" min="0" defaultValue={costs.fuelPricePerL} required /></label>
+            <button className="btn small">Enregistrer</button>
+          </form>
         </div>
 
         <div>
