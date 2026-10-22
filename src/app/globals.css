@@ -2326,3 +2326,29 @@ html:not(.in-app) .btn-arrow:active::after, html:not(.in-app) .quick-btn:active:
 .form .pk-time input:not([type="checkbox"]):not([type="radio"]), .pk-time input:not([type="checkbox"]):not([type="radio"]) { all: unset; flex: 1 1 auto; width: 100% !important; min-width: 0 !important; height: auto !important; padding: 0 !important; margin: 0 !important; border: 0 !important; background: transparent !important; box-shadow: none !important; border-radius: 0 !important; font: inherit; font-size: 16px; font-weight: 600; color: inherit; cursor: text; }
 .pk-time { cursor: text; overflow: hidden; }
 .pk, .pk-field { min-width: 0; max-width: 100%; }
+
+/* ---------- Pied de page compact ---------- */
+.ft { padding: 22px 0 14px !important; font-size: .88rem; }
+.ft-top { display: grid; grid-template-columns: 1.1fr 1.5fr .8fr; gap: 24px; align-items: start; }
+.ft-brand strong { display: flex; align-items: center; gap: 8px; font-size: 1.05rem; color: #fff; }
+.ft-brand p { margin: 6px 0 0; line-height: 1.45; }
+.ft-contact a { color: #fff !important; font-weight: 600; }
+.ft-col summary { list-style: none; font-weight: 700; color: #fff; margin-bottom: 6px; cursor: default; pointer-events: none; }
+.ft-col summary::-webkit-details-marker { display: none; }
+.ft .ft-col ul { gap: 3px !important; }
+.ft-trips { display: grid !important; grid-template-columns: 1fr 1fr; column-gap: 18px; }
+.ft-bottom { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.12); }
+.ft-legal { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: baseline; margin-top: 10px; font-size: .78rem; opacity: .8; }
+.ft-legal-links { display: inline-flex; flex-wrap: wrap; gap: 4px 14px; }
+.ft-legal small { flex-basis: 100%; opacity: .7; font-size: .72rem; }
+@media (max-width: 900px) {
+  .ft-top { grid-template-columns: 1fr; gap: 6px; }
+  .ft-col { border-top: 1px solid rgba(255,255,255,.12); }
+  .ft-col summary { pointer-events: auto; cursor: pointer; padding: 10px 0; margin: 0; display: flex; justify-content: space-between; }
+  .ft-col summary::after { content: "+"; font-weight: 400; opacity: .7; }
+  .ft-col[open] summary::after { content: "−"; }
+  .ft-col ul { padding-bottom: 8px !important; }
+  .ft-bottom { margin-top: 8px; }
+  .ft { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)) !important; }
+  .site-footer.ft ul a, .ft-legal a { min-height: 34px; }
+}
