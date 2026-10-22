@@ -1999,3 +1999,9 @@ html.in-app .hero.cine h1 { color: var(--app-navy); }
 .date-chips { display: flex; gap: 6px; flex-wrap: wrap; margin: 2px 0 4px; }
 .date-chips .chip { font-size: .78rem; padding: 5px 10px; font-weight: 600; cursor: pointer; }
 .date-chips .chip.on { background: #000; color: #fff; border-color: #000; }
+
+/* Pied de page : liens plus faciles à toucher sur mobile */
+@media (max-width: 760px) {
+  .site-footer ul { gap: 2px; }
+  .site-footer ul a, .footer-legal a { display: inline-flex; align-items: center; min-height: 40px; padding: 4px 0; }
+}
