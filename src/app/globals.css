@@ -1903,7 +1903,7 @@ details { padding: 12px 0; }
 
 /* ==== Application iOS (Capacitor) ==== */
 /* Google refuse la connexion dans un navigateur intégré : seul « Continuer avec Apple » reste proposé dans l'application. */
-html.in-app .auth-btn:not(.apple) { display: none; }
+html.in-app .auth-btn.google { display: none; }
 html.in-app body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; overscroll-behavior-y: none; }
 html.in-app input, html.in-app textarea { -webkit-user-select: text; user-select: text; }
 html.in-app .site-header { padding-top: env(safe-area-inset-top); }
@@ -3565,3 +3565,53 @@ h2.bk-sub::before { content: ""; width: 4px; height: 1.1em; border-radius: 4px; 
 @media (max-width: 900px) {
   .hero-dests .hd-cards { padding-bottom: 38px !important; margin-bottom: -22px !important; scroll-padding-inline: 16px; }
 }
+
+/* ===== Espace client : bloc « Réserver un nouveau trajet » (prix affiché sur place) ===== */
+.acc-book { display: grid !important; gap: 14px !important; }
+.ab-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.ab-head h2 { margin: 0 !important; }
+.ab-head .muted { font-size: .85rem; }
+.ab-route { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 8px; align-items: center; }
+.ab-route > label { margin: 0; }
+.ab-swap { width: 40px; height: 40px; border-radius: 50%; border: 1px solid #e4e4e7; background: #fff; color: #0b0b0c; display: grid; place-items: center; cursor: pointer; transition: transform .2s; }
+.ab-swap:not(:disabled):hover { transform: rotate(180deg); border-color: #1f5bff; color: #1f5bff; }
+.ab-swap:disabled { opacity: .45; cursor: default; }
+.ab-when { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.ab-when .tf-label { display: grid; gap: 6px; font-weight: 600; font-size: .88rem; }
+.ab-when .tf-label .muted { font-weight: 500; }
+.acc-book .acc-places { margin: -4px 0 0; }
+.acc-book .acc-place { cursor: pointer; font: inherit; font-weight: 600; font-size: .88rem; }
+.ab-price { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; min-height: 56px; padding: 12px 16px; border-radius: 16px; background: #f5f5f7; border: 1px dashed #d4d4d8; }
+.ab-price.on { background: #eef3ff; border: 1px solid #d6e2ff; }
+.ab-price > div { display: grid; }
+.ab-price small { font-size: .75rem; color: #5e5e5e; font-weight: 600; }
+.ab-price strong { font-size: 1.7rem; font-weight: 800; letter-spacing: -.02em; line-height: 1.1; font-variant-numeric: tabular-nums; color: #0b0b0c; }
+.ab-price .muted { font-size: .85rem; }
+.acc-book > .btn { width: 100%; justify-content: center; }
+.acc-book > .btn:disabled { opacity: .55; }
+@media (max-width: 640px) {
+  .ab-route { grid-template-columns: 1fr; }
+  .ab-swap { justify-self: center; margin: -4px 0; transform: rotate(0); }
+  .ab-swap svg { transform: rotate(0); }
+}
+
+/* Cases sélectionnées (Aujourd'hui / Demain, Avion / Train / Bus…) : bleu plein, texte blanc, lisible jour comme nuit */
+.date-chips .chip.on, .date-chips .chip[aria-checked="true"], .date-chips label.chip:has(input:checked) { background: #1f5bff !important; color: #fff !important; border-color: #1f5bff !important; box-shadow: 0 6px 16px -10px rgba(31,91,255,.9) !important; }
+.date-chips .chip.on svg, .date-chips .chip[aria-checked="true"] svg { color: #fff !important; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) :is(.date-chips .chip.on, .date-chips .chip[aria-checked="true"], .date-chips label.chip:has(input:checked)) { filter: invert(1) hue-rotate(180deg); } }
+:root[data-theme="dark"] :is(.date-chips .chip.on, .date-chips .chip[aria-checked="true"], .date-chips label.chip:has(input:checked)) { filter: invert(1) hue-rotate(180deg); }
+
+/* Connexion : Google, Apple et X en une rangée compacte de logos */
+.auth-icons { display: grid !important; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); grid-auto-flow: column; gap: 10px !important; }
+.auth-icons .auth-btn { min-height: 50px !important; height: 50px; padding: 0 10px !important; gap: 8px !important; border-radius: 14px !important; border: 1.5px solid #d4d4d8 !important; background: #fff !important; color: #0b0b0c !important; font-weight: 700; font-size: .95rem; box-shadow: 0 1px 2px rgba(0,0,0,.05) !important; }
+.auth-icons .auth-btn svg { flex: none; }
+.auth-icons .auth-btn.apple, .auth-icons .auth-btn.xbtn { color: #000 !important; }
+@media (hover: hover) { .auth-icons .auth-btn:hover { border-color: #0b0b0c !important; transform: translateY(-1px); } }
+.auth-or-top { margin: 2px 0 -4px !important; }
+@media (max-width: 380px) { .auth-icons .auth-btn span { display: none; } }
+/* Lien Administration (visible uniquement pour le propriétaire du site) */
+.acc-nav a.acc-admin { color: #1f5bff !important; background: #eef3ff; }
+.acc-nav a.acc-admin svg { color: #1f5bff !important; }
+.acc-book .pk input:not([type="x"]):not([type="y"]) { border: 0 !important; background: transparent !important; box-shadow: none !important; padding: 0 !important; border-radius: 0 !important; }
+.auth-or.auth-or-top::before, .auth-or.auth-or-top::after { display: none; }
+.auth-or.auth-or-top { justify-content: center; font-weight: 600; }

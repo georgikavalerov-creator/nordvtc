@@ -4,13 +4,13 @@ import IconC from "@/components/IconC";
 import TripCard, { rebookHref, placeParts, Route } from "@/components/TripCard";
 import { getPlaces, requireUser, STATUS, userBookings } from "@/lib/account";
 import { docPath } from "@/lib/docsign";
+import { signPlace } from "@/lib/place-sign";
 import { euro } from "@/lib/pricing";
 
 export const metadata = { title: "Mon espace" };
 
 const TZ = "Europe/Paris";
 const f = (iso: string, o: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat("fr-FR", { timeZone: TZ, ...o }).format(new Date(iso));
-const ICON = { home: "house", work: "briefcase", other: "pin" } as const;
 
 export default async function Accueil() {
   const user = await requireUser();
@@ -66,18 +66,7 @@ export default async function Accueil() {
         <div><dt>Total réglé</dt><dd>{euro(spent)}</dd></div>
       </dl>
 
-      <AccountSearch>
-        {places.length > 0 && (
-          <div className="acc-places">
-            {places.map((p) => (
-              <Link key={p.id} className="acc-place" href={`/reservation?to=${encodeURIComponent(p.address.slice(0, 120))}`}>
-                <IconC name={ICON[p.kind]} size={18} />
-                <span>{p.label}</span>
-              </Link>
-            ))}
-          </div>
-        )}
-      </AccountSearch>
+      <AccountSearch places={places.map((p) => ({ ...p, sig: signPlace({ label: p.address, lat: p.lat, lng: p.lng }).sig }))} />
 
       {others.length > 0 && (
         <>

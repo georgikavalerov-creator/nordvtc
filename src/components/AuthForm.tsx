@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { browserClient } from "@/lib/supabase-browser";
 import PasswordMeter from "./PasswordMeter";
 import FaceIdLogin from "./FaceIdLogin";
@@ -7,6 +7,10 @@ import { clientPkLogin, clientPkLoginOptions } from "@/app/compte/(espace)/actio
 
 const G = (<svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.1 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.4c-.5 2.9-2.2 5.3-4.6 6.9l7.4 5.7c4.3-4 6.9-9.9 6.9-17.1z"/><path fill="#FBBC05" d="M10.5 28.7a14.5 14.5 0 0 1 0-9.4l-7.9-6.1a24 24 0 0 0 0 21.6l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.4-5.7c-2 1.4-4.9 2.3-8.5 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg>);
 const A = (<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 12.7c0-2.5 2-3.7 2.1-3.8-1.2-1.7-3-1.9-3.6-2-1.5-.2-3 .9-3.8.9s-2-.9-3.2-.9c-1.7 0-3.2 1-4.1 2.4-1.7 3-.4 7.500 1.300 9.900.8 1.200 1.800 2.500 3.100 2.500 1.200 0 1.700-.8 3.200-.8s1.900.8 3.200.8c1.300 0 2.200-1.200 3-2.400.9-1.400 1.300-2.700 1.300-2.800-.1 0-2.500-1-2.500-3.800zM14 5.200c.7-.8 1.100-1.900 1-3-1 0-2.200.7-2.900 1.500-.6.700-1.200 1.900-1 3 1.100.1 2.200-.6 2.900-1.500z"/></svg>);
+
+const X = (<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.9 2H22l-6.8 7.8L23.2 22h-6.3l-4.9-6.4L6.4 22H3.3l7.3-8.3L2.8 2h6.4l4.4 5.9L18.9 2zm-1.1 18.1h1.7L7.3 3.8H5.5l12.3 16.3z"/></svg>);
+type Social = "google" | "apple" | "x";
+const NAMES: Record<Social, string> = { google: "Google", apple: "Apple", x: "X" };
 
 export default function AuthForm({ next = "/compte", failed = false }: { next?: string; failed?: boolean }) {
   const [email, setEmail] = useState("");
@@ -20,12 +24,21 @@ export default function AuthForm({ next = "/compte", failed = false }: { next?: 
   const [error, setError] = useState(failed ? "La connexion a échoué ou le lien a expiré. Réessayez." : "");
   const redirectTo = () => `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`;
 
-  const [soon, setSoon] = useState(false);
-  async function oauth(provider: "google" | "apple") {
+  const [soon, setSoon] = useState<Social | null>(null);
+  // Fournisseurs réellement activés dans Supabase (les autres affichent « bientôt disponible » au lieu d'une page d'erreur).
+  const [enabled, setEnabled] = useState<Record<string, boolean> | null>(null);
+  useEffect(() => {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL, key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (!url || !key) return;
+    fetch(`${url}/auth/v1/settings`, { headers: { apikey: key } }).then((r) => r.ok ? r.json() : null).then((d) => d?.external && setEnabled(d.external)).catch(() => {});
+  }, []);
+  async function oauth(provider: Social) {
     setError("");
-    if (provider === "apple") { setSoon(true); return; } // Apple : pas encore configuré
-    setSoon(false);
-    const { error } = await browserClient().auth.signInWithOAuth({ provider, options: { redirectTo: redirectTo() } });
+    if (provider === "apple" && !enabled?.apple) { setSoon("apple"); return; }
+    if (provider === "x" && !enabled?.x && !enabled?.twitter) { setSoon("x"); return; }
+    setSoon(null);
+    const p = provider === "x" && !enabled?.x ? "twitter" : provider;
+    const { error } = await browserClient().auth.signInWithOAuth({ provider: p, options: { redirectTo: redirectTo() } });
     if (error) setError("Connexion indisponible pour le moment.");
   }
   async function magic(e: React.FormEvent) {
@@ -71,11 +84,13 @@ export default function AuthForm({ next = "/compte", failed = false }: { next?: 
   return (
     <div className="callgate authbox">
       <FaceIdLogin getOptions={clientPkLoginOptions} verify={clientPkLogin} next={next} orText="ou" />
-      <div className="auth-social">
-        <button type="button" className="btn auth-btn" onClick={() => oauth("google")}>{G} Continuer avec Google</button>
-        <button type="button" className="btn auth-btn apple" onClick={() => oauth("apple")}>{A} Continuer avec Apple</button>
-        {soon && <p className="notice" role="status" style={{ margin: 0 }}>La connexion avec Apple sera bientôt disponible. En attendant, utilisez Google ou votre adresse e-mail.</p>}
+      <p className="auth-or auth-or-top"><span>Continuer avec</span></p>
+      <div className="auth-social auth-icons" role="group" aria-label="Se connecter avec un compte existant">
+        <button type="button" className="btn auth-btn google" onClick={() => oauth("google")} aria-label="Continuer avec Google">{G}<span>Google</span></button>
+        <button type="button" className="btn auth-btn apple" onClick={() => oauth("apple")} aria-label="Continuer avec Apple">{A}<span>Apple</span></button>
+        <button type="button" className="btn auth-btn xbtn" onClick={() => oauth("x")} aria-label="Continuer avec X">{X}<span>X</span></button>
       </div>
+      {soon && <p className="notice" role="status" style={{ margin: 0 }}>La connexion avec {NAMES[soon]} sera bientôt disponible. En attendant, utilisez {soon === "google" ? "votre adresse e-mail" : "Google ou votre adresse e-mail"}.</p>}
       <p className="auth-or"><span>ou avec votre adresse e-mail</span></p>
       <div className="acc-tabs" role="tablist" style={{ marginTop: 0 }}>
         {([["magic", "Lien e-mail"], ["signup", "Créer un compte"], ["login", "Connexion"]] as const).map(([k, l]) => (

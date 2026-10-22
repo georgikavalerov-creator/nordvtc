@@ -12,7 +12,7 @@ const ITEMS: { href: string; label: string; icon: CIName; exact?: boolean }[] = 
   { href: "/compte/securite", label: "Sécurité", icon: "shield" },
   { href: "/compte/aide", label: "Aide", icon: "headset" },
 ];
-export default function AccountNav() {
+export default function AccountNav({ owner = false }: { owner?: boolean }) {
   const path = usePathname();
   return (
     <nav className="acc-nav" aria-label="Espace personnel">
@@ -25,6 +25,11 @@ export default function AccountNav() {
             </Link>
           );
         })}
+        {owner && (
+          <a href="/admin" className="acc-admin">
+            <IconC name="shield" size={20} /><span>Administration</span>
+          </a>
+        )}
       </div>
       <form action="/auth/signout" method="post" className="acc-out">
         <button type="submit">Se déconnecter</button>

@@ -34,7 +34,7 @@ export default async function EspaceLayout({ children }: { children: React.React
         </header>
         <FaceIdPrompt count={(await listPasskeys(`user:${user.id}`).catch(() => [])).length} getOptions={clientPkRegOptions} save={clientPkRegVerify} storeKey={`u-${user.id.slice(0, 8)}`} />
         <div className="acc-grid">
-          <AccountNav />
+          <AccountNav owner={!!user.email_confirmed_at && !!user.email && user.email.toLowerCase() === (process.env.MAIL_NOTIFY_TO ?? "").trim().toLowerCase()} />
           <div className="acc-body">{children}</div>
         </div>
         <UndoBar />

@@ -15,10 +15,10 @@ export const metadata: Metadata = {
   alternates: { canonical: "/reservation" },
 };
 
-type Props = { searchParams: Promise<{ from?: string; to?: string }> };
+type Props = { searchParams: Promise<{ from?: string; to?: string; o?: string; d?: string; date?: string; time?: string }> };
 
 export default async function ReservationPage({ searchParams }: Props) {
-  const { from = "", to = "" } = await searchParams;
+  const { from = "", to = "", o, d, date, time } = await searchParams;
   // Liens depuis les cartes postales et les trajets proposés : adresses trouvées avant l'affichage.
   const resolve = async (q: string) => {
     const t = q.trim().slice(0, 120);
@@ -30,7 +30,18 @@ export default async function ReservationPage({ searchParams }: Props) {
       return r ? signPlace(r) : null;
     } catch { return null; }
   };
-  const [initialOrigin, initialDest] = await Promise.all([resolve(from), resolve(to)]);
+  // Adresse déjà choisie dans l'espace client : réutilisée telle quelle si sa signature est valide.
+  const unpack = (v?: string) => {
+    if (!v) return null;
+    const [label, lat, lng, sig] = v.split("|");
+    const p = { label: (label ?? "").slice(0, 300), lat: Number(lat), lng: Number(lng) };
+    if (!p.label || !Number.isFinite(p.lat) || !Number.isFinite(p.lng)) return null;
+    const signed = signPlace(p);
+    return sig && signed.sig === sig ? signed : null;
+  };
+  const [initialOrigin, initialDest] = await Promise.all([unpack(o) ?? resolve(from), unpack(d) ?? resolve(to)]);
+  const initialDate = date && /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : "";
+  const initialTime = time && /^\d{2}:\d{2}$/.test(time) ? time : "";
   const user = await currentUser();
   const [places, prof] = user ? await Promise.all([getPlaces(user.id), getProfile(user.id)]) : [[], null];
   return (
@@ -45,7 +56,7 @@ export default async function ReservationPage({ searchParams }: Props) {
       <section className="section">
         <div className="wrap booking-layout">
           <div>
-            <BookingForm initialFrom={from.slice(0, 120)} initialTo={to.slice(0, 120)} initialOrigin={initialOrigin} initialDest={initialDest} accountName={prof?.full_name ?? (user?.user_metadata?.full_name as string) ?? ""} accountEmail={user?.email ?? ""} accountPhone={prof?.phone ?? ""} defaultPassengers={prof?.default_passengers ?? 1} defaultChildSeat={prof?.default_child_seat ?? false} defaultPet={prof?.default_pet ?? false} savedPlaces={places} />
+            <BookingForm initialFrom={from.slice(0, 120)} initialTo={to.slice(0, 120)} initialOrigin={initialOrigin} initialDest={initialDest} initialDate={initialDate} initialTime={initialTime} accountName={prof?.full_name ?? (user?.user_metadata?.full_name as string) ?? ""} accountEmail={user?.email ?? ""} accountPhone={prof?.phone ?? ""} defaultPassengers={prof?.default_passengers ?? 1} defaultChildSeat={prof?.default_child_seat ?? false} defaultPet={prof?.default_pet ?? false} savedPlaces={places} />
           </div>
           <aside className="reassure">
             <h2>Réservez l'esprit tranquille</h2>
