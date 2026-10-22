@@ -1,6 +1,4 @@
-// Tarifs PROVISOIRES : modifiables depuis /admin (table `settings`, clé "pricing").
-// Valeurs de départ calées sur les prix indicatifs publiés par saiyango.fr (≈ 50 € + 1,65 €/km depuis Lille).
-// À CONFIRMER par le chauffeur avant la mise en ligne : ce sont ses prix qui comptent.
+// Tarifs du chauffeur : 25 € de prise en charge + 2,30 €/km, minimum 25 €. Modifiables depuis /admin (table `settings`, clé "pricing").
 
 export type Pricing = {
   baseFare: number; // prise en charge, en euros
@@ -16,10 +14,10 @@ export type Pricing = {
 };
 
 export const DEFAULT_PRICING: Pricing = {
-  baseFare: 50,
-  perKm: 1.65,
+  baseFare: 25,
+  perKm: 2.3,
   perMinute: 0,
-  minimumFare: 35,
+  minimumFare: 25,
   nightSurchargePct: 20,
   nightStartHour: 22,
   nightEndHour: 6,
