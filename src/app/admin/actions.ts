@@ -1,4 +1,5 @@
 "use server";
+import { checkPhoto } from "@/lib/photo";
 
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
@@ -391,4 +392,16 @@ export async function set2faChannel(via: "email" | "sms", on: boolean): Promise<
 export async function makeBackupCodes(): Promise<string[]> {
   if (!(await isAdmin())) redirect("/admin");
   return newBackupCodes();
+}
+
+/** Photo de l'administrateur (data URL recadrée par le navigateur ; null = retirer). */
+export async function saveAdminPhoto(dataUrl: string | null): Promise<{ ok?: boolean; error?: string }> {
+  if (!(await isAdmin())) return { error: "Session expirée, reconnectez-vous." };
+  if (dataUrl && !checkPhoto(dataUrl)) return { error: "Image non prise en charge ou trop lourde." };
+  const { error } = dataUrl
+    ? await db().from("settings").upsert({ key: "admin_photo", value: { src: dataUrl }, updated_at: new Date().toISOString() })
+    : await db().from("settings").delete().eq("key", "admin_photo");
+  if (error) return { error: "Enregistrement impossible." };
+  revalidatePath("/admin", "layout");
+  return { ok: true };
 }

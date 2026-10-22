@@ -15,7 +15,8 @@ async function toSquareJpeg(file: File, size = 256): Promise<string> {
   return c.toDataURL("image/jpeg", 0.86);
 }
 
-export default function AvatarField({ avatar, name }: { avatar: string | null; name: string }) {
+type Save = (dataUrl: string | null) => Promise<{ ok?: boolean; error?: string }>;
+export default function AvatarField({ avatar, name, save: saveFn = saveAvatar, hint = "Elle s'affiche dans votre espace. Recadrée automatiquement." }: { avatar: string | null; name: string; save?: Save; hint?: string }) {
   const [src, setSrc] = useState(avatar);
   const [msg, setMsg] = useState<{ ok?: string; error?: string }>({});
   const [pending, start] = useTransition();
@@ -25,7 +26,7 @@ export default function AvatarField({ avatar, name }: { avatar: string | null; n
   function save(next: string | null) {
     setMsg({});
     start(async () => {
-      const r = await saveAvatar(next);
+      const r = await saveFn(next);
       if (r.error) { setMsg({ error: r.error }); return; }
       setSrc(next); setMsg({ ok: next ? "Photo enregistrée ✓" : "Photo retirée" }); router.refresh();
     });
@@ -47,7 +48,7 @@ export default function AvatarField({ avatar, name }: { avatar: string | null; n
       </button>
       <div>
         <strong>Photo de profil</strong>
-        <p className="muted" style={{ margin: "2px 0 10px", fontSize: ".9rem" }}>Elle s&apos;affiche dans votre espace. Recadrée automatiquement.</p>
+        <p className="muted" style={{ margin: "2px 0 10px", fontSize: ".9rem" }}>{hint}</p>
         <div className="trip-actions" style={{ margin: 0 }}>
           <button type="button" className="btn small" onClick={() => input.current?.click()} disabled={pending}>{pending ? "Envoi…" : src ? "Changer la photo" : "Ajouter une photo"}</button>
           {src && <button type="button" className="btn small ghost" onClick={() => save(null)} disabled={pending}>Retirer</button>}

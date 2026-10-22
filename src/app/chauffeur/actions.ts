@@ -1,4 +1,5 @@
 "use server";
+import { checkPhoto } from "@/lib/photo";
 
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
@@ -101,6 +102,17 @@ export async function removeDriverLogo(_: R): Promise<R> {
   const d = await currentDriver();
   if (!d) redirect("/chauffeur");
   await db().from("drivers").update({ logo: null }).eq("id", d.id);
+  revalidatePath("/chauffeur", "layout");
+  return { ok: true };
+}
+
+/** Photo du chauffeur (data URL recadrée par le navigateur ; null = retirer). */
+export async function saveDriverPhoto(dataUrl: string | null): Promise<{ error?: string; ok?: boolean }> {
+  const d = await currentDriver();
+  if (!d) return { error: "Session expirée, reconnectez-vous." };
+  if (dataUrl && !checkPhoto(dataUrl)) return { error: "Image non prise en charge ou trop lourde." };
+  const { error } = await db().from("drivers").update({ photo: dataUrl }).eq("id", d.id);
+  if (error) return { error: "Enregistrement impossible." };
   revalidatePath("/chauffeur", "layout");
   return { ok: true };
 }

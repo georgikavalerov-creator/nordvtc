@@ -7,6 +7,7 @@ import { db, dbConfigured } from "@/lib/supabase";
 import { normalizePhone } from "@/lib/callback";
 import { submitClaimCore } from "@/lib/claim";
 import { cancelBookingCore } from "@/lib/cancel";
+import { checkPhoto } from "@/lib/photo";
 
 async function me() {
   const u = await currentUser();
@@ -111,12 +112,7 @@ export async function saveAvatar(dataUrl: string | null): Promise<{ ok?: boolean
   const u = await me();
   let avatar: string | null = null;
   if (dataUrl) {
-    const m = /^data:image\/(jpeg|png|webp);base64,([A-Za-z0-9+/]+={0,2})$/.exec(dataUrl);
-    if (!m || dataUrl.length > 200_000) return { error: "Image non prise en charge ou trop lourde." };
-    // Vérifie la signature réelle du fichier (pas seulement l'en-tête annoncé).
-    const head = Buffer.from(m[2].slice(0, 24), "base64");
-    const ok = (m[1] === "jpeg" && head[0] === 0xff && head[1] === 0xd8) || (m[1] === "png" && head[0] === 0x89 && head[1] === 0x50) || (m[1] === "webp" && head.toString("latin1", 8, 12) === "WEBP");
-    if (!ok) return { error: "Image non prise en charge." };
+    if (!checkPhoto(dataUrl)) return { error: "Image non prise en charge ou trop lourde." };
     avatar = dataUrl;
   }
   const { error } = await db().from("profiles").upsert({ user_id: u.id, avatar, updated_at: new Date().toISOString() });
