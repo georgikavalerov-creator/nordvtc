@@ -52,7 +52,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ m
   let agenda: { ref: string; dep: CalEvent; arr: CalEvent | null }[] = [];
   let agendaError = "";
   if (icloudOn && source) {
-    try { agenda = pairUp(await icloudEventsBetween(new Date(from), new Date(to), source.url)).filter((c) => c.dep.date.startsWith(base)); }
+    try { agenda = pairUp(await icloudEventsBetween(new Date(from), new Date(to), source.url)).filter((c) => c.dep.date.startsWith(base) && !c.dep.allDay); } // les événements « journée entière » ne sont pas des courses
     catch { agendaError = "Agenda iCloud injoignable pour le moment."; }
   }
   const madeFrom = new Map<string, string>();
