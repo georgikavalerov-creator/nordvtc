@@ -1,3 +1,4 @@
+import { pushBookingToIcloud } from "./icloud-push";
 import { z } from "zod";
 import { db, getPricing } from "./supabase";
 import { computeQuote } from "./pricing";
@@ -90,6 +91,8 @@ export async function createManual(form: FormData, driver: Driver | null): Promi
     if (e2 || !r2) { console.error("manual return", e2); return { error: "Aller créé, mais le retour n'a pas pu être enregistré : créez-le séparément." }; }
     await db().from("bookings").update({ group_id: data.id }).eq("id", data.id);
     await db().rpc("issue_order", { bid: r2.id });
+    await pushBookingToIcloud(r2.id);
   }
+  await pushBookingToIcloud(data.id);
   return { id: data.id, goto: v.goto };
 }

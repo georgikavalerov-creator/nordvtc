@@ -71,6 +71,12 @@ export function calendar(list: CalBooking[], name = "Nord VTC · courses"): stri
   return lines.map(fold).join("\r\n") + "\r\n";
 }
 
+/** Une course seule, au format attendu par un agenda CalDAV (iCloud) : pas de METHOD. */
+export function calendarObject(b: CalBooking): string {
+  const lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Nord VTC//Courses//FR", "CALSCALE:GREGORIAN", ...vevent(b), "END:VCALENDAR"];
+  return lines.map(fold).join("\r\n") + "\r\n";
+}
+
 // Lien « Ajouter à Google Agenda » (Android) : ouvre l'application avec tous les champs remplis.
 export function googleUrl(b: CalBooking): string {
   const [s, e] = span(b);

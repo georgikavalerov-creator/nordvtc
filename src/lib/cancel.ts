@@ -2,6 +2,7 @@ import { db } from "@/lib/supabase";
 import { cancelPolicy, fmtDate } from "@/lib/account";
 import { getStripe, stripeConfigured } from "@/lib/stripe";
 import { sendCancellationEmails } from "@/lib/mail";
+import { pushBookingToIcloud } from "@/lib/icloud-push";
 
 type Result = { ok?: boolean; error?: string; refunded?: number };
 
@@ -33,6 +34,7 @@ export async function cancelBookingCore(bookingId: string, userId?: string): Pro
       return { error: "Le remboursement a échoué : votre réservation est conservée. Contactez-nous." };
     }
   }
+  await pushBookingToIcloud(bookingId);
   try {
     await sendCancellationEmails({ id: b.id, name: b.customer_name, email: b.customer_email, originLabel: b.origin_label, destLabel: b.dest_label, pickupAtLocal: fmtDate(b.pickup_at), refundedCents: pol.refundCents, keptCents: pol.keptCents });
   } catch (e) { console.error("cancel mail", e); }

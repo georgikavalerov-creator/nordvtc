@@ -6,6 +6,7 @@ import { computeQuote, parisToUtc } from "@/lib/pricing";
 import { applyDiscount } from "@/lib/promo";
 import { fmtDate } from "@/lib/account";
 import { sendModificationEmails } from "@/lib/mail";
+import { pushBookingToIcloud } from "@/lib/icloud-push";
 
 // Modification d'une réservation confirmée par le client (espace client ou lien de suivi signé).
 // Règle : le prix est recalculé côté serveur. S'il est inférieur à ce qui a déjà été réglé en ligne,
@@ -86,6 +87,7 @@ export async function modifyBookingCore(bookingId: string, raw: unknown, confirm
     price_cents: finalCents, modified_at: new Date().toISOString(),
   }).eq("id", bookingId).eq("status", "confirmed").select("id").maybeSingle();
   if (!upd) return { error: "Cette réservation vient d'être modifiée. Rechargez la page." };
+  await pushBookingToIcloud(bookingId);
 
   try {
     await sendModificationEmails({

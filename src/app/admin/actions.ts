@@ -1,4 +1,5 @@
 "use server";
+import { pushBookingToIcloud } from "@/lib/icloud-push";
 import { deletePasskey, listPasskeys, loginOptions, loginVerify, registrationOptions, registrationVerify } from "@/lib/passkey";
 import type { AuthenticationResponseJSON, RegistrationResponseJSON } from "@simplewebauthn/server";
 import { checkPhoto } from "@/lib/photo";
@@ -107,6 +108,7 @@ export async function setStatus(form: FormData) {
   } else {
     await db().from("bookings").update({ status: parsed.data.status }).eq("id", parsed.data.id);
   }
+  await pushBookingToIcloud(parsed.data.id);
   revalidatePath("/admin", "layout");
 }
 
@@ -150,6 +152,7 @@ export async function saveBookingMeta(form: FormData) {
     admin_note: String(form.get("admin_note") ?? "").slice(0, 1000) || null,
     driver: String(form.get("driver") ?? "").slice(0, 80) || null,
   }).eq("id", id.data);
+  await pushBookingToIcloud(id.data);
   wipe();
 }
 
@@ -171,6 +174,7 @@ export async function refundBooking(_: { error?: string; ok?: string } | undefin
     return { error: "Stripe a refusé le remboursement." };
   }
   await db().from("bookings").update({ refunded_cents: (b.refunded_cents ?? 0) + cents, ...(form.get("cancel") === "on" ? { status: "cancelled", cancelled_at: new Date().toISOString() } : {}) }).eq("id", id.data);
+  await pushBookingToIcloud(id.data);
   wipe();
   return { ok: `${(cents / 100).toFixed(2)} € remboursés.` };
 }
@@ -440,4 +444,27 @@ export async function adminPkLogin(resp: AuthenticationResponseJSON): Promise<{ 
   await logSecurity("admin_login_ok", undefined, { method: "face-id" });
   await startSession();
   return { ok: true };
+}
+
+// ---------- Agenda iCloud : choix de l'agenda qui reçoit les courses ----------
+export async function saveIcloudTarget(form: FormData) {
+  if (!(await isAdmin())) redirect("/admin");
+  const { listIcloudCalendars, setIcloudTarget, syncAllToIcloud } = await import("@/lib/icloud-push");
+  const url = String(form.get("cal") ?? "");
+  let n = 0;
+  if (!url) await setIcloudTarget(null);
+  else {
+    const cal = (await listIcloudCalendars().catch(() => [])).find((c) => c.url === url);
+    if (!cal) redirect("/admin/calendrier?ical=introuvable#agenda");
+    await setIcloudTarget(cal);
+    n = (await syncAllToIcloud()).ok;
+  }
+  revalidatePath("/admin/calendrier");
+  redirect(`/admin/calendrier?ical=${url ? `ok&n=${n}` : "off"}#agenda`);
+}
+export async function syncIcloudNow() {
+  if (!(await isAdmin())) redirect("/admin");
+  const { syncAllToIcloud } = await import("@/lib/icloud-push");
+  const r = await syncAllToIcloud();
+  redirect(`/admin/calendrier?ical=ok&n=${r.ok}${r.failed ? `&e=${r.failed}` : ""}#agenda`);
 }

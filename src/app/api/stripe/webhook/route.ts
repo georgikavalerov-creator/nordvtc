@@ -3,6 +3,7 @@ import type Stripe from "stripe";
 import { getStripe } from "@/lib/stripe";
 import { db } from "@/lib/supabase";
 import { sendBookingEmails } from "@/lib/mail";
+import { pushBookingToIcloud } from "@/lib/icloud-push";
 import { docPath, trackPath } from "@/lib/docsign";
 import { SITE } from "@/lib/site";
 
@@ -48,6 +49,7 @@ export async function POST(req: Request) {
               timeStyle: "short",
             }).format(new Date(b.pickup_at));
             await db().rpc("issue_order", { bid: b.id });
+            await pushBookingToIcloud(b.id);
             await sendBookingEmails({
               orderUrl: `${SITE.url}${docPath("bon", b.id)}`,
               trackUrl: `${SITE.url}${trackPath(b.id)}`,

@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { db, dbConfigured } from "@/lib/supabase";
 import { AdminPage } from "../gate";
-import { addBlock, removeBlock } from "../actions";
+import { addBlock, removeBlock, saveIcloudTarget, syncIcloudNow } from "../actions";
+import { getIcloudTarget, listIcloudCalendars } from "@/lib/icloud-push";
+import { icloudConfigured } from "@/lib/icloud";
 import { fmtDT, ymd, type Booking } from "../lib";
 import { agendaToken } from "@/lib/ics";
 import { SITE } from "@/lib/site";
@@ -13,7 +15,7 @@ export const dynamic = "force-dynamic";
 type Block = { id: string; start_at: string; end_at: string; reason: string | null };
 const MONTHS = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
 
-export default async function Page({ searchParams }: { searchParams: Promise<{ m?: string }> }) {
+export default async function Page({ searchParams }: { searchParams: Promise<{ m?: string; ical?: string; n?: string; e?: string }> }) {
   const sp = await searchParams;
   const base = /^\d{4}-\d{2}$/.test(sp.m ?? "") ? sp.m! : ymd(new Date()).slice(0, 7);
   const [Y, M] = base.split("-").map(Number);
@@ -36,6 +38,11 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ m
   const today = ymd(new Date());
   const blockedOn = (day: string) => blocks.some((b) => ymd(b.start_at) <= day && ymd(b.end_at) >= day);
 
+  const icloudOn = icloudConfigured();
+  const [target, cals] = await Promise.all([
+    getIcloudTarget().catch(() => null),
+    icloudOn ? listIcloudCalendars().catch(() => null) : Promise.resolve([]),
+  ]);
   const tok = agendaToken();
   const host = SITE.url.replace(/^https?:\/\//, "");
   const feed = `${host}/api/agenda/${tok}`;
@@ -53,6 +60,29 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ m
           Les courses en attente de paiement n'y figurent pas. iPhone : actualisation en quelques minutes à 1 h ; Google Agenda : jusqu'à 12 h (utilisez « Google Agenda » sur une course pour l'ajouter tout de suite).
         </p>
         {!tok && <p className="notice">Renseignez ADMIN_SESSION_SECRET pour activer le lien.</p>}
+      </div>
+      <div className="adm-box adm-ical" id="agenda">
+        <strong>Ajouter les courses dans un agenda précis de mon iPhone</strong>
+        <p className="muted" style={{ margin: "6px 0 10px" }}>Choisissez l&apos;agenda iCloud (Travail, Personnel, VTC…) : chaque course confirmée y est ajoutée toute seule, mise à jour si elle change et retirée si elle est annulée.</p>
+        {sp.ical === "ok" && <p className="notice" role="status">Agenda enregistré : {sp.n ?? 0} course(s) envoyée(s){sp.e ? `, ${sp.e} en échec` : ""}.</p>}
+        {sp.ical === "off" && <p className="notice" role="status">Ajout automatique désactivé.</p>}
+        {!icloudOn ? (
+          <p className="muted" style={{ margin: 0 }}>Connexion iCloud non configurée : ajoutez ICLOUD_APPLE_ID et ICLOUD_APP_PASSWORD (mot de passe d&apos;application Apple) dans les variables de Cloudflare.</p>
+        ) : cals === null ? (
+          <p className="error" style={{ margin: 0 }}>iCloud refuse la connexion : vérifiez l&apos;identifiant Apple et le mot de passe d&apos;application.</p>
+        ) : (
+          <div className="adm-ical-row">
+            <form action={saveIcloudTarget} className="adm-ical-form">
+              <select name="cal" defaultValue={target?.url ?? ""} aria-label="Agenda iCloud">
+                <option value="">Aucun (ne rien ajouter)</option>
+                {cals.map((c) => <option key={c.url} value={c.url}>{c.name}</option>)}
+              </select>
+              <button className="btn small">Enregistrer</button>
+            </form>
+            {target && <form action={syncIcloudNow}><button className="btn small ghost">Tout renvoyer maintenant</button></form>}
+          </div>
+        )}
+        {target && <p className="muted" style={{ fontSize: ".82rem", margin: "10px 0 0" }}>Agenda actuel : <strong>{target.name}</strong>. L&apos;abonnement ci-dessus reste possible en plus, mais évitez les deux à la fois pour ne pas voir les courses en double.</p>}
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: 12, justifyContent: "space-between" }}>

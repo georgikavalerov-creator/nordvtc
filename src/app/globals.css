@@ -3684,3 +3684,6 @@ h2.bk-sub::before { content: ""; width: 4px; height: 1.1em; border-radius: 4px; 
 :root[data-theme="dark"] .adm-nav.adm-side a.on { background: #e0e0e0 !important; color: #0b0b0c !important; box-shadow: inset 3px 0 0 #1f5bff !important; }
 :root[data-theme="dark"] .adm .muted, .adm small { color: #5e5e5e !important; }
 :root[data-theme="dark"] .adm table th { color: #5e5e5e !important; }
+.adm-ical-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.adm-ical-form { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; flex: 1 1 360px; }
+.adm-ical-form select { flex: 1 1 220px; min-width: 0; }

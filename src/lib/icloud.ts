@@ -1,4 +1,4 @@
-// Pont avec l'agenda iCloud (iPhone) en CalDAV, lecture seule.
+// Pont avec l'agenda iCloud (iPhone) en CalDAV : lecture (import) et écriture des courses dans l'agenda choisi (icloud-push).
 // Identifiants : ICLOUD_APPLE_ID + ICLOUD_APP_PASSWORD (mot de passe d'application créé sur appleid.apple.com),
 // saisis comme secrets dans Cloudflare, jamais dans le code. ICLOUD_CALENDARS (facultatif) : noms des agendas à lire, séparés par des virgules.
 
@@ -10,6 +10,8 @@ export const icloudConfigured = () => !!(process.env.ICLOUD_APPLE_ID && process.
 function auth() {
   return "Basic " + btoa(`${process.env.ICLOUD_APPLE_ID}:${process.env.ICLOUD_APP_PASSWORD}`);
 }
+
+export const icloudAuth = auth;
 
 async function dav(url: string, method: "PROPFIND" | "REPORT", body: string, depth: "0" | "1") {
   const r = await fetch(url, { method, headers: { Authorization: auth(), Depth: depth, "Content-Type": "application/xml; charset=utf-8" }, body, redirect: "follow", cache: "no-store" });
@@ -24,7 +26,7 @@ const tags = (xml: string, name: string) => [...xml.matchAll(new RegExp(`<(?:[\\
 const xmlText = (s: string) => s.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&#13;/g, "\r").replace(/&#10;/g, "\n").replace(/&amp;/g, "&").trim();
 const abs = (href: string, base: string) => new URL(xmlText(tag(href, "href") || href), base).toString();
 
-async function calendars() {
+export async function calendars() {
   const p1 = await dav(`${ROOT}/`, "PROPFIND", `<?xml version="1.0"?><d:propfind xmlns:d="DAV:"><d:prop><d:current-user-principal/></d:prop></d:propfind>`, "0");
   const principal = abs(tag(p1.text, "current-user-principal"), p1.url);
   const p2 = await dav(principal, "PROPFIND", `<?xml version="1.0"?><d:propfind xmlns:d="DAV:" xmlns:c="urn:ietf:params:xml:ns:caldav"><d:prop><c:calendar-home-set/></d:prop></d:propfind>`, "0");
@@ -56,6 +58,7 @@ function parseEvents(ics: string, calendar: string): CalEvent[] {
     else if (v.endsWith("Z")) { const d = new Date(`${v.slice(0, 4)}-${v.slice(4, 6)}-${v.slice(6, 8)}T${v.slice(9, 11)}:${v.slice(11, 13)}:${v.slice(13, 15)}Z`); ({ date, time } = paris(d)); startIso = d.toISOString(); }
     else { date = `${v.slice(0, 4)}-${v.slice(4, 6)}-${v.slice(6, 8)}`; time = `${v.slice(9, 11)}:${v.slice(11, 13)}`; startIso = `${date}T${time}:00`; } // heure locale (agenda en Europe/Paris)
     const uid = prop("UID")?.value ?? `${date}${time}`;
+    if (/^[0-9a-f-]{36}@/i.test(uid)) continue; // courses du site déjà envoyées dans l'agenda : pas à réimporter
     out.push({
       uid, ref: `ical:${uid}@${date}`.slice(0, 200), calendar,
       title: icsVal(prop("SUMMARY")?.value ?? ""), location: icsVal(prop("LOCATION")?.value ?? ""), notes: icsVal(prop("DESCRIPTION")?.value ?? ""),
