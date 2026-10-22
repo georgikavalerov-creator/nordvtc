@@ -2053,3 +2053,28 @@ html body .btn.is-pressed::before, html body .btn:active::before { transform: tr
 @media (max-width: 900px) { .statement { height: 130vh; } }
 @media (max-width: 560px) { .statement { height: 125vh; } .statement-inner { top: 14svh; height: 72svh; } }
 @media (prefers-reduced-motion: reduce) { .statement { height: auto; } .statement-inner { position: static; height: auto; padding: 56px 24px; } }
+
+/* ---------- Mode jour : champs de formulaire bien visibles ---------- */
+/* Fond blanc, contour gris net, libellés foncés ; focus bleu avec halo. Le mode nuit n'est pas modifié. */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) :is(.form, .claim-box) :is(input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), select, textarea) { background-color: #fff; border: 1.5px solid #b9c0cc; color: #0b1430; box-shadow: 0 1px 2px rgba(11,20,48,.06); }
+  :root:not([data-theme="dark"]) :is(.form, .claim-box) :is(input, select, textarea):hover { border-color: #8892a3; }
+  :root:not([data-theme="dark"]) :is(.form, .claim-box) :is(input:not([type="checkbox"]):not([type="radio"]), select, textarea):focus { border-color: #1f5bff; box-shadow: 0 0 0 4px rgba(31,91,255,.16); outline: none; }
+  :root:not([data-theme="dark"]) :is(.form, .claim-box) ::placeholder { color: #6b7385; opacity: 1; }
+  :root:not([data-theme="dark"]) :is(.form, .claim-box) label, :root:not([data-theme="dark"]) .form .tf-label { color: #1d2433; font-weight: 600; }
+  :root:not([data-theme="dark"]) .form .toggle { border: 1.5px solid #b9c0cc; background: #fff; }
+}
+:root[data-theme="light"] :is(.form, .claim-box) :is(input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), select, textarea) { background-color: #fff; border: 1.5px solid #b9c0cc; color: #0b1430; box-shadow: 0 1px 2px rgba(11,20,48,.06); }
+:root[data-theme="light"] :is(.form, .claim-box) :is(input, select, textarea):hover { border-color: #8892a3; }
+:root[data-theme="light"] :is(.form, .claim-box) :is(input:not([type="checkbox"]):not([type="radio"]), select, textarea):focus { border-color: #1f5bff; box-shadow: 0 0 0 4px rgba(31,91,255,.16); outline: none; }
+:root[data-theme="light"] :is(.form, .claim-box) ::placeholder { color: #6b7385; opacity: 1; }
+:root[data-theme="light"] :is(.form, .claim-box) label, :root[data-theme="light"] .form .tf-label { color: #1d2433; font-weight: 600; }
+:root[data-theme="light"] .form .toggle { border: 1.5px solid #b9c0cc; background: #fff; }
+/* Erreurs : toujours en rouge, quel que soit le mode */
+.form :is(input, select)[aria-invalid="true"] { border-color: #c4281c !important; }
+
+/* Heure : liste déroulante simple (créneaux de 15 min) */
+.tf-select { width: 100%; cursor: pointer; font-variant-numeric: tabular-nums; }
+.tf-label { display: grid; gap: 6px; }
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) .form .toggle.on { border-color: #1f5bff; background: #f3f6ff; } }
+:root[data-theme="light"] .form .toggle.on { border-color: #1f5bff; background: #f3f6ff; }
