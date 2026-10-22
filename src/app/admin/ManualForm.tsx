@@ -21,15 +21,22 @@ export default function ManualForm({ mode = "booking", action = createManualBook
   const [coAddr, setCoAddr] = useState("");
   const [coSiren, setCoSiren] = useState("");
   if (s && "url" in s && s.url) {
+    const id = "id" in s ? s.id : undefined;
     return (
-      <div className="adm-box imp-done">
-        <strong>Bon de commande créé{i.name ? ` · ${i.name}` : ""}</strong>
-        <a className="btn small" href={s.url} target="_blank" rel="noreferrer">Ouvrir le bon</a>
+      <div className="adm-box imp-done adm-created">
+        <strong>✓ Course enregistrée et bon de commande créé{i.name ? ` · ${i.name}` : ""}</strong>
+        <p className="muted" style={{ margin: 0 }}>Elle apparaît dans vos réservations, votre calendrier et, si vous l&apos;avez choisi, dans votre agenda iPhone.</p>
+        <div className="adm-actions">
+          <a className="btn small" href={s.url} target="_blank" rel="noreferrer">Ouvrir le bon de commande</a>
+          {id && <a className="btn small ghost" href={`/admin/ics/${id}`}>Ajouter à l&apos;agenda</a>}
+          {id && <a className="btn small ghost" href={`/admin/reservations?q=${id.slice(0, 8)}&ouvrir=1`}>Voir la réservation</a>}
+          <a className="btn small ghost" href="/admin/reservations/nouvelle">Nouvelle course</a>
+        </div>
       </div>
     );
   }
   return (
-    <form action={act} className="form adm-box" style={{ display: "grid", gap: 14, maxWidth: 760 }}>
+    <form action={act} className="form adm-box adm-manual">
       <input type="hidden" name="origin" value={o ? JSON.stringify(o) : ""} />
       <input type="hidden" name="dest" value={d ? JSON.stringify(d) : ""} />
       {mode === "bon" && <input type="hidden" name="goto" value={stay ? "stay" : "bon"} />}

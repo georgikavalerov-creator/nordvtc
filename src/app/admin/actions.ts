@@ -253,12 +253,12 @@ export async function saveSettings(_: { error?: string; ok?: boolean } | undefin
 }
 
 // ---------- Réservation créée à la main (téléphone, SMS, client habituel) ----------
-export async function createManualBooking(_: { error?: string; url?: string } | undefined, form: FormData): Promise<{ error?: string; url?: string } | undefined> {
+export async function createManualBooking(_: { error?: string; url?: string; id?: string } | undefined, form: FormData): Promise<{ error?: string; url?: string; id?: string } | undefined> {
   if (!(await isAdmin())) redirect("/admin");
   const r = await createManual(form, null);
   if ("error" in r) return r;
   wipe();
-  if (r.goto === "stay") return { url: docPath("bon", r.id) };
+  if (r.goto === "stay") return { url: docPath("bon", r.id), id: r.id };
   if (r.goto === "bon") redirect(docPath("bon", r.id));
   redirect(`/admin/reservations?q=${r.id.slice(0, 8)}&ouvrir=1`);
 }

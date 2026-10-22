@@ -3704,3 +3704,44 @@ h2.bk-sub::before { content: ""; width: 4px; height: 1.1em; border-radius: 4px; 
 @media (max-width: 560px) { .tfa-setup { grid-template-columns: 1fr; justify-items: center; } .tfa-head { grid-template-columns: auto minmax(0, 1fr); } .tfa-head .pill { grid-column: 2; justify-self: start; } }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .tfa-qr { filter: invert(1) hue-rotate(180deg); } }
 :root[data-theme="dark"] .tfa-qr { filter: invert(1) hue-rotate(180deg); }
+
+/* Tous les champs « Choisir un fichier » du site : arrondis, comme les autres champs */
+input[type="file"] { max-width: 100%; box-sizing: border-box; padding: 8px !important; border: 1.5px dashed #c2c2c7 !important; border-radius: 999px !important; background: #fff !important; color: #3a3a3c; font-size: .92rem; cursor: pointer; }
+input[type="file"]::file-selector-button { margin-right: 12px; border: 0; border-radius: 999px; padding: 9px 16px; background: #0b0b0c; color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+input[type="file"]:hover { border-color: #1f5bff !important; }
+input[type="file"]:focus-visible { outline: none; border-color: #1f5bff !important; box-shadow: 0 0 0 4px rgba(31,91,255,.16); }
+
+/* Administration : champs de même hauteur, mêmes couleurs, jour comme nuit */
+.adm :is(input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), select) { min-height: 46px; box-sizing: border-box; }
+.adm :is(input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), select, textarea) { background-color: #fff !important; border: 1.5px solid #d4d4d8 !important; color: #0b0b0c !important; border-radius: 14px !important; }
+.adm :is(input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), select, textarea):focus { border-color: #1f5bff !important; box-shadow: 0 0 0 4px rgba(31,91,255,.14) !important; outline: none; }
+.adm :is(input, textarea)::placeholder { color: #8e8e93 !important; }
+.adm label { font-weight: 600; font-size: .88rem; }
+.adm-manual { display: grid !important; gap: 14px !important; }
+.adm-manual > strong { font-size: 1rem; margin-top: 4px; }
+.adm-manual details { border: 1px solid #e4e4e7; border-radius: 14px; padding: 10px 14px; }
+.adm-manual summary { font-weight: 600; font-size: .92rem; }
+.adm-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.adm-created { display: grid !important; gap: 10px; border-color: #b9e6c9 !important; background: #f2fbf5 !important; }
+.adm-filters.adm-box { display: grid !important; grid-template-columns: minmax(220px, 2fr) repeat(2, minmax(160px, 1fr)) auto; gap: 12px; align-items: end; }
+@media (max-width: 760px) { .adm-filters.adm-box { grid-template-columns: 1fr; } }
+.adm-table { padding: 0 !important; overflow-x: auto; }
+.adm-table table { width: 100%; border-collapse: collapse; }
+.adm-table th { text-align: left; font-size: .75rem; letter-spacing: .06em; text-transform: uppercase; color: #5e5e5e; padding: 12px 16px; border-bottom: 1px solid #e4e4e7; }
+.adm-table td { padding: 12px 16px; border-bottom: 1px solid #f0f0f2; vertical-align: top; font-size: .92rem; }
+.adm-table tr:last-child td { border-bottom: 0; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) input[type="file"] { background: #f3f3f3 !important; border-color: #b8b8bd !important; color: #3a3a3c !important; }
+  :root:not([data-theme="light"]) .adm :is(input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), select, textarea) { background-color: #ececec !important; border-color: #cfcfd3 !important; color: #0b0b0c !important; }
+  :root:not([data-theme="light"]) .adm-manual details { border-color: #d9d9dc; }
+  :root:not([data-theme="light"]) .adm-created { background: #f3f3f3 !important; border-color: #c9c9cc !important; }
+  :root:not([data-theme="light"]) .adm-table th { border-bottom-color: #d9d9dc; } 
+  :root:not([data-theme="light"]) .adm-table td { border-bottom-color: #e2e2e4; }
+}
+:root[data-theme="dark"] input[type="file"] { background: #f3f3f3 !important; border-color: #b8b8bd !important; color: #3a3a3c !important; }
+:root[data-theme="dark"] .adm :is(input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), select, textarea) { background-color: #ececec !important; border-color: #cfcfd3 !important; color: #0b0b0c !important; }
+:root[data-theme="dark"] .adm-manual details { border-color: #d9d9dc; }
+:root[data-theme="dark"] .adm-created { background: #f3f3f3 !important; border-color: #c9c9cc !important; }
+:root[data-theme="dark"] .adm-table th { border-bottom-color: #d9d9dc; } 
+:root[data-theme="dark"] .adm-table td { border-bottom-color: #e2e2e4; }
+input[type="file"][hidden] { display: none !important; }

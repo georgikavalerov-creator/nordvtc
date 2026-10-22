@@ -8,9 +8,9 @@ export const dynamic = "force-dynamic";
 
 export default function Page() {
   return (
-    <AdminPage title="Nouvelle réservation" actions={<Link className="btn ghost small" href="/admin/reservations">← Réservations</Link>}>
-      <p className="muted" style={{ margin: 0 }}>Pour une course prise par téléphone ou message. Elle est créée « confirmée », avec bon de commande ; après création, ajoutez-la à votre agenda en un geste.</p>
-      <ManualForm />
+    <AdminPage title="Bon de commande" actions={<Link className="btn ghost small" href="/admin/reservations">← Réservations</Link>}>
+      <p className="muted" style={{ margin: 0 }}>Pour une course prise hors du site (téléphone, message, client régulier). Elle est créée « confirmée » avec son bon de commande numéroté et toutes les mentions obligatoires, puis ajoutée à vos réservations et à votre agenda.</p>
+      <ManualForm mode="bon" stay />
     </AdminPage>
   );
 }
