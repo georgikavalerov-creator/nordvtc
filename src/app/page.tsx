@@ -172,10 +172,10 @@ export default function Home() {
             <h2>Ce qu'une application ne vous garantit pas</h2>
           </div>
           <div className="grid cols-4 fx-stagger" data-fx="" suppressHydrationWarning>
-            <div className="iconbox"><div className="ico"><Icon name="euro" size={30} /></div><h3>Prix ferme, même quand tout le monde réserve</h3><p>Le montant affiché est celui que vous payez : pas de tarif dynamique selon la demande ou la météo. Les majorations prévues (nuit, par exemple) sont incluses avant que vous confirmiez.</p></div>
-            <div className="iconbox"><div className="ico"><Icon name="calendarCheck" size={30} /></div><h3>Un acompte, pas un prépaiement total</h3><p>Vous bloquez la course avec un acompte, le reste se règle à bord. Annulation gratuite jusqu'à 24 h avant.</p></div>
-            <div className="iconbox"><div className="ico"><Icon name="plane" size={30} /></div><h3>Je suis votre vol ou votre train</h3><p>Votre vol atterrit en retard ? Je suis déjà informé et je vous attends : un temps d'attente raisonnable est inclus.</p></div>
-            <div className="iconbox"><div className="ico"><Icon name="seal" size={30} /></div><h3>Un chauffeur qui ne se désiste pas</h3><p>Une course réservée est une course assurée : pas de chauffeur qui annule au dernier moment, pas de recherche à l'arrivée.</p></div>
+            <div className="iconbox"><div className="ico"><Icon name="euro" size={38} /></div><h3>Prix ferme, même quand tout le monde réserve</h3><p>Le montant affiché est celui que vous payez : pas de tarif dynamique selon la demande ou la météo. Les majorations prévues (nuit, par exemple) sont incluses avant que vous confirmiez.</p></div>
+            <div className="iconbox"><div className="ico"><Icon name="calendarCheck" size={38} /></div><h3>Un acompte, pas un prépaiement total</h3><p>Vous bloquez la course avec un acompte, le reste se règle à bord. Annulation gratuite jusqu'à 24 h avant.</p></div>
+            <div className="iconbox"><div className="ico"><Icon name="plane" size={38} /></div><h3>Je suis votre vol ou votre train</h3><p>Votre vol atterrit en retard ? Je suis déjà informé et je vous attends : un temps d'attente raisonnable est inclus.</p></div>
+            <div className="iconbox"><div className="ico"><Icon name="seal" size={38} /></div><h3>Un chauffeur qui ne se désiste pas</h3><p>Une course réservée est une course assurée : pas de chauffeur qui annule au dernier moment, pas de recherche à l'arrivée.</p></div>
           </div>
         </div>
       </section>
