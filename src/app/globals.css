@@ -2225,3 +2225,4 @@ html body .btn.is-pressed::before, html body .btn:active::before { transform: tr
 .chat-resume { margin: 0 0 4px; font-size: .74rem; opacity: .7; text-align: center; }
 .cta-actions .btn { height: 60px; min-height: 60px; box-sizing: border-box; padding-top: 0; padding-bottom: 0; display: inline-flex; align-items: center; border-width: 2px; line-height: 1.2; }
 @media (max-width: 640px) { .cta-actions .btn { height: auto; min-height: 56px; padding-top: 12px; padding-bottom: 12px; } }
+@media (max-width: 640px) { .perks { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; } .perks li { padding: 7px 10px; font-size: .8rem; border-radius: 12px; gap: 6px; } .perks li span { font-size: 1rem; } }
