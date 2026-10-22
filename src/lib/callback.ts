@@ -73,7 +73,9 @@ async function twilio(path: string, body: Record<string, string>) {
     },
     body: new URLSearchParams(body),
   });
-  return { ok: res.ok, data: (await res.json().catch(() => ({}))) as { status?: string } };
+  const data = (await res.json().catch(() => ({}))) as { status?: string; code?: number; message?: string };
+  if (!res.ok) console.error(`twilio:${path}:${res.status}`, JSON.stringify({ code: data.code, message: data.message }));
+  return { ok: res.ok, data };
 }
 export async function sendOtp(phone: string) {
   return (await twilio("Verifications", { To: phone, Channel: "sms", Locale: "fr" })).ok;
