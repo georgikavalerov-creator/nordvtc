@@ -2628,3 +2628,87 @@ ol.steps > li::before { box-shadow: 0 6px 14px -8px var(--c2) !important; }
 :root[data-theme="dark"] .story-copy::before {
   background: radial-gradient(closest-side, rgba(4,8,22,.9) 0%, rgba(4,8,22,.84) 55%, rgba(4,8,22,.5) 78%, rgba(4,8,22,0) 100%);
 }
+
+/* ===================== Retouches 22/10 : alignement, étapes sobres, comparatif, Liquid Glass ===================== */
+
+/* Liste de confiance : le 1er élément aligné sur les autres en mobile/tablette */
+@media (max-width: 900px) {
+  .trustbar .trust-item, .trustbar .trust-item:first-child { padding-left: 10px; padding-right: 10px; }
+}
+
+/* « Simple et rapide » : sobre, dans les couleurs du site (noir, blanc, une touche de bleu) */
+ol.steps > li { overflow: visible !important; }
+ol.steps > li::before { background: #0b0b0c !important; color: #fff !important; box-shadow: 0 0 0 4px rgba(31,91,255,.14), 0 8px 18px -10px rgba(0,0,0,.6) !important; }
+@media (hover: hover) { ol.steps > li:hover::before { background: #1f5bff !important; } }
+ol.steps > li h3 { color: #0b0b0c !important; letter-spacing: -.01em; }
+@media (max-width: 760px) {
+  ol.steps > li:not(:last-child)::after { background: linear-gradient(#1f5bff, rgba(31,91,255,.15)) !important; left: 37px !important; width: 2px; height: 12px; top: 100% !important; }
+}
+
+/* Comparatif : titres de critère mis en valeur, colonnes plus lisibles */
+.cmp { box-shadow: 0 18px 40px -28px rgba(15,23,42,.35); }
+.cmp-head { background: #fafafa; }
+.cmp-head > span { color: #5b5b60; }
+.cmp-head .cmp-us { color: #1f5bff !important; font-weight: 900; }
+.cmp-row:not(.cmp-head) > .cmp-k { color: #0b0b0c !important; font-weight: 800; }
+.cmp-row .cmp-us { background: rgba(31,91,255,.07); color: #0b0b0c; }
+.cmp-them { color: #66666b !important; }
+@media (max-width: 760px) {
+  .cmp-head > span { font-size: .8rem; padding: 14px 8px; }
+  .cmp-row:not(.cmp-head) > .cmp-k { font-size: .9rem !important; letter-spacing: .09em !important; padding: 16px 12px 8px !important; gap: 8px; }
+  .cmp-row:not(.cmp-head) > .cmp-k::before { content: ""; width: 14px; height: 3px; border-radius: 3px; background: #1f5bff; flex: none; }
+  .cmp-row:not(.cmp-head) > .cmp-k::after { content: ""; width: 14px; height: 3px; border-radius: 3px; background: #1f5bff; flex: none; }
+  .cmp-row > .cmp-us { font-size: .95rem !important; font-weight: 650; }
+  .cmp-row > .cmp-them { font-size: .9rem !important; }
+}
+
+/* ===== Liquid Glass (façon iOS) : verre translucide, flou, reflets sur les bords ===== */
+@media (max-width: 1100px) {
+  .mbar, html.in-app .mbar {
+    background: linear-gradient(180deg, rgba(255,255,255,.62), rgba(255,255,255,.42)) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(190%) brightness(1.04); backdrop-filter: blur(18px) saturate(190%) brightness(1.04);
+    border: 1px solid rgba(255,255,255,.7);
+    box-shadow: inset 0 1px 1px rgba(255,255,255,.95), inset 0 -1px 1px rgba(255,255,255,.35), inset 0 0 0 .5px rgba(0,0,0,.06), 0 18px 40px -14px rgba(15,23,42,.45) !important;
+    overflow: hidden; isolation: isolate;
+  }
+  .mbar::before { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: -1;
+    background: radial-gradient(120% 90% at 18% -20%, rgba(255,255,255,.75), transparent 55%), radial-gradient(90% 70% at 100% 130%, rgba(255,255,255,.4), transparent 60%); }
+  .mbar a, .mbar a.main, html.in-app .mbar a, html.in-app .mbar a.main { color: #4a4a50 !important; }
+  .mbar a.on, html.in-app .mbar a.on {
+    color: #1f5bff !important;
+    background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.6)) !important;
+    box-shadow: inset 0 1px 1px #fff, inset 0 -1px 2px rgba(0,0,0,.06), 0 6px 16px -8px rgba(15,23,42,.35);
+  }
+}
+.chat-fab {
+  background: linear-gradient(180deg, rgba(255,255,255,.7), rgba(255,255,255,.45)) !important; color: #0b0b0c !important; opacity: 1;
+  -webkit-backdrop-filter: blur(16px) saturate(190%); backdrop-filter: blur(16px) saturate(190%);
+  border: 1px solid rgba(255,255,255,.75) !important;
+  box-shadow: inset 0 1px 1px #fff, inset 0 -1px 1px rgba(255,255,255,.35), 0 12px 28px -12px rgba(15,23,42,.5) !important;
+}
+.chat-fab:hover, .chat-fab.is-open { background: linear-gradient(180deg, rgba(31,91,255,.9), rgba(31,91,255,.75)) !important; color: #fff !important; }
+.story-hint { -webkit-backdrop-filter: blur(14px) saturate(180%); backdrop-filter: blur(14px) saturate(180%); background: rgba(10,16,34,.5) !important; box-shadow: inset 0 1px 1px rgba(255,255,255,.35), 0 0 30px rgba(31,91,255,.35) !important; }
+@media (prefers-reduced-transparency: reduce) {
+  .mbar, html.in-app .mbar, .chat-fab { background: #f4f4f5 !important; -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
+/* Mode nuit (auto ou choisi) */
+@media (prefers-color-scheme: dark) {
+:root:not([data-theme="light"]) .faq-tabs .chip.on { background: #0b0b0c !important; color: #fff !important; border-color: #0b0b0c !important; box-shadow: none !important; }
+:root:not([data-theme="light"]) ol.steps > li { background: #ebebeb !important; }
+:root:not([data-theme="light"]) ol.steps > li::before { background: #fff !important; color: #0b0b0c !important; box-shadow: 0 0 0 4px rgba(31,91,255,.25) !important; }
+:root:not([data-theme="light"]) ol.steps > li h3 { color: #000 !important; }
+:root:not([data-theme="light"]) .cmp-head { background: #f0f0f0; }
+:root:not([data-theme="light"]) .cmp-row:not(.cmp-head) > .cmp-k { color: #000 !important; }
+:root:not([data-theme="light"]) .cmp-row .cmp-us { background: rgba(31,91,255,.1); color: #000; }
+:root:not([data-theme="light"]) .cmp-them { color: #5a5a5a !important; }
+:root:not([data-theme="light"]) .cmp { box-shadow: inset 0 0 0 1px #d4d4d4; }
+}
+:root[data-theme="dark"] .faq-tabs .chip.on { background: #0b0b0c !important; color: #fff !important; border-color: #0b0b0c !important; box-shadow: none !important; }
+:root[data-theme="dark"] ol.steps > li { background: #ebebeb !important; }
+:root[data-theme="dark"] ol.steps > li::before { background: #fff !important; color: #0b0b0c !important; box-shadow: 0 0 0 4px rgba(31,91,255,.25) !important; }
+:root[data-theme="dark"] ol.steps > li h3 { color: #000 !important; }
+:root[data-theme="dark"] .cmp-head { background: #f0f0f0; }
+:root[data-theme="dark"] .cmp-row:not(.cmp-head) > .cmp-k { color: #000 !important; }
+:root[data-theme="dark"] .cmp-row .cmp-us { background: rgba(31,91,255,.1); color: #000; }
+:root[data-theme="dark"] .cmp-them { color: #5a5a5a !important; }
+:root[data-theme="dark"] .cmp { box-shadow: inset 0 0 0 1px #d4d4d4; }
