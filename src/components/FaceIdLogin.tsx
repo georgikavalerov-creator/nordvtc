@@ -33,7 +33,7 @@ export default function FaceIdLogin({ getOptions, verify, next }: { getOptions: 
       setErr(r.error ?? "Connexion impossible.");
     } catch (e) {
       const m = (e as Error)?.message ?? "";
-      setErr(/NotAllowed|cancel|annul|timed out/i.test((e as Error)?.name + m) ? "Connexion annulée." : m.includes("Trop") ? m : `${label} n'est pas encore activé sur cet appareil. Connectez-vous avec votre mot de passe, puis activez-le dans vos réglages.`);
+      setErr(m.includes("Trop") ? m : `Connexion annulée, ou ${label} pas encore activé sur cet appareil : connectez-vous avec votre mot de passe, puis activez-le dans vos réglages.`);
     } finally { setBusy(false); }
   }
   return (
