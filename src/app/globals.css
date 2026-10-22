@@ -2739,3 +2739,16 @@ button.pk-field { cursor: pointer; text-align: left; -webkit-tap-highlight-color
   .bk-grid > .tf-label:nth-child(2) .pk-pop, .pk-pop { left: 12px !important; right: 12px !important; width: auto !important; }
   .pk-pop { box-shadow: 0 0 0 100vmax rgba(5,8,18,.38), 0 -10px 40px -10px rgba(0,0,0,.35) !important; }
 }
+
+/* Retour : encart clair avec les adresses du retour, modifiables sur tous les écrans */
+.ret-box { margin-top: 10px; padding: 14px; border-radius: 18px; background: #fff; border: 1.5px solid #dfe3ea; }
+.ret-sum { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 4px 12px; }
+.ret-k { font-size: .78rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: #1f5bff; }
+.ret-v { grid-column: 1; font-weight: 700; line-height: 1.35; }
+.ret-v b { color: #1f5bff; font-weight: 800; margin: 0 4px; }
+.ret-sum .ret-edit { grid-column: 2; grid-row: 1 / span 2; white-space: nowrap; }
+.ret-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+@media (max-width: 560px) {
+  .ret-sum { grid-template-columns: 1fr; }
+  .ret-sum .ret-edit { grid-column: 1; grid-row: auto; width: 100%; margin-top: 8px; min-height: 44px; }
+}

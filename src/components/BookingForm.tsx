@@ -347,38 +347,41 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
           <span>Prévoir aussi le retour (autre date possible)</span>
         </label>
         {wantReturn && (
-          <div className="bk-grid bk-2" style={{ marginTop: 8 }}>
-            <div className="tf-label">
-              Date du retour
-              <DateField value={retDate} min={date || today()} ariaLabel="Date du retour" invalid={!!errors.ret && !retDate} onChange={(v) => { setRetDate(v); setErrors((x) => ({ ...x, ret: undefined })); }} />
-            </div>
-            <div className="tf-label">
-              Heure du retour
-              <TimeField value={retTime} invalid={!!errors.ret && !retTime} onChange={(v) => { setRetTime(v); setErrors((x) => ({ ...x, ret: undefined })); }} />
+          <div className="ret-box">
+            {!retCustom ? (
+              <div className="ret-sum">
+                <span className="ret-k">Trajet du retour</span>
+                <span className="ret-v">{dest ? dest.label.split(",")[0] : "Votre arrivée"} <b aria-hidden="true">→</b> {origin ? origin.label.split(",")[0] : "votre départ"}</span>
+                <button type="button" className="btn small ghost ret-edit" onClick={() => { setRetCustom(true); setRetFrom(dest); setRetTo(origin); setRfText(dest?.label ?? ""); setRtText(origin?.label ?? ""); setRetKey((k) => k + 1); }}>Changer les adresses du retour</button>
+              </div>
+            ) : (
+              <>
+                <div className="ret-head">
+                  <span className="ret-k">Adresses du retour</span>
+                  <button type="button" className="linklike" onClick={() => { setRetCustom(false); setRetFrom(null); setRetTo(null); setErrors((x) => ({ ...x, ret: undefined })); }}>Revenir au trajet inverse</button>
+                </div>
+                <div className="bk-route">
+                  <AddressField key={`rf${retKey}`} label="Départ du retour" value={retFrom} onChange={(p) => { setRetFrom(p); setErrors((x) => ({ ...x, ret: undefined })); }} initialText={retFrom?.label ?? rfText} autoResolve={false} onText={setRfText} placeholder="Adresse, gare, aéroport…" />
+                  <button type="button" className="bk-swap" onClick={() => { const a = retFrom, t = rfText; setRetFrom(retTo); setRetTo(a); setRfText(retTo?.label ?? rtText); setRtText(a?.label ?? t); setRetTurns((n) => n + 1); setRetKey((k) => k + 1); }} aria-label="Inverser les adresses du retour" title="Inverser">
+                    <span className="bk-swap-i" style={{ transform: `rotate(${retTurns * 180}deg)` }}><IconC name="swap" size={20} /></span>
+                  </button>
+                  <AddressField key={`rt${retKey}`} label="Arrivée du retour" value={retTo} onChange={(p) => { setRetTo(p); setErrors((x) => ({ ...x, ret: undefined })); }} initialText={retTo?.label ?? rtText} autoResolve={false} onText={setRtText} placeholder="Adresse, gare, aéroport…" />
+                </div>
+              </>
+            )}
+            <div className="bk-grid bk-2" style={{ marginTop: 10 }}>
+              <div className="tf-label">
+                Date du retour
+                <DateField value={retDate} min={date || today()} ariaLabel="Date du retour" invalid={!!errors.ret && !retDate} onChange={(v) => { setRetDate(v); setErrors((x) => ({ ...x, ret: undefined })); }} />
+              </div>
+              <div className="tf-label">
+                Heure du retour
+                <TimeField value={retTime} invalid={!!errors.ret && !retTime} onChange={(v) => { setRetTime(v); setErrors((x) => ({ ...x, ret: undefined })); }} />
+              </div>
             </div>
           </div>
         )}
         {errors.ret && <p className="field-error ret-error" role="alert">{errors.ret}</p>}
-        {wantReturn && origin && dest && !retCustom && (
-          <p className="muted" style={{ margin: "6px 0 0", fontSize: ".85rem" }}>
-            Retour : {dest.label} → {origin.label} ·{" "}
-            <button type="button" className="linklike" onClick={() => { setRetCustom(true); setRetFrom(dest); setRetTo(origin); setRetKey((k) => k + 1); }}>Modifier les adresses du retour</button>
-          </p>
-        )}
-        {wantReturn && retCustom && (
-          <div className="bk-route" style={{ marginTop: 8 }}>
-            <AddressField key={`rf${retKey}`} label="Départ du retour" value={retFrom} onChange={(p) => { setRetFrom(p); setErrors((x) => ({ ...x, ret: undefined })); }} initialText={retFrom?.label ?? rfText} autoResolve={false} onText={setRfText} placeholder="Adresse, gare, aéroport…" />
-            <button type="button" className="bk-swap" onClick={() => { const a = retFrom, t = rfText; setRetFrom(retTo); setRetTo(a); setRfText(retTo?.label ?? rtText); setRtText(a?.label ?? t); setRetTurns((n) => n + 1); setRetKey((k) => k + 1); }} aria-label="Inverser les adresses du retour" title="Inverser">
-              <span className="bk-swap-i" style={{ transform: `rotate(${retTurns * 180}deg)` }}><IconC name="swap" size={20} /></span>
-            </button>
-            <AddressField key={`rt${retKey}`} label="Arrivée du retour" value={retTo} onChange={(p) => { setRetTo(p); setErrors((x) => ({ ...x, ret: undefined })); }} initialText={retTo?.label ?? rtText} autoResolve={false} onText={setRtText} placeholder="Adresse, gare, aéroport…" />
-          </div>
-        )}
-        {wantReturn && retCustom && (
-          <p className="muted" style={{ margin: "4px 0 0", fontSize: ".85rem" }}>
-            <button type="button" className="linklike" onClick={() => { setRetCustom(false); setRetFrom(null); setRetTo(null); }}>Revenir au trajet inverse</button>
-          </p>
-        )}
       </div>
 
       <div className="bk-pane">
