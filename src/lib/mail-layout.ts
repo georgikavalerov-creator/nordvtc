@@ -87,7 +87,7 @@ export const note = (html: string, tone: Tone = "blue") => {
 export const signature = (phone?: string) => `
 <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:22px 0 4px">
   <tr>
-    <td valign="middle" style="padding-right:14px"><img src="${img("chauffeur.jpg")}" width="52" height="52" alt="" style="display:block;border-radius:50%;width:52px;height:52px"></td>
+    <td valign="middle" style="padding-right:14px"><img src="${img("chauffeur-manga.jpg")}" width="52" height="52" alt="" style="display:block;border-radius:50%;width:52px;height:52px"></td>
     <td valign="middle">
       <p style="margin:0;font:700 15px/1.3 ${FONT};color:${INK}">Georgi Kavalerov</p>
       <p style="margin:2px 0 0;font:400 13px/1.4 ${FONT};color:${MUTED}">Votre chauffeur · ${esc(SITE.name)}${phone ? ` · <a href="tel:${esc(phone.replace(/\s/g, ""))}" style="color:${MUTED};text-decoration:none;white-space:nowrap">${esc(phone)}</a>` : ""}</p>
