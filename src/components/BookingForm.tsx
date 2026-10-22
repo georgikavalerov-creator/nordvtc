@@ -290,7 +290,7 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
                 const pl = { label: sp.address, lat: sp.lat, lng: sp.lng };
                 if (!origin) { setOrigin(pl); setSwapKey((k) => k + 1); } else { setDest(pl); setSwapKey((k) => k + 1); }
                 setErrors((x) => ({ ...x, origin: undefined, dest: undefined }));
-              }}><IconC name={sp.kind === "home" ? "house" : sp.kind === "work" ? "briefcase" : "pin"} size={16} /> {sp.label}</button>
+              }}>{sp.kind === "home" ? "🏠" : sp.kind === "work" ? "💼" : "📍"} {sp.label}</button>
             ))}
           </div>
         )}
@@ -412,7 +412,7 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
           <div className="bk-promo">
             {promoInfo ? (
               <p className="promo-ok" role="status">
-                <span>Code <strong>{promoInfo.code}</strong> appliqué : {promoInfo.label} (−{eur(promoInfo.discountCents)})</span>
+                <span>🏷️ Code <strong>{promoInfo.code}</strong> appliqué : {promoInfo.label} (−{eur(promoInfo.discountCents)})</span>
                 <button type="button" className="linklike" onClick={() => { setPromoApplied(""); setPromoInput(""); setPromoInfo(null); }}>Retirer</button>
               </p>
             ) : showPromo ? (

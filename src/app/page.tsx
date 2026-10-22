@@ -15,6 +15,7 @@ import ColorIcon, { colorIconFor } from "@/components/ColorIcon";
 import Icon, { iconFor } from "@/components/Icon";
 import MapMount from "@/components/MapMount";
 import CineMount from "@/components/CineMount";
+import HeroPass from "@/components/HeroPass";
 import HeroBooking from "@/components/HeroBooking";
 import Reveal from "@/components/Reveal";
 import OnBoard from "@/components/OnBoard";
@@ -72,11 +73,14 @@ export default function Home() {
           </div>
           <aside className="hero-dests" aria-label="Trajets les plus demandés">
             <p className="hd-title">Trajets les plus demandés</p>
-            <ul>
+            <HeroPass trips={TRIPS} />
+            <ul className="hd-cards">
               {TRIPS.map((t) => (
                 <li key={t.to}>
                   <Link href={`/reservation?${new URLSearchParams({ from: t.fromQ, to: t.toQ }).toString()}`}>
-                    <span className="hd-img" style={{ backgroundImage: `url(${imgThumb(t.img)})`, backgroundPosition: t.pos }} role="img" aria-label={t.alt} />
+                    <span className="hd-img" style={{ backgroundImage: `url(${imgThumb(t.img)})`, backgroundPosition: t.pos }} role="img" aria-label={t.alt}>
+                      <span className="hd-stamp">{t.price.replace("dès ", "")}<small>dès</small></span>
+                    </span>
                     <span className="hd-txt"><b>{t.label}</b><small>{t.price}</small></span>
                     <span className="hd-go" aria-hidden="true">→</span>
                   </Link>

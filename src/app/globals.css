@@ -3127,3 +3127,33 @@ h2.bk-sub::before { content: ""; width: 4px; height: 1.1em; border-radius: 4px; 
   .site-footer .ft-col { border: 0 !important; padding: 0 !important; margin: 0 !important; background: none !important; box-shadow: none !important; }
   .site-footer .ft-col > summary { display: block; color: #fff !important; font-size: .82rem; letter-spacing: .08em; text-transform: uppercase; opacity: .7; margin-bottom: 10px; padding: 0; }
 }
+
+/* ===== Bloc 1 : « Trajets les plus demandés » en cartes postales ===== */
+@media (min-width: 901px) {
+  .hero.cine > .wrap { align-items: start !important; }
+  .hero-dests { padding-top: 0; align-self: start; }
+  .hero-dests .hd-title { margin-bottom: 18px; }
+  .hero-dests .hd-cards { display: none !important; }
+  .hd-pass { min-height: 520px; }
+  .hd-pass .pass-wrap { max-width: 380px; }
+  .hd-pass .pass-photo { height: 210px; }
+  .hd-pass .pass-route { font-size: 1.45rem; }
+}
+@media (max-width: 900px) {
+  .hd-pass { display: none; }
+  .hero-dests .hd-cards { gap: 14px !important; padding-top: 8px !important; padding-bottom: 14px !important; }
+  .hero-dests .hd-cards li { width: 152px !important; }
+  .hero-dests .hd-cards li:nth-child(odd) a { transform: rotate(-1.4deg); }
+  .hero-dests .hd-cards li:nth-child(even) a { transform: rotate(1.2deg); }
+  .hero-dests .hd-cards a { flex-direction: column; align-items: stretch; gap: 8px !important; height: auto !important; padding: 6px 6px 10px !important; border-radius: 8px !important; background: #fff !important; color: #0b1430 !important; border: 0 !important; box-shadow: 0 1px 0 rgba(0,0,0,.05), 0 14px 26px -14px rgba(0,0,0,.55) !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+  .hero-dests .hd-cards .hd-img { position: relative; width: 100% !important; height: 92px !important; border-radius: 4px !important; box-shadow: inset 0 0 0 1px rgba(0,0,0,.08); }
+  .hero-dests .hd-cards .hd-txt { padding: 0 4px; }
+  .hero-dests .hd-cards .hd-txt b { color: #0b1430 !important; font-size: .84rem !important; }
+  .hero-dests .hd-cards .hd-txt small { display: none; }
+}
+.hd-stamp { display: none; }
+@media (max-width: 900px) {
+  .hd-stamp { display: grid; position: absolute; top: 6px; right: 6px; place-items: center; min-width: 46px; padding: 4px 5px 3px; background: #fff; color: #1f5bff; font-weight: 800; font-size: .8rem; line-height: 1; border: 1.5px dashed #1f5bff; border-radius: 3px; transform: rotate(5deg); box-shadow: 0 3px 6px -2px rgba(0,0,0,.35); }
+  .hd-stamp small { order: -1; font-size: .55rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #6b7385; margin-bottom: 2px; }
+}
+@media (max-width: 900px) { .hero.cine > .wrap { padding-bottom: 118px !important; } }
