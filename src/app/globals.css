@@ -2015,3 +2015,33 @@ html.in-app .hero.cine h1 { color: var(--app-navy); }
   .btn:not(.danger):not(.disabled):not([disabled]):hover::before, .pricing:hover .btn::before { transform: translateX(270%) skewX(-18deg); transition: transform .7s ease; }
 }
 html body .btn.is-pressed::before, html body .btn:active::before { transform: translateX(270%) skewX(-18deg); transition: transform .6s ease; }
+
+/* ---------- Page 404 ---------- */
+.nf { overflow: hidden; }
+.nf-wrap { text-align: center; max-width: 760px; }
+.nf-digits { display: flex; align-items: center; justify-content: center; gap: clamp(6px, 2vw, 16px); font-weight: 800; font-size: clamp(5.5rem, 22vw, 11rem); line-height: 1; letter-spacing: -.04em; margin: 10px 0 6px;
+  background: linear-gradient(100deg, var(--c-blue, #1f5bff), #9db7ff 60%, #ff5fa2); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.nf-digits > span:first-child { animation: nfBounce 2.4s ease-in-out infinite; display: inline-block; }
+.nf-digits > span:last-child { animation: nfBounce 2.4s .3s ease-in-out infinite; display: inline-block; }
+.nf-wheel { width: .82em; height: .82em; color: var(--c-blue, #1f5bff); display: inline-block; animation: nfSpin 1.6s linear infinite; }
+.nf-title { font-size: clamp(1.6rem, 4.5vw, 2.4rem); margin: 6px 0 8px; }
+.nf-excuse { min-height: 3em; font-size: 1.05rem; color: var(--muted, #8a93a6); animation: nfFade .5s ease both; margin: 0 auto; max-width: 34em; }
+.nf-road { position: relative; height: 90px; margin: 18px 0 2px; overflow: hidden; }
+.nf-lane { position: absolute; left: 0; right: 0; bottom: 8px; height: 4px; border-radius: 2px;
+  background: repeating-linear-gradient(90deg, currentColor 0 22px, transparent 22px 40px); opacity: .25; }
+.nf-car { position: absolute; bottom: 10px; left: 0; background: none; border: 0; padding: 0; cursor: pointer; animation: nfDrive 5.5s linear infinite; }
+.nf-car svg { display: block; animation: nfRumble .35s ease-in-out infinite; }
+.nf-car.honk svg { animation: nfHonk .5s ease; }
+.nf-car:hover, .nf-car.honk { animation-play-state: paused; }
+.nf-bubble { position: absolute; bottom: 58px; left: 50%; transform: translateX(-50%); white-space: nowrap; background: #ffd23f; color: #111; font-weight: 700; font-size: .85rem; padding: 4px 10px; border-radius: 12px; animation: nfPop .5s ease; }
+.nf-hint { font-size: .8rem; margin: 0 0 18px; }
+.nf-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.nf-links { margin-top: 18px; font-size: .92rem; }
+@keyframes nfSpin { to { transform: rotate(360deg); } }
+@keyframes nfBounce { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-10px) rotate(-4deg); } }
+@keyframes nfFade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes nfDrive { from { transform: translateX(-140px); } to { transform: translateX(calc(min(760px, 100vw - 40px) + 20px)); } }
+@keyframes nfRumble { 50% { transform: translateY(-1.5px); } }
+@keyframes nfHonk { 25% { transform: scale(1.12) rotate(-3deg); } 60% { transform: scale(.96) rotate(2deg); } }
+@keyframes nfPop { from { opacity: 0; transform: translate(-50%, 8px) scale(.8); } to { opacity: 1; transform: translate(-50%, 0); } }
+@media (prefers-reduced-motion: reduce) { .nf-wheel, .nf-digits > span, .nf-car, .nf-car svg, .nf-excuse { animation: none !important; } .nf-car { left: 50%; transform: translateX(-50%); } }
