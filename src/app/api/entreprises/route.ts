@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { sameSiteOrLog } from "@/lib/same-site";
-import { guard } from "@/lib/security-log";
-import { allow, clientIp } from "@/lib/ratelimit";
+import { guard, guardVisitor } from "@/lib/security-log";
+import { allow, clientIp, allowVisitor } from "@/lib/ratelimit";
 
 // Suggestions d'entreprises (nom, SIREN ou SIRET) depuis l'annuaire public de l'État :
 // recherche-entreprises.api.gouv.fr (données INSEE / RNE, gratuit, sans clé).
@@ -14,7 +14,7 @@ export async function GET(req: Request) {
   const q = (new URL(req.url).searchParams.get("q") ?? "").trim().slice(0, 80);
   const digits = q.replace(/\s/g, "");
   if (q.length < 3 && !/^\d{9}$/.test(digits)) return NextResponse.json({ results: [] });
-  if (!allow(`ent:${clientIp(req)}`, 40, 60_000)) return NextResponse.json({ results: [] }, { status: 429 });
+  if (!allowVisitor(req, "ent", 40, 60_000)) return NextResponse.json({ results: [] }, { status: 429 });
   const url = new URL("https://recherche-entreprises.api.gouv.fr/search");
   url.searchParams.set("q", /^\d[\d\s]{8,}$/.test(q) ? digits : q);
   url.searchParams.set("per_page", "6");

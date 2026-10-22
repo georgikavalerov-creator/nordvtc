@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { sameSiteOrLog } from "@/lib/same-site";
-import { guard } from "@/lib/security-log";
-import { allow, clientIp } from "@/lib/ratelimit";
+import { guard, guardVisitor } from "@/lib/security-log";
+import { allow, clientIp, allowVisitor } from "@/lib/ratelimit";
 import { dbConfigured, db } from "@/lib/supabase";
 import { addVisitorMessage, cleanBody, messagesAfter, startThread, threadFor, validEmail } from "@/lib/chat";
 
@@ -13,7 +13,7 @@ const bad = (error: string, status = 400) => NextResponse.json({ error }, { stat
 export async function GET(req: Request) {
   if (!dbConfigured()) return bad("Indisponible", 503);
   const u = new URL(req.url);
-  if (!allow(`chat-poll:${clientIp(req)}`, 120, 60_000)) return bad("Trop de requêtes", 429);
+  if (!allowVisitor(req, "chat-poll", 120, 60_000)) return bad("Trop de requêtes", 429);
   const t = await threadFor(u.searchParams.get("id"), u.searchParams.get("token"));
   if (!t) return bad("Discussion introuvable", 404);
   const after = Math.max(0, Number(u.searchParams.get("after")) || 0);
@@ -29,7 +29,7 @@ export async function POST(req: Request) {
   if (!(await sameSiteOrLog(req))) return bad("Non autorisé", 403);
   if (!dbConfigured()) return bad("Indisponible", 503);
   const ip = clientIp(req);
-  if (!allow(`chat:${ip}`, 20, 60_000)) return bad("Trop de messages, patientez un instant.", 429);
+  if (!allowVisitor(req, "chat", 20, 60_000)) return bad("Trop de messages, patientez un instant.", 429);
   const b = await req.json().catch(() => null);
   if (!b || typeof b !== "object") return bad("Requête invalide");
   if (typeof b.website === "string" && b.website) return NextResponse.json({ ok: true }, { headers: H }); // piège à robots

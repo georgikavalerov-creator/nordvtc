@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { sameSiteOrLog } from "@/lib/same-site";
-import { guard, logSecurity } from "@/lib/security-log";
+import { guard, logSecurity, guardVisitor } from "@/lib/security-log";
 import { z } from "zod";
 import { routeSummary } from "@/lib/here";
 import { tampered, trustPlace } from "@/lib/place-sign";
@@ -9,7 +9,7 @@ import { db, dbConfigured, getPricing } from "@/lib/supabase";
 import { getStripe, stripeConfigured } from "@/lib/stripe";
 import { trackKey } from "@/lib/docsign";
 import { SITE } from "@/lib/site";
-import { allow, clientIp, allowDurable } from "@/lib/ratelimit";
+import { allow, clientIp, allowDurable, allowVisitor } from "@/lib/ratelimit";
 import { currentUser } from "@/lib/auth";
 import { applyDiscount, validatePromo } from "@/lib/promo";
 
@@ -44,7 +44,7 @@ const schema = z.object({
 
 export async function POST(req: Request) {
   if (!(await sameSiteOrLog(req))) return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
-  if (!(await guard(req, `booking:${clientIp(req)}`, 8, 10 * 60_000))) {
+  if (!(await guardVisitor(req, "booking", 8, 10 * 60_000))) {
     return NextResponse.json({ error: "Trop de tentatives, réessayez dans quelques minutes." }, { status: 429 });
   }
   if (!dbConfigured() || !stripeConfigured()) {

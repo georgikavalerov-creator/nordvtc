@@ -89,12 +89,13 @@ export async function checkOtp(phone: string, code: string) {
 export function turnstileConfigured(): boolean {
   return Boolean(process.env.TURNSTILE_SECRET && process.env.NEXT_PUBLIC_TURNSTILE_SITEKEY);
 }
-export async function checkTurnstile(token: unknown, ip: string): Promise<boolean> {
+export async function checkTurnstile(token: unknown, _ip?: string): Promise<boolean> {
   if (!turnstileConfigured()) return true;
   if (typeof token !== "string" || !token) return false;
   const res = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
     method: "POST",
-    body: new URLSearchParams({ secret: process.env.TURNSTILE_SECRET!, response: token, remoteip: ip }),
+    // Pas d'IP transmise : avec un VPN ou le Relais privé iCloud, l'IP change entre le navigateur et le serveur et ferait échouer la vérification.
+    body: new URLSearchParams({ secret: process.env.TURNSTILE_SECRET!, response: token }),
   });
   const d = (await res.json().catch(() => ({}))) as { success?: boolean };
   return d.success === true;

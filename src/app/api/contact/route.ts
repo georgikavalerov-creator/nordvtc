@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import { sameSiteOrLog } from "@/lib/same-site";
-import { guard } from "@/lib/security-log";
+import { guard, guardVisitor } from "@/lib/security-log";
 import { z } from "zod";
 import { sendContactNotice } from "@/lib/mail";
-import { allow, clientIp, allowDurable } from "@/lib/ratelimit";
+import { allow, clientIp, allowDurable, allowVisitor } from "@/lib/ratelimit";
 
 const schema = z.object({
   name: z.string().trim().min(2).max(100),
@@ -17,7 +17,7 @@ const schema = z.object({
 
 export async function POST(req: Request) {
   if (!(await sameSiteOrLog(req))) return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
-  if (!(await guard(req, `contact:${clientIp(req)}`, 5, 10 * 60_000))) {
+  if (!(await guardVisitor(req, "contact", 5, 10 * 60_000))) {
     return NextResponse.json({ error: "Trop de messages, réessayez plus tard." }, { status: 429 });
   }
   const parsed = schema.safeParse(await req.json().catch(() => null));

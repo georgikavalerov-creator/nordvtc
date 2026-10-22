@@ -2,7 +2,7 @@ import { after } from "next/server";
 import { headers as nextHeaders } from "next/headers";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { db, dbConfigured } from "./supabase";
-import { allowDurable, ipFrom } from "./ratelimit";
+import { allowDurable, ipFrom, clientIp, visitorKey, SHARED_IP_FACTOR } from "./ratelimit";
 
 // Journal de sécurité : tout ce qui permet de remonter à un attaquant (adresse IP, pays et ville, réseau / FAI (ASN),
 // navigateur, page visée, identifiant de requête Cloudflare « Ray ID » à fournir à Cloudflare ou aux autorités).
@@ -61,4 +61,9 @@ export async function guard(src: Src, key: string, max: number, windowMs: number
   const ok = await allowDurable(key, max, windowMs);
   if (!ok) await logSecurity(kind, src, { key: key.replace(/:[^:]*$/, ""), max, windowMin: Math.round(windowMs / 60000) });
   return ok;
+}
+
+/** Même limite, mais par visiteur (IP + navigateur) avec une marge pour l'IP partagée (VPN, Relais privé, 4G/5G). */
+export async function guardVisitor(src: Request, name: string, max: number, windowMs: number, kind: SecKind = "rate_limited") {
+  return (await guard(src, `${name}:${visitorKey(src)}`, max, windowMs, kind)) && (await guard(src, `${name}:ip:${clientIp(src)}`, max * SHARED_IP_FACTOR, windowMs, kind));
 }

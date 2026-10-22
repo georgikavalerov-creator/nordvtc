@@ -23,16 +23,16 @@ export default function CallGate() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const captcha = useRef("");
+  const [capErr, setCapErr] = useState(false); // vérification anti-robot bloquée (DNS filtrant, VPN, bloqueur)
   const box = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetch("/api/callback/init", { cache: "no-store" }).then((r) => r.json()).then((d) => {
       setToken(d.token); setOtp(!!d.otp); setCountries(d.countries ?? []);
+      // La langue du navigateur passe avant le pays de l'IP : avec un VPN, l'IP peut sembler venir d'un autre pays.
       let c = d.country as string;
-      if (c === "FR") { // la langue du navigateur affine le choix quand la géolocalisation ne dit rien
-        const m = (navigator.language || "").split("-")[1]?.toUpperCase();
-        if (m && (d.countries ?? []).some((x: { code: string }) => x.code === m)) c = m;
-      }
+      const m = (navigator.language || "").split("-")[1]?.toUpperCase();
+      if (m && (d.countries ?? []).some((x: { code: string }) => x.code === m)) c = m;
       setCountry(c);
     }).catch(() => {});
     try { const n = sessionStorage.getItem("nvtc-num"); if (n) { setNumber(n); setStep("done"); } } catch {}
@@ -45,7 +45,10 @@ export default function CallGate() {
     captchaLoaded.current = true;
     const s = document.createElement("script");
     s.src = "https://challenges.cloudflare.com/turnstile/v0/api.js"; s.async = true;
-    s.onload = () => box.current && window.turnstile?.render(box.current, { sitekey: SITEKEY, callback: (t: string) => (captcha.current = t) });
+    const blocked = () => setCapErr(true);
+    const t = window.setTimeout(() => { if (!window.turnstile) blocked(); }, 12000);
+    s.onload = () => { window.clearTimeout(t); if (box.current) window.turnstile?.render(box.current, { sitekey: SITEKEY, callback: (tk: string) => { captcha.current = tk; setCapErr(false); }, "error-callback": blocked }); };
+    s.onerror = () => { window.clearTimeout(t); blocked(); };
     document.head.appendChild(s);
   }
 
@@ -114,6 +117,7 @@ export default function CallGate() {
           <div aria-hidden="true" style={{ position: "absolute", left: "-9999px" }}><label>Ne pas remplir<input name="website" tabIndex={-1} autoComplete="off" /></label></div>
           <label className="cg-consent"><input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} required /><span>J'accepte d'être recontacté à ce numéro pour ma demande (<a href="/confidentialite">confidentialité</a>).</span></label>
           {SITEKEY && <div ref={box} />}
+          {capErr && <p className="error" role="alert">La vérification anti-robot ne se charge pas : un VPN, un DNS filtrant (NextDNS, AdGuard…) ou un bloqueur l&apos;empêche. Autorisez <b>challenges.cloudflare.com</b>, ou <a href="/reservation">réservez directement en ligne</a> ou écrivez à <a href="mailto:contact@nordvtc.fr">contact@nordvtc.fr</a>.</p>}
           {error && <p className="error" role="alert">{error}</p>}
           <button className="btn" type="submit" disabled={busy || !token}>{busy ? "Vérification…" : otp ? "Recevoir mon code" : "Afficher le numéro"}</button>
         </form>

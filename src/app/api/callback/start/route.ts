@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { sameSiteOrLog } from "@/lib/same-site";
-import { guard } from "@/lib/security-log";
+import { guard, guardVisitor } from "@/lib/security-log";
 import { z } from "zod";
-import { allowDurable, clientIp } from "@/lib/ratelimit";
+import { allowDurable, clientIp, allowVisitor } from "@/lib/ratelimit";
 import { checkFormToken, checkTurnstile, dailyCapOk, normalizePhone, otpConfigured, sendOtp } from "@/lib/callback";
 import { saveLeadAndReveal } from "@/lib/lead";
 
@@ -21,7 +21,7 @@ export async function POST(req: Request) {
   if (!(await sameSiteOrLog(req))) return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
   const ip = clientIp(req);
   const fail = (error: string, status = 400) => NextResponse.json({ error }, { status });
-  if (!(await guard(req, `cb:${ip}`, 5, 10 * 60_000))) return fail("Trop de tentatives, réessayez dans quelques minutes.", 429);
+  if (!(await guardVisitor(req, "cb", 5, 10 * 60_000))) return fail("Trop de tentatives, réessayez dans quelques minutes.", 429);
 
   const body = await req.json().catch(() => null);
   const p = schema.safeParse(body);
