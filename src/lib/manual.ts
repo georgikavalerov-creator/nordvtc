@@ -40,6 +40,11 @@ export async function createManual(form: FormData, driver: Driver | null): Promi
   const pickup = new Date(`${v.date}T${v.time}:00${new Intl.DateTimeFormat("en", { timeZone: "Europe/Paris", timeZoneName: "longOffset" }).formatToParts(new Date(`${v.date}T12:00:00Z`)).find((x) => x.type === "timeZoneName")?.value.replace("GMT", "") || "+01:00"}`);
   if (Number.isNaN(pickup.getTime())) return { error: "Date ou heure invalide." };
 
+  const sourceRef = String(form.get("source_ref") ?? "").slice(0, 200);
+  if (sourceRef) {
+    const { data: dup } = await db().from("bookings").select("id").eq("source_ref", sourceRef).neq("status", "cancelled").limit(1).maybeSingle();
+    if (dup) return { error: "Un bon a déjà été créé pour cet événement." };
+  }
   let distanceM = 0, durationS = 0, priceCents = eurToCents(v.price);
   try {
     const r = await routeSummary(o, d);
@@ -57,6 +62,7 @@ export async function createManual(form: FormData, driver: Driver | null): Promi
     distance_m: distanceM, duration_s: durationS, price_cents: priceCents, charge_cents: paidCents, pay_mode: paidCents >= priceCents ? "full" : "deposit",
     paid_cents: paidCents, paid_at: paidCents ? new Date().toISOString() : null, admin_note: driver ? null : "Créée à la main", driver_id: driver?.id ?? null, driver: driver?.name ?? null,
     billing_company: v.company || null, billing_address: v.billing_address || null, billing_siren: v.siren || null,
+    source_ref: String(form.get("source_ref") ?? "").slice(0, 200) || null,
   }).select("id").single();
   if (error || !data) { console.error("manual booking", error); return { error: "Enregistrement impossible." }; }
   await db().rpc("issue_order", { bid: data.id });

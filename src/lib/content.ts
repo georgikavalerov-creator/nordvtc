@@ -13,6 +13,7 @@ export type SiteSettings = {
   carteVtc: string;
   plaque: string;
   vehicule: string;
+  tiimeEmail: string;
 };
 
 export const getSiteSettings = cache(async (): Promise<Partial<SiteSettings>> => {

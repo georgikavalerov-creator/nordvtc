@@ -8,6 +8,7 @@ const ITEMS = [
   ["/admin/messages", "Messages"],
   ["/admin/calendrier", "Calendrier"],
   ["/admin/documents", "Documents"],
+  ["/admin/import", "Importer des courses"],
   ["/admin/chauffeurs", "Chauffeurs"],
   ["/admin/guide", "Guide"],
   ["/admin/clients", "Clients"],

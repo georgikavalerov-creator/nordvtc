@@ -2539,3 +2539,26 @@ ol.steps > li { background: #f6f6f6 !important; border-color: transparent !impor
 ol.steps > li h3 { color: inherit !important; }
 ol.steps > li::before { box-shadow: 0 6px 14px -8px var(--c2) !important; }
 .step-ico { display: none !important; }
+
+/* Administration : import de courses (agenda iCloud, captures) */
+.imp { display: grid; gap: 18px; }
+.imp-sec h2 { font-size: 1.25rem; margin: 0 0 4px; }
+.imp-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+.imp-setup { background: #f5f7fb; border-radius: 14px; padding: 14px 16px; margin-top: 10px; }
+.imp-setup ol { margin: 8px 0; padding-left: 20px; display: grid; gap: 6px; font-size: .92rem; }
+.imp-events { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 8px; }
+.imp-day { margin: 10px 0 4px; font-weight: 700; font-size: .82rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted, #5e5e5e); }
+.imp-ev { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px; background: #fff; border: 1px solid #e6e8ee; }
+.imp-ev.is-done { opacity: .6; }
+.imp-time { flex: none; font-weight: 800; font-variant-numeric: tabular-nums; min-width: 54px; }
+.imp-txt { flex: 1; min-width: 0; display: grid; }
+.imp-txt strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.imp-txt small { color: var(--muted, #5e5e5e); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.imp-badge { flex: none; font-size: .78rem; font-weight: 700; padding: 5px 10px; border-radius: 999px; background: #e5f6ec; color: #137a3f; }
+.imp-badge.is-wait { background: #eef2ff; color: #1f4fd8; }
+.imp-events .adm-box, .imp-shot .adm-box { margin-top: 8px; }
+.imp-drop { margin-top: 12px; display: grid; place-items: center; gap: 4px; text-align: center; padding: 28px 16px; border: 2px dashed #c9d2e6; border-radius: 16px; background: #f8faff; cursor: pointer; }
+.imp-drop:hover, .imp-drop:focus-visible { border-color: #1f5bff; background: #eef3ff; outline: none; }
+.imp-shots { display: grid; gap: 14px; margin-top: 14px; }
+.imp-done { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: #e5f6ec; color: #137a3f; }
+.imp-time small { display: block; font-weight: 600; font-size: .75rem; color: var(--muted, #5e5e5e); }

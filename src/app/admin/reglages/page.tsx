@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getSiteSettings } from "@/lib/content";
 import { AdminPage } from "../gate";
-import { SettingsForm } from "../Forms";
+import { SettingsForm, TiimeCatchUp } from "../Forms";
 import LogoUploader from "@/components/LogoUploader";
 import { getLogo } from "@/lib/logo";
 import { removeLogo, saveLogo } from "../actions";
@@ -17,6 +17,7 @@ export default async function Page() {
       <p className="muted" style={{ margin: 0 }}>Ces informations s'affichent dans les mentions légales, la page contact et les messages envoyés aux clients. Elles s'appliquent dans la minute.</p>
       <LogoUploader current={logo} save={saveLogo} remove={removeLogo} />
       <SettingsForm v={v} envPhone={Boolean(process.env.DRIVER_PHONE)} />
+      <TiimeCatchUp />
       <div className="adm-box">
         <strong>Sécurité</strong>
         <p className="muted" style={{ marginBottom: 0 }}>Le mot de passe de l'administration se change dans les variables d'environnement (ADMIN_PASSWORD) de votre hébergeur. Changer ADMIN_SESSION_SECRET déconnecte toutes les sessions.</p>

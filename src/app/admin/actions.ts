@@ -9,6 +9,8 @@ import { allow } from "@/lib/ratelimit";
 import { db } from "@/lib/supabase";
 import { DEFAULT_PRICING } from "@/lib/pricing";
 import { sendInvoiceEmail } from "@/lib/mail";
+import { sendInvoiceToTiime, sendPendingToTiime } from "@/lib/tiime";
+import { after } from "next/server";
 import { docPath } from "@/lib/docsign";
 import { SITE } from "@/lib/site";
 import { getStripe, stripeConfigured } from "@/lib/stripe";
@@ -81,6 +83,8 @@ export async function setStatus(form: FormData) {
     if (num) {
       const { data: b } = await db().from("bookings").select("customer_name,customer_email").eq("id", parsed.data.id).single();
       if (b) await sendInvoiceEmail({ name: b.customer_name, email: b.customer_email, number: num as string, url: `${SITE.url}${docPath("facture", parsed.data.id)}` }).catch((e) => console.error("invoice mail", e));
+      const bid = parsed.data.id;
+      after(async () => { await sendInvoiceToTiime(bid).catch((e) => console.error("tiime", e)); });
     }
   } else {
     await db().from("bookings").update({ status: parsed.data.status }).eq("id", parsed.data.id);
@@ -213,11 +217,12 @@ const settingsSchema = z.object({
   carteVtc: z.string().trim().max(40),
   plaque: z.string().trim().max(20),
   vehicule: z.string().trim().max(80),
+  tiimeEmail: z.string().trim().email().or(z.literal("")).optional(),
 });
 export async function saveSettings(_: { error?: string; ok?: boolean } | undefined, form: FormData) {
   if (!(await isAdmin())) redirect("/admin");
   const p = settingsSchema.safeParse(Object.fromEntries(form));
-  if (!p.success) return { error: "Vérifiez l'e-mail et l'adresse web du médiateur." };
+  if (!p.success) return { error: "Vérifiez les adresses e-mail et l'adresse web du médiateur." };
   const { error } = await db().from("settings").upsert({ key: "site", value: p.data, updated_at: new Date().toISOString() });
   if (error) return { error: "Enregistrement impossible." };
   for (const path of ["/mentions-legales", "/contact", "/confidentialite", "/cgv"]) revalidatePath(path);
@@ -226,11 +231,12 @@ export async function saveSettings(_: { error?: string; ok?: boolean } | undefin
 }
 
 // ---------- Réservation créée à la main (téléphone, SMS, client habituel) ----------
-export async function createManualBooking(_: { error?: string } | undefined, form: FormData) {
+export async function createManualBooking(_: { error?: string; url?: string } | undefined, form: FormData): Promise<{ error?: string; url?: string } | undefined> {
   if (!(await isAdmin())) redirect("/admin");
   const r = await createManual(form, null);
   if ("error" in r) return r;
   wipe();
+  if (r.goto === "stay") return { url: docPath("bon", r.id) };
   if (r.goto === "bon") redirect(docPath("bon", r.id));
   redirect(`/admin/reservations?q=${r.id.slice(0, 8)}&ouvrir=1`);
 }
@@ -311,4 +317,12 @@ export async function closeChat(form: FormData) {
   const id = z.string().uuid().safeParse(form.get("thread"));
   if (id.success) await db().from("chat_threads").update({ closed: form.get("reopen") ? false : true }).eq("id", id.data);
   revalidatePath("/admin/messages");
+}
+
+// ---------- Tiime : rattrapage des factures déjà émises ----------
+export async function tiimeCatchUp(_: { error?: string; ok?: boolean | string } | undefined): Promise<{ error?: string; ok?: boolean | string }> {
+  if (!(await isAdmin())) redirect("/admin");
+  const r = await sendPendingToTiime(25);
+  if (r.failed && !r.sent) return { error: "Envoi impossible : vérifiez l'adresse Tiime dans les réglages." };
+  return { ok: `${r.sent} facture(s) envoyée(s) à Tiime${r.left ? `, ${r.left} restante(s) : cliquez à nouveau` : ""}.` };
 }

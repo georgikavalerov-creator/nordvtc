@@ -1,6 +1,6 @@
 "use client";
 import { useActionState } from "react";
-import { decideClaim, refundBooking, savePost, saveSettings } from "./actions";
+import { decideClaim, refundBooking, savePost, saveSettings, tiimeCatchUp } from "./actions";
 import type { SiteSettings } from "@/lib/content";
 
 type R = { error?: string; ok?: boolean | string } | undefined;
@@ -19,6 +19,8 @@ export function SettingsForm({ v, envPhone }: { v: Partial<SiteSettings>; envPho
       <label>Médiateur de la consommation (nom)<input name="mediatorName" defaultValue={v.mediatorName ?? ""} placeholder="Société Médiation Professionnelle" /></label>
       <label>Site web du médiateur<input name="mediatorUrl" type="url" defaultValue={v.mediatorUrl ?? ""} placeholder="https://…" /></label>
       <label>Adresse postale du médiateur<input name="mediatorAddress" defaultValue={v.mediatorAddress ?? ""} /></label>
+      <label>Adresse de dépôt Tiime (chaque facture y est envoyée en PDF)<input name="tiimeEmail" type="email" defaultValue={v.tiimeEmail ?? ""} placeholder="votre-adresse@…tiime…" /></label>
+      <small className="muted" style={{ marginTop: -6 }}>Dans Tiime : bloc « Déposer ici un document » en bas à gauche (web) ou Réglages → Gestion des documents (appli). Cliquez sur l&apos;adresse pour la copier.</small>
       <Msg s={s} />
       <button className="btn" disabled={pending}>{pending ? "Enregistrement…" : "Enregistrer"}</button>
     </form>
@@ -71,6 +73,18 @@ export function ClaimDecision({ id }: { id: string }) {
       <button className="btn small" name="decision" value="accept" disabled={pending}>{pending ? "…" : "Accepter : annuler et tout rembourser"}</button>
       <button className="btn small ghost" name="decision" value="refuse" disabled={pending}>Refuser</button>
       <Msg s={s} />
+    </form>
+  );
+}
+
+export function TiimeCatchUp() {
+  const [s, act, pending] = useActionState(tiimeCatchUp, undefined);
+  return (
+    <form action={act} className="adm-box" style={{ display: "grid", gap: 8, maxWidth: 640 }}>
+      <strong>Tiime : factures déjà émises</strong>
+      <small className="muted">Les nouvelles factures partent automatiquement. Ce bouton envoie celles émises avant l&apos;activation (25 par clic).</small>
+      <Msg s={s} />
+      <button className="btn ghost small" disabled={pending} style={{ justifySelf: "start" }}>{pending ? "Envoi…" : "Envoyer les factures en attente"}</button>
     </form>
   );
 }

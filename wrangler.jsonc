@@ -6,6 +6,7 @@
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
   "observability": { "enabled": true },
+  "ai": { "binding": "AI" },
   "vars": {
     "MAIL_FROM": "Nord VTC <reservation@nordvtc.fr>",
     "MAIL_NOTIFY_TO": "georgi.kavalerov@gmail.com",
