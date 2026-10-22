@@ -33,14 +33,15 @@ async function send(to: string, subject: string, html: string) {
   const resend = new Resend(key);
   // Resend renvoie { error } sans lever d'exception : on la journalise, et on retente (limite de débit, erreur passagère).
   for (let attempt = 1; attempt <= 3; attempt++) {
+    const from = process.env.MAIL_FROM ?? `${SITE.name} <onboarding@resend.dev>`;
     const { error } = await resend.emails.send({
-      from: process.env.MAIL_FROM ?? `${SITE.name} <onboarding@resend.dev>`,
+      from,
       to,
       subject,
       html,
     });
     if (!error) return;
-    console.error(`mail:${subject}:essai ${attempt}`, JSON.stringify(error));
+    console.error(`mail:${subject}:essai ${attempt} expéditeur=${from}`, JSON.stringify(error));
     if (attempt === 3) throw new Error(`Envoi e-mail impossible : ${error.message}`);
     await sleep(900 * attempt);
   }
