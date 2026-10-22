@@ -15,11 +15,10 @@ export default function CookieNotice() {
 
   useEffect(() => {
     setStats(read("plausible_ignore") !== "true");
-    if (/^\/(admin|chauffeur|reservation|doc)/.test(location.pathname)) return; // jamais pendant une réservation
-    let t = 0;
-    if (!read(KEY)) t = window.setTimeout(() => setShow(true), 2500);
     const open = () => { setDetails(true); setShow(true); };
-    window.addEventListener("nvtc:cookies", open);
+    window.addEventListener("nvtc:cookies", open); // le lien « Cookies » du pied de page marche partout
+    let t = 0;
+    if (!read(KEY) && !/^\/(admin|chauffeur|reservation|doc)/.test(location.pathname)) t = window.setTimeout(() => setShow(true), 2500); // jamais pendant une réservation
     return () => { window.clearTimeout(t); window.removeEventListener("nvtc:cookies", open); };
   }, []);
 
