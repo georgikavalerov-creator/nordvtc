@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { sameSiteOrLog } from "@/lib/same-site";
+import { guard } from "@/lib/security-log";
 import { allow, clientIp } from "@/lib/ratelimit";
 
 // Suggestions d'entreprises (nom, SIREN ou SIRET) depuis l'annuaire public de l'État :
@@ -8,6 +10,7 @@ export type Company = { name: string; siren: string; siret: string; address: str
 const nice = (s: string) => s.toLowerCase().replace(/(^|[\s'’-])(\p{L})/gu, (_, a: string, b: string) => a + b.toUpperCase()).replace(/\b(\d{5})\b/, "$1");
 
 export async function GET(req: Request) {
+  if (!(await sameSiteOrLog(req))) return NextResponse.json({ results: [] }, { status: 403 });
   const q = (new URL(req.url).searchParams.get("q") ?? "").trim().slice(0, 80);
   const digits = q.replace(/\s/g, "");
   if (q.length < 3 && !/^\d{9}$/.test(digits)) return NextResponse.json({ results: [] });

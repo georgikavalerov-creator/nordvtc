@@ -2571,3 +2571,14 @@ ol.steps > li::before { box-shadow: 0 6px 14px -8px var(--c2) !important; }
 .co-wait { position: absolute; right: 14px; bottom: 15px; width: 16px; height: 16px; border-radius: 50%; border: 2px solid #c9d2e6; border-top-color: #1f5bff; animation: coSpin .7s linear infinite; }
 @keyframes coSpin { to { transform: rotate(360deg); } }
 .tfa-qr svg { width: 200px; height: 200px; display: block; background: #fff; border-radius: 12px; padding: 6px; }
+
+/* Administration : journal de sécurité */
+.sec-intro p { margin: 0 0 10px; font-size: .92rem; }
+.sec-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.sec-scroll { overflow-x: auto; margin-top: 8px; }
+.sec-table { width: 100%; border-collapse: collapse; font-size: .84rem; margin-top: 8px; }
+.sec-table th, .sec-table td { text-align: left; padding: 7px 8px; border-bottom: 1px solid #eceef3; vertical-align: top; white-space: nowrap; }
+.sec-table td small { white-space: normal; }
+.sec-table tr.is-high td { background: #fdeceb; }
+.sec-table tr.is-warn td:first-child { box-shadow: inset 3px 0 0 #f59e0b; }
+.sec-table tr.is-high td:first-child { box-shadow: inset 3px 0 0 #dc2626; }

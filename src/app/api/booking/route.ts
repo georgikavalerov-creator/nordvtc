@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
+import { sameSiteOrLog } from "@/lib/same-site";
+import { guard, logSecurity } from "@/lib/security-log";
 import { z } from "zod";
 import { routeSummary } from "@/lib/here";
-import { trustPlace } from "@/lib/place-sign";
+import { tampered, trustPlace } from "@/lib/place-sign";
 import { computeQuote, euro, parisToUtc } from "@/lib/pricing";
 import { db, dbConfigured, getPricing } from "@/lib/supabase";
 import { getStripe, stripeConfigured } from "@/lib/stripe";
@@ -41,7 +43,8 @@ const schema = z.object({
 });
 
 export async function POST(req: Request) {
-  if (!(await allowDurable(`booking:${clientIp(req)}`, 8, 10 * 60_000))) {
+  if (!(await sameSiteOrLog(req))) return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
+  if (!(await guard(req, `booking:${clientIp(req)}`, 8, 10 * 60_000))) {
     return NextResponse.json({ error: "Trop de tentatives, réessayez dans quelques minutes." }, { status: 429 });
   }
   if (!dbConfigured() || !stripeConfigured()) {
@@ -57,6 +60,7 @@ export async function POST(req: Request) {
   const d = parsed.data;
   // Coordonnées vérifiées (signature du site) ou recalculées depuis l'adresse : le prix ne peut pas être faussé.
   {
+    if (tampered(d.origin) || tampered(d.dest)) await logSecurity("price_tamper", req, { origin: d.origin, dest: d.dest });
     const o = await trustPlace(d.origin), t = await trustPlace(d.dest);
     if (!o || !t) return NextResponse.json({ error: "Adresse non reconnue : choisissez-la dans la liste proposée." }, { status: 422 });
     d.origin = o; d.dest = t;

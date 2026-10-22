@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { sameSiteOrLog } from "@/lib/same-site";
+import { guard } from "@/lib/security-log";
 import { z } from "zod";
 import { routeSummary } from "@/lib/here";
 import { computeQuote } from "@/lib/pricing";
@@ -20,6 +22,8 @@ const schema = z.object({
 });
 
 export async function POST(req: Request) {
+  if (!(await sameSiteOrLog(req))) return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
+  if (!(await guard(req, `quote-day:${clientIp(req)}`, 300, 86_400_000))) return NextResponse.json({ error: "Trop de requêtes" }, { status: 429 });
   if (!allow(`quote:${clientIp(req)}`, 40, 60_000)) {
     return NextResponse.json({ error: "Trop de requêtes" }, { status: 429 });
   }
@@ -38,7 +42,7 @@ export async function POST(req: Request) {
     let quote = computeQuote(route.distanceM, route.durationS, hour, pricing);
     let promoOut: { code: string; discountCents: number; label: string } | { error: string } | undefined;
     if (promo?.trim()) {
-      if (!(await allowDurable(`promo:${clientIp(req)}`, 15, 10 * 60_000))) return NextResponse.json({ error: "Trop d'essais de code, réessayez plus tard." }, { status: 429 });
+      if (!(await guard(req, `promo:${clientIp(req)}`, 15, 10 * 60_000))) return NextResponse.json({ error: "Trop d'essais de code, réessayez plus tard." }, { status: 429 });
       const user = await currentUser();
       const r = await validatePromo(promo, quote.priceCents, { userId: user?.id, email: email ?? user?.email });
       if (r.ok) { promoOut = { code: r.code, discountCents: r.discountCents, label: r.label }; quote = { ...applyDiscount(quote, r.discountCents, pricing) }; }

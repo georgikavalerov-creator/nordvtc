@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { sameSiteOrLog } from "@/lib/same-site";
+import { guard } from "@/lib/security-log";
 import { allow, clientIp } from "@/lib/ratelimit";
 import { dbConfigured, db } from "@/lib/supabase";
 import { addVisitorMessage, cleanBody, messagesAfter, startThread, threadFor, validEmail } from "@/lib/chat";
@@ -24,6 +26,7 @@ export async function GET(req: Request) {
 
 // POST { action: "start" | "send" | "email", … }
 export async function POST(req: Request) {
+  if (!(await sameSiteOrLog(req))) return bad("Non autorisé", 403);
   if (!dbConfigured()) return bad("Indisponible", 503);
   const ip = clientIp(req);
   if (!allow(`chat:${ip}`, 20, 60_000)) return bad("Trop de messages, patientez un instant.", 429);

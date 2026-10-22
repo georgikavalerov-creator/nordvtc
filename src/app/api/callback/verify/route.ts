@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { allowDurable, clientIp } from "@/lib/ratelimit";
+import { clientIp } from "@/lib/ratelimit";
+import { guard, logSecurity } from "@/lib/security-log";
 import { checkOtp, dailyCapOk, normalizePhone, otpConfigured } from "@/lib/callback";
 import { saveLeadAndReveal } from "@/lib/lead";
 
@@ -18,10 +19,10 @@ export async function POST(req: Request) {
   const p = schema.safeParse(await req.json().catch(() => null));
   const phone = p.success ? normalizePhone(p.data.phone) : null;
   if (!p.success || !phone) return fail("Code invalide.");
-  if (!(await allowDurable(`cbv:${ip}`, 8, 10 * 60_000)) || !(await allowDurable(`cbv:${phone}`, 5, 10 * 60_000))) {
+  if (!(await guard(req, `cbv:${ip}`, 8, 10 * 60_000)) || !(await guard(req, `cbv:${phone}`, 5, 10 * 60_000))) {
     return fail("Trop d'essais. Réessayez dans quelques minutes.", 429);
   }
-  if (!(await checkOtp(phone, p.data.code))) return fail("Code incorrect ou expiré.", 422);
+  if (!(await checkOtp(phone, p.data.code))) { await logSecurity("otp_fail", req, { phone: phone.slice(0, -4) + "****" }); return fail("Code incorrect ou expiré.", 422); }
   if (!dailyCapOk(300)) return fail("Service momentanément saturé.", 503);
   const number = await saveLeadAndReveal({ name: p.data.name, phone, need: p.data.need, ip, verified: true });
   return NextResponse.json({ step: "done", number });

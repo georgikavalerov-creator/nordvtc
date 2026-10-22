@@ -8,7 +8,8 @@ import { currentDriver, endDriverSession, hashPassword, startDriverSession, veri
 import { createManual } from "@/lib/manual";
 import { processLogo } from "@/lib/logo";
 import { docPath } from "@/lib/docsign";
-import { allow, allowDurable, ipFrom } from "@/lib/ratelimit";
+import { allow, ipFrom } from "@/lib/ratelimit";
+import { guard, logSecurity } from "@/lib/security-log";
 import { db } from "@/lib/supabase";
 
 type R = { error?: string; ok?: boolean } | undefined;
@@ -17,12 +18,13 @@ export async function loginDriver(_: R, form: FormData): Promise<R> {
   const ip = ipFrom(await headers());
   const email = String(form.get("email") ?? "").trim().toLowerCase();
   // Anti force brute : par adresse IP et par compte visé.
-  if (!(await allowDurable(`driver-login:${ip}`, 8, 15 * 60_000)) || !(await allowDurable(`driver-login:${email}`, 10, 3_600_000))) return { error: "Trop de tentatives. Réessayez plus tard." };
+  if (!(await guard(undefined, `driver-login:${ip}`, 8, 15 * 60_000, "driver_login_blocked")) || !(await guard(undefined, `driver-login:${email}`, 10, 3_600_000, "driver_login_blocked"))) return { error: "Trop de tentatives. Réessayez plus tard." };
   let data: { id: string; password_hash: string; active: boolean } | null = null;
   try { data = (await db().from("drivers").select("id,password_hash,active").eq("email", email).maybeSingle()).data; }
   catch { return { error: "Service momentanément indisponible." }; }
   // Même message dans tous les cas : on ne révèle pas si le compte existe.
-  if (!data || !data.active || !verifyPassword(String(form.get("password") ?? ""), data.password_hash)) return { error: "E-mail ou mot de passe incorrect." };
+  if (!data || !data.active || !verifyPassword(String(form.get("password") ?? ""), data.password_hash)) { await logSecurity("driver_login_fail", undefined, { email }); return { error: "E-mail ou mot de passe incorrect." }; }
+  await logSecurity("driver_login_ok", undefined, { email });
   await startDriverSession(data.id);
   await db().from("drivers").update({ last_login_at: new Date().toISOString() }).eq("id", data.id);
   redirect("/chauffeur");

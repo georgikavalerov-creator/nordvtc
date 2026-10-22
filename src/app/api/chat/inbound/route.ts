@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { timingSafeEqual } from "node:crypto";
 import { handleInboundChatEmail } from "@/lib/chat-inbound";
+import { logSecurity } from "@/lib/security-log";
 
 // Appelé uniquement par le gestionnaire e-mail du Worker (custom-worker.ts), dans le même processus.
 // Protégé par le secret de session admin : inaccessible depuis l'extérieur.
@@ -18,6 +19,7 @@ export async function POST(req: Request) {
     const r = await handleInboundChatEmail(raw, req.headers.get("x-mail-from") ?? "");
     if ("error" in r) {
       console.warn("chat inbound refusé:", r.error);
+      if (r.error !== "auto") await logSecurity("mail_rejected", req, { from: req.headers.get("x-mail-from"), reason: r.error });
       return NextResponse.json(r, { status: r.error === "auto" ? 202 : 422 });
     }
     return NextResponse.json(r);

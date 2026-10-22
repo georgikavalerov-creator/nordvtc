@@ -11,6 +11,7 @@ import { DEFAULT_PRICING } from "@/lib/pricing";
 import { sendInvoiceEmail } from "@/lib/mail";
 import { sendInvoiceToTiime, sendPendingToTiime } from "@/lib/tiime";
 import { after } from "next/server";
+import { guard, logSecurity } from "@/lib/security-log";
 import { get2fa, set2fa, check2faLogin, newSecret, otpauthUri, totpStep } from "@/lib/totp";
 import { docPath } from "@/lib/docsign";
 import { SITE } from "@/lib/site";
@@ -25,14 +26,15 @@ import { adminReply } from "@/lib/chat";
 export async function login(_: { error?: string; need2fa?: boolean } | undefined, form: FormData): Promise<{ error?: string; need2fa?: boolean } | undefined> {
   const ip = ipFrom(await headers());
   // Anti force brute : 5 essais / 15 min par adresse IP, et 40 / heure au total (attaques réparties).
-  if (!(await allowDurable(`admin-login:${ip}`, 5, 15 * 60_000)) || !(await allowDurable("admin-login:all", 40, 3_600_000))) return { error: "Trop de tentatives. Réessayez plus tard." };
-  if (!checkPassword(String(form.get("password") ?? ""))) { await new Promise((r) => setTimeout(r, 600)); return { error: "Mot de passe incorrect." }; }
+  if (!(await guard(undefined, `admin-login:${ip}`, 5, 15 * 60_000, "admin_login_blocked")) || !(await guard(undefined, "admin-login:all", 40, 3_600_000, "admin_login_blocked"))) return { error: "Trop de tentatives. Réessayez plus tard." };
+  if (!checkPassword(String(form.get("password") ?? ""))) { await logSecurity("admin_login_fail"); await new Promise((r) => setTimeout(r, 600)); return { error: "Mot de passe incorrect." }; }
   // Double authentification (si activée) : code à 6 chiffres de l'application, à usage unique.
   if ((await get2fa()).enabled) {
     const code = String(form.get("code") ?? "").trim();
     if (!code) return { error: "Entrez le code à 6 chiffres de votre application d'authentification.", need2fa: true };
-    if (!(await check2faLogin(code))) { await new Promise((r) => setTimeout(r, 600)); return { error: "Code incorrect ou déjà utilisé.", need2fa: true }; }
+    if (!(await check2faLogin(code))) { await logSecurity("admin_2fa_fail"); await new Promise((r) => setTimeout(r, 600)); return { error: "Code incorrect ou déjà utilisé.", need2fa: true }; }
   }
+  await logSecurity("admin_login_ok");
   await startSession();
   redirect("/admin");
 }

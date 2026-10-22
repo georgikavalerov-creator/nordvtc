@@ -8,6 +8,13 @@ const payload = (p: Place) => `${p.label}|${p.lat.toFixed(5)}|${p.lng.toFixed(5)
 
 export const signPlace = (p: Place) => ({ ...p, sig: createHmac("sha256", key()).update(payload(p)).digest("base64url").slice(0, 24) });
 
+/** Vrai si une signature est fournie mais ne correspond pas : coordonnées modifiées à la main. */
+export function tampered(p: Place & { sig?: string }) {
+  if (!p.sig) return false;
+  const good = signPlace({ label: p.label, lat: p.lat, lng: p.lng }).sig;
+  return !(good.length === p.sig.length && timingSafeEqual(Buffer.from(good), Buffer.from(p.sig)));
+}
+
 /** Adresse fiable : signature valide, sinon coordonnées recalculées à partir du libellé (jamais celles du navigateur). */
 export async function trustPlace(p: Place & { sig?: string }): Promise<Place | null> {
   if (p.sig) {

@@ -7,6 +7,7 @@ import { euro } from "@/lib/pricing";
 import { SITE } from "@/lib/site";
 import { getSiteSettings } from "@/lib/content";
 import { getLogo } from "@/lib/logo";
+import { logSecurity } from "@/lib/security-log";
 
 export const metadata: Metadata = { title: "Document", robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
@@ -19,7 +20,10 @@ const METHOD: Record<string, string> = { card: "carte bancaire à bord", cash: "
 export default async function Doc({ params, searchParams }: Props) {
   const { type, id } = await params;
   const { k } = await searchParams;
-  if (!/^[0-9a-f-]{36}$/.test(id) || !verifyDoc(type, id, k) || !dbConfigured()) notFound();
+  if (!/^[0-9a-f-]{36}$/.test(id) || !verifyDoc(type, id, k) || !dbConfigured()) {
+    if (k) await logSecurity("doc_bad_link", undefined, { type, id: id.slice(0, 40) });
+    notFound();
+  }
   const t = type as DocType;
   let { data: b } = await db().from("bookings").select("*").eq("id", id).maybeSingle();
   if (!b) notFound();
