@@ -30,9 +30,11 @@ export default function HeroBooking() {
           <AddressField label="" value={to} onChange={setTo} placeholder="Destination (gare, aéroport, adresse)" />
         </div>
       </div>
-      <button type="submit" className="btn quick-btn btn-arrow">Voir mon prix</button>
+      <div className="quick-row">
+        <button type="submit" className="btn quick-btn btn-arrow">Voir mon prix</button>
+        <RatingBadge className="rb-hero" />
+      </div>
       <p className="quick-note">Gratuit · sans compte · prix ferme avant de payer</p>
-      <RatingBadge className="rb-hero" />
     </form>
   );
 }

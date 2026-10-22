@@ -3177,3 +3177,17 @@ h2.bk-sub::before { content: ""; width: 4px; height: 1.1em; border-radius: 4px; 
 :root[data-theme="dark"] .hd-pass .pass-wrap::after { background: #d9d6ce !important; }
 :root[data-theme="dark"] .hd-pass .pass-photo img { filter: brightness(.92) saturate(.95); }
 :root[data-theme="dark"] .hd-pass .pass-note { color: #2d5bd6 !important; }
+
+/* Badge 4,98/5 : même présentation sur toutes les pages (note puis texte, aligné à gauche) */
+.rating-badge { display: inline-flex !important; flex-direction: column; align-items: flex-start !important; justify-content: center !important; gap: 2px !important; text-align: left !important; padding: 8px 14px !important; border-radius: 14px !important; max-width: 100%; }
+.rb-score { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+.rb-text { font-size: .84rem; line-height: 1.3; opacity: .9; }
+.rb-sep { display: none; }
+/* Bloc 1 : badge à droite du bouton « Voir mon prix », sur la même ligne */
+.quick-row { display: flex; align-items: center; gap: 14px; flex-wrap: nowrap; }
+.quick-row .quick-btn { flex: none; }
+.quick-row .rb-hero { margin: 0 !important; flex: 1 1 auto; min-width: 0; }
+@media (max-width: 560px) {
+  .quick-row { flex-direction: column; align-items: stretch; gap: 10px; }
+  .quick-row .rb-hero { align-self: flex-start; }
+}

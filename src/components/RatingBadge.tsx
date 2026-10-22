@@ -6,10 +6,8 @@ export const RATING = "4,98";
 export default function RatingBadge({ className = "" }: { className?: string }) {
   return (
     <p className={`rating-badge ${className}`}>
-      <span className="rb-stars" aria-hidden="true">★★★★★</span>
-      <strong>{RATING}/5</strong>
-      <span className="rb-sep" aria-hidden="true">·</span>
-      <span>plus de {RIDES} courses réalisées sur les applications VTC</span>
+      <span className="rb-score"><span className="rb-stars" aria-hidden="true">★★★★★</span><strong>{RATING}/5</strong></span>
+      <span className="rb-text">plus de {RIDES} courses réalisées sur les applications VTC</span>
     </p>
   );
 }
