@@ -112,7 +112,7 @@ export function layout(o: { preheader: string; badge?: string; title: string; bo
     <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" class="nv-card" style="width:100%;max-width:600px;background:#ffffff;border-radius:20px;overflow:hidden">
       <tr><td style="background:#000000;padding:22px 32px" class="nv-pad">
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
-          <td><a href="${SITE.url}" style="text-decoration:none"><img src="${img("logo-clair.png")}" width="228" height="38" alt="${esc(SITE.name)} — chauffeur privé à Lille" style="display:block;border:0;width:228px;height:38px"></a></td>
+          <td><a href="${SITE.url}" style="text-decoration:none"><img src="${img("logo-phares.png")}" width="236" height="44" alt="${esc(SITE.name)} — chauffeur privé à Lille" style="display:block;border:0;width:236px;height:44px"></a></td>
           ${admin ? `<td align="right" style="font:600 11px/1 ${FONT};letter-spacing:.12em;text-transform:uppercase;color:#8b8f99">Espace chauffeur</td>` : ""}
         </tr></table>
       </td></tr>

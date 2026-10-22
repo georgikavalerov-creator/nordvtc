@@ -2358,3 +2358,10 @@ html:not(.in-app) .btn-arrow:active::after, html:not(.in-app) .quick-btn:active:
 .perks li .ico-d { color: #1f5bff; }
 .cmp-row .cmp-us .ico-d { color: #1f5bff; margin-right: 8px; vertical-align: -0.25em; }
 .iconbox .ico .ico-d { color: #1f5bff; }
+
+/* Accueil : plus d'espace vide sous l'en-tête, le contenu démarre tout de suite */
+.hero.cine { justify-content: flex-start; }
+.hero.cine > .wrap { padding-top: 26px; }
+.hero.cine .cine-frame { display: none; }
+@media (max-width: 900px) { .hero.cine > .wrap { padding-top: 22px; } }
+@media (max-width: 560px) { .hero.cine > .wrap { padding-top: 18px; } }
