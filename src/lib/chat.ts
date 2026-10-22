@@ -51,8 +51,10 @@ export async function addVisitorMessage(t: Thread, body: string) {
   if (error || !data) return { error: "Message non envoyé, réessayez." };
   const now = new Date().toISOString();
   await db().from("chat_threads").update({ last_visitor_at: now, visitor_seen_at: now, closed: false }).eq("id", t.id);
-  // Alerte e-mail au chauffeur : au premier message, puis au plus une fois toutes les 10 minutes.
-  const quiet = !t.notified_at || Date.now() - new Date(t.notified_at).getTime() > 10 * 60_000;
+  // Alerte e-mail au chauffeur : au premier message, dès que le client relance après une réponse du chauffeur,
+  // sinon au plus une fois toutes les 10 minutes (pas d'avalanche si le client envoie plusieurs messages d'affilée).
+  const answeredSince = !!t.last_admin_at && (!t.notified_at || new Date(t.last_admin_at) > new Date(t.notified_at));
+  const quiet = !t.notified_at || answeredSince || Date.now() - new Date(t.notified_at).getTime() > 10 * 60_000;
   if (quiet) {
     await db().from("chat_threads").update({ notified_at: now }).eq("id", t.id);
     await sendChatNotice({ threadId: t.id, name: t.visitor_name, email: t.visitor_email, page: t.page, body, url: `${SITE.url}/admin/messages?t=${t.id}` }).catch((e) => console.error("chat mail", e));
