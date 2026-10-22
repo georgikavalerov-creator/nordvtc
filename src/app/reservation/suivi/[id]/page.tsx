@@ -31,7 +31,7 @@ export default async function Suivi({ params, searchParams }: Props) {
   const st = STATUS[b.status] ?? { label: b.status, cls: "" };
   const rest = Math.max(0, b.price_cents - b.paid_cents);
   const pending = b.status === "pending_payment";
-  const pol = cancelPolicy(b.pickup_at, b.paid_cents);
+  const pol = cancelPolicy(b.pickup_at, b.paid_cents, b.price_cents);
   const phone = (await getSiteSettings()).driverPhone || process.env.DRIVER_PHONE || "";
   return (
     <section className="section">

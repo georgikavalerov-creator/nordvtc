@@ -14,7 +14,7 @@ export async function cancelBookingCore(bookingId: string, userId?: string): Pro
   const { data: b } = await db().from("bookings").select("*").eq("id", bookingId).maybeSingle();
   if (!b) return { error: "Réservation introuvable." };
   if (b.status !== "confirmed") return { error: "Cette réservation ne peut plus être annulée en ligne." };
-  const pol = cancelPolicy(b.pickup_at, b.paid_cents);
+  const pol = cancelPolicy(b.pickup_at, b.paid_cents, b.price_cents);
   if (!pol.canCancel) return { error: "Le trajet a déjà commencé : contactez-nous." };
   if (pol.refundCents > 0 && (!stripeConfigured() || !b.stripe_payment_intent)) return { error: "Remboursement automatique indisponible : contactez-nous, nous annulons et remboursons pour vous." };
 

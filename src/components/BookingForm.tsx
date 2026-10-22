@@ -344,7 +344,7 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
             <textarea rows={2} maxLength={500} value={notes} onChange={(e) => setNotes(e.target.value)} autoFocus />
           </label>
         ) : (
-          <button type="button" className="linklike" onClick={() => setShowNotes(true)}>+ Ajouter une précision (terminal, bagage volumineux…)</button>
+          <button type="button" className="linklike" onClick={() => setShowNotes(true)}>+ Ajouter une précision (terminal, bagage volumineux, animal…)</button>
         )}
         {quote && (
           <div className="bk-promo">

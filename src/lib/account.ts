@@ -1,3 +1,4 @@
+import { DEFAULT_PRICING } from "./pricing";
 import type { User } from "@supabase/supabase-js";
 import { redirect } from "next/navigation";
 import { currentUser } from "./auth";
@@ -63,8 +64,11 @@ export const fmtDate = (iso: string, long = true) =>
   new Intl.DateTimeFormat("fr-FR", { timeZone: "Europe/Paris", ...(long ? { weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" } : { day: "2-digit", month: "2-digit", year: "numeric" }) }).format(new Date(iso));
 
 /** Règle d'annulation (identique aux CGV) : gratuite jusqu'à 24 h avant la prise en charge. */
-export function cancelPolicy(pickupAt: string, paidCents: number, now = Date.now()) {
+// CGV art. 5 : plus de 24 h avant, tout est remboursé ; moins de 24 h avant, seule une somme égale à l'acompte est conservée.
+export function cancelPolicy(pickupAt: string, paidCents: number, priceCents?: number, now = Date.now()) {
   const hours = (new Date(pickupAt).getTime() - now) / 3_600_000;
   const refundable = hours >= 24;
-  return { canCancel: hours > 0, refundable, refundCents: refundable ? paidCents : 0, keptCents: refundable ? 0 : paidCents };
+  const deposit = priceCents ? Math.max(50, Math.round((priceCents * DEFAULT_PRICING.depositPct) / 100 / 100) * 100) : paidCents;
+  const keptCents = refundable ? 0 : Math.min(paidCents, deposit);
+  return { canCancel: hours > 0, refundable, refundCents: paidCents - keptCents, keptCents };
 }

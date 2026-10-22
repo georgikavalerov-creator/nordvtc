@@ -13,7 +13,7 @@ export default function CancelTrip({ id, refundLabel, keptLabel, action, full = 
     <div className="cancel-box" role="alertdialog" aria-label="Confirmer l'annulation">
       <p><strong>Annuler ce trajet ?</strong></p>
       <p className="muted" style={{ margin: 0 }}>
-        {refundLabel ? <>Annulation gratuite : <strong>{refundLabel}</strong> remboursés sur votre moyen de paiement.</> : keptLabel ? <>Le trajet est dans moins de 24 h : l'acompte de <strong>{keptLabel}</strong> reste acquis (voir CGV).</> : "Aucun paiement n'a été effectué."}
+        {refundLabel && keptLabel ? <>Le trajet est dans moins de 24 h : <strong>{keptLabel}</strong> restent acquis (montant de l'acompte, voir CGV) et <strong>{refundLabel}</strong> vous sont remboursés.</> : refundLabel ? <>Annulation gratuite : <strong>{refundLabel}</strong> remboursés sur votre moyen de paiement.</> : keptLabel ? <>Le trajet est dans moins de 24 h : l'acompte de <strong>{keptLabel}</strong> reste acquis (voir CGV).</> : "Aucun paiement n'a été effectué."}
       </p>
       {err && <p className="error" role="alert">{err}</p>}
       <div className="trip-actions">

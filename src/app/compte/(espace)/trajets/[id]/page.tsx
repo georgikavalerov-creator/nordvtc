@@ -18,7 +18,7 @@ export default async function Detail({ params }: Props) {
   const b = await userBooking(user, id);
   if (!b) notFound();
   const st = STATUS[b.status] ?? { label: b.status, cls: "" };
-  const pol = cancelPolicy(b.pickup_at, b.paid_cents);
+  const pol = cancelPolicy(b.pickup_at, b.paid_cents, b.price_cents);
   const rest = Math.max(0, b.price_cents - b.paid_cents);
   const { data: rating } = await db().from("trip_ratings").select("stars,comment").eq("booking_id", b.id).maybeSingle();
   const steps = [

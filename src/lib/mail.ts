@@ -91,8 +91,9 @@ export async function sendBookingEmails(b: BookingMail) {
 }
 
 export async function sendCancellationEmails(b: { id: string; name: string; email: string; originLabel: string; destLabel: string; pickupAtLocal: string; refundedCents: number; keptCents: number }) {
+  const kept = b.keptCents > 0 ? `<p>L'annulation intervient moins de 24 h avant la prise en charge : ${euro(b.keptCents)} restent acquis (montant de l'acompte), conformément aux conditions générales de vente.</p>` : "";
   const money = b.refundedCents > 0
-    ? `<p>Un remboursement de <strong>${euro(b.refundedCents)}</strong> a été émis sur votre moyen de paiement (délai bancaire : quelques jours ouvrés).</p>`
+    ? kept + `<p>Un remboursement de <strong>${euro(b.refundedCents)}</strong> a été émis sur votre moyen de paiement (délai bancaire : quelques jours ouvrés).</p>`
     : b.keptCents > 0
       ? `<p>L'annulation intervient moins de 24 h avant la prise en charge : l'acompte de ${euro(b.keptCents)} reste acquis, conformément aux conditions générales de vente.</p>`
       : "";
