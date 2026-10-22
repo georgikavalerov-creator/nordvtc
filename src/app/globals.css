@@ -3761,3 +3761,14 @@ input[type="file"][hidden] { display: none !important; }
 @media (max-width: 640px) { .ag-list li { grid-template-columns: 1fr auto; } .ag-when { grid-column: 1 / -1; display: flex; gap: 8px; } }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .ag-list li { background: #f3f3f3; border-color: #d9d9dc; } }
 :root[data-theme="dark"] .ag-list li { background: #f3f3f3; border-color: #d9d9dc; }
+
+/* Admin : aucune colonne ne déborde (tableaux larges = défilement interne), champs date/heure à la taille de leur case */
+.adm-layout { grid-template-columns: 220px minmax(0, 1fr); }
+@media (max-width: 1000px) { .adm-layout { grid-template-columns: minmax(0, 1fr) !important; } }
+.adm-main { grid-template-columns: minmax(0, 1fr); }
+.adm-main > * { min-width: 0; max-width: 100%; }
+.adm :is(input:not([type="checkbox"]):not([type="radio"]), select, textarea) { min-width: 0; max-width: 100%; width: 100%; }
+.adm label { min-width: 0; }
+.adm .adm-box:has(table), .adm .table-wrap { overflow-x: auto; }
+.adm .adm-box table { min-width: 560px; }
+.adm input[type="date"], .adm input[type="time"] { padding-right: 10px !important; }
