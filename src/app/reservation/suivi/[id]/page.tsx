@@ -9,7 +9,10 @@ import { docPath, trackPath, verifyTrack } from "@/lib/docsign";
 import { euro } from "@/lib/pricing";
 import { db, dbConfigured } from "@/lib/supabase";
 import { getSiteSettings } from "@/lib/content";
-import { cancelByLink, claimByLink } from "./actions";
+import { cancelByLink, claimByLink, modifyByLink } from "./actions";
+import ModifyTrip from "@/components/ModifyTrip";
+import { canModify } from "@/lib/modify";
+import { modifyInitial } from "@/lib/modify-initial";
 import ClaimCancel from "@/components/ClaimCancel";
 import { claimOpen, latestClaim } from "@/lib/claim";
 
@@ -24,7 +27,7 @@ export default async function Suivi({ params, searchParams }: Props) {
   if (!/^[0-9a-f-]{36}$/.test(id) || !verifyTrack(id, k) || !dbConfigured()) notFound();
   const { data: b } = await db()
     .from("bookings")
-    .select("id,group_id,is_return,status,origin_label,dest_label,pickup_at,passengers,luggage,flight,child_seat,pet,price_cents,paid_cents,customer_name")
+    .select("id,group_id,is_return,status,origin_label,origin_lat,origin_lng,dest_label,dest_lat,dest_lng,notes,pickup_at,passengers,luggage,flight,child_seat,pet,price_cents,paid_cents,customer_name")
     .eq("id", id)
     .maybeSingle();
   if (!b || b.status === "expired") notFound();
@@ -36,6 +39,7 @@ export default async function Suivi({ params, searchParams }: Props) {
   const pending = b.status === "pending_payment";
   const pol = cancelPolicy(b.pickup_at, b.paid_cents, b.price_cents);
   const claim = await latestClaim(b.id);
+  const editable = await canModify(b.status, b.pickup_at);
   const phone = (await getSiteSettings()).driverPhone || process.env.DRIVER_PHONE || "";
   return (
     <section className="section">
@@ -74,7 +78,8 @@ export default async function Suivi({ params, searchParams }: Props) {
           {["confirmed", "completed"].includes(b.status) && (
             <Link href={docPath("bon", b.id)} className="btn">Bon de commande</Link>
           )}
-          <Link href="/contact" className="btn ghost">Modifier mon trajet</Link>
+          {editable ? <ModifyTrip initial={modifyInitial(b)} action={modifyByLink.bind(null, b.id, k as string)} label="Modifier mon trajet" />
+            : <Link href="/contact" className="btn ghost">Modifier mon trajet</Link>}
           {b.status === "confirmed" && pol.canCancel && (
             <CancelTrip
               id={b.id}

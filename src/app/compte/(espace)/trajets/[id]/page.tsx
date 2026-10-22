@@ -5,7 +5,10 @@ import RateTrip from "@/components/RateTrip";
 import CancelTrip from "@/components/CancelTrip";
 import ClaimCancel from "@/components/ClaimCancel";
 import { claimOpen, latestClaim } from "@/lib/claim";
-import { claimMine } from "@/app/compte/(espace)/actions";
+import { claimMine, modifyMine } from "@/app/compte/(espace)/actions";
+import ModifyTrip from "@/components/ModifyTrip";
+import { canModify } from "@/lib/modify";
+import { modifyInitial } from "@/lib/modify-initial";
 import { rebookHref, stillBooked, Route } from "@/components/TripCard";
 import HideTrip from "@/components/HideTrip";
 import { cancelPolicy, fmtDate, requireUser, STATUS, userBooking } from "@/lib/account";
@@ -32,6 +35,8 @@ export default async function Detail({ params }: Props) {
     { l: "Course", d: fmtDate(b.pickup_at), on: b.status === "completed" || b.status === "confirmed" },
     { l: "Terminée", d: "", on: b.status === "completed" },
   ];
+  const editable = await canModify(b.status, b.pickup_at);
+  const { data: coords } = editable && dbConfigured() ? await db().from("bookings").select("origin_lat,origin_lng,dest_lat,dest_lng").eq("id", b.id).maybeSingle() : { data: null };
   const help = (s: string) => `/contact?sujet=${encodeURIComponent(`${s} — réservation ${b.id.slice(0, 8)}`)}`;
   return (
     <>
@@ -67,7 +72,8 @@ export default async function Detail({ params }: Props) {
         {b.status === "completed" && <Link className="btn small" href={docPath("facture", b.id)}>Facture</Link>}
         <Link className="btn small ghost" href={rebookHref(b)}>Réserver à nouveau</Link>
         {b.status === "confirmed" && pol.canCancel && <CancelTrip id={b.id} refundLabel={pol.refundCents > 0 ? euro(pol.refundCents) : null} keptLabel={pol.keptCents > 0 ? euro(pol.keptCents) : null} />}
-        {b.status === "confirmed" && <Link className="btn small ghost" href={help("Modification")}>Modifier</Link>}
+        {editable && coords ? <ModifyTrip initial={modifyInitial({ ...b, ...coords })} action={modifyMine.bind(null, b.id)} contactHref={help("Modification")} />
+          : b.status === "confirmed" && <Link className="btn small ghost" href={help("Modification")}>Modifier</Link>}
         <Link className="btn small ghost" href={help("Aide")}>Besoin d'aide</Link>
         <HideTrip ids={[b.id]} label="Supprimer de mon espace" after="/compte/trajets" booked={stillBooked(b)} />
       </div>

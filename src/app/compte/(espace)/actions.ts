@@ -196,3 +196,17 @@ export async function clientPkLogin(resp: AuthenticationResponseJSON): Promise<{
     return { ok: true };
   } catch { return { error: "Connexion impossible pour le moment." }; }
 }
+
+// ---------- Modification d'une réservation confirmée ----------
+export async function modifyMine(bookingId: string, input: unknown, confirm: boolean): Promise<import("@/lib/modify").ModifyResult> {
+  const u = await me();
+  if (!/^[0-9a-f-]{36}$/.test(bookingId)) return { error: "Réservation introuvable." };
+  if (!(await guard(undefined, `modify:${u.id}`, 30, 15 * 60_000))) return { error: "Trop de tentatives. Réessayez dans quelques minutes." };
+  const { data: b } = await db().from("bookings").select("id,user_id,customer_email").eq("id", bookingId).maybeSingle();
+  const mine = b && (b.user_id === u.id || (u.email_confirmed_at && b.customer_email?.toLowerCase() === (u.email ?? "").toLowerCase()));
+  if (!b || !mine) return { error: "Réservation introuvable." };
+  const { modifyBookingCore } = await import("@/lib/modify");
+  const r = await modifyBookingCore(bookingId, input, confirm);
+  if (r.done) revalidatePath("/compte", "layout");
+  return r;
+}

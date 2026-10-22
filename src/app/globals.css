@@ -3495,3 +3495,35 @@ h2.bk-sub::before { content: ""; width: 4px; height: 1.1em; border-radius: 4px; 
 .bk-toggles .toggle { margin: 0 !important; }
 /* Téléphone : panneau date / heure rendu dans <body>, toujours au-dessus de tout */
 .pk-pop.pk-sheet { position: fixed !important; z-index: 1000 !important; left: 12px !important; right: 12px !important; top: auto !important; bottom: calc(12px + env(safe-area-inset-bottom, 0px)) !important; width: auto !important; max-width: none !important; max-height: calc(100dvh - 40px); overflow-y: auto; overscroll-behavior: contain; }
+
+/* ===== Modification d'une réservation confirmée ===== */
+.trip-actions .mod-box, .btn-row .mod-box, .trip-actions .mod-done, .btn-row .mod-done { flex: 1 1 100%; }
+.mod-box { display: grid; gap: 14px; margin-top: 4px; padding: 18px; border: 1px solid #e4e4e7; border-radius: 20px; background: #fff; box-shadow: 0 18px 40px -32px rgba(0,0,0,.45); text-align: left; }
+.mod-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.mod-head strong { font-size: 1.05rem; }
+.mod-x { border: 0; background: #f2f2f4; width: 32px; height: 32px; border-radius: 50%; font-size: 1.2rem; line-height: 1; cursor: pointer; color: #3a3a3c; }
+.mod-lead { margin: -6px 0 0; font-size: .9rem; }
+.mod-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-items: end; }
+.mod-grid > label, .mod-grid > .tf-label { display: grid; gap: 6px; font-weight: 600; font-size: .9rem; min-width: 0; }
+.mod-grid > .mod-wide { grid-column: 1 / -1; }
+.mod-grid select, .mod-grid input:not([type="checkbox"]), .mod-grid textarea { width: 100%; box-sizing: border-box; }
+.mod-grid .toggle { margin: 0 !important; }
+.mod-price { display: grid; gap: 8px; padding: 14px 16px; border-radius: 16px; background: #eef3ff; border: 1px solid #d6e2ff; }
+.mod-price dl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 0; }
+.mod-price dt { font-size: .78rem; color: #5e5e5e; }
+.mod-price dd { margin: 2px 0 0; font-weight: 800; font-size: 1.2rem; font-variant-numeric: tabular-nums; }
+.mod-price > p { margin: 0; font-size: .85rem; }
+.mod-price.floor { background: #fff8e6; border-color: #f3dfa6; }
+.mod-floor { color: #4d3800 !important; font-size: .9rem !important; line-height: 1.45; }
+.mod-floor a { color: #1f5bff; font-weight: 700; }
+.mod-done { margin: 8px 0 0; }
+@media (max-width: 560px) {
+  .mod-box { padding: 14px; }
+  .mod-grid { grid-template-columns: 1fr 1fr; }
+  .mod-grid > label:has(> .ac), .mod-grid > :first-child, .mod-grid > :nth-child(2) { grid-column: 1 / -1; }
+  .mod-grid > .toggle { grid-column: 1 / -1; }
+  .mod-price dd { font-size: 1.05rem; }
+}
+.mod-grid :is(input:not([type="checkbox"]), select, textarea) { background-color: #fff !important; border: 1.5px solid #c2c2c7 !important; color: #0b0b0c; }
+.mod-grid :is(input:not([type="checkbox"]), select, textarea):focus { border-color: #1f5bff !important; box-shadow: 0 0 0 4px rgba(31,91,255,.16); outline: none; }
+.mod-grid .muted { font-weight: 500; }

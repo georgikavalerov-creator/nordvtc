@@ -151,6 +151,62 @@ export async function sendCancellationEmails(b: { id: string; name: string; emai
   }), { replyTo: b.email });
 }
 
+export async function sendModificationEmails(m: {
+  id: string; name: string; email: string; phone: string;
+  before: { originLabel: string; destLabel: string; pickupAtLocal: string; priceCents: number };
+  after: { originLabel: string; destLabel: string; pickupAtLocal: string; priceCents: number };
+  passengers: number; luggage: number; childSeat: boolean; pet: boolean; flight: string | null; notes: string | null;
+  paidCents: number; floor: boolean; quotedCents: number;
+}) {
+  const rest = Math.max(0, m.after.priceCents - m.paidCents);
+  const details = rows([
+    ["Passagers", String(m.passengers)],
+    ["Bagages", String(m.luggage)],
+    m.childSeat && ["Siège enfant", "Demandé"],
+    m.pet && ["Animal de compagnie", "Oui"],
+    m.flight && ["Vol / train", esc(m.flight)],
+    ["Référence", ref(m.id)],
+  ]);
+  const prices: [string, string][] = [["Nouveau prix", euro(m.after.priceCents)], ["Déjà réglé en ligne", euro(m.paidCents)], [rest > 0 ? "Reste à régler à bord" : "Reste à régler", euro(rest)]];
+  const floorNote = m.floor ? note(`Le nouveau trajet est calculé à ${euro(m.quotedCents)}, moins que la somme déjà réglée : le prix retenu reste ${euro(m.paidCents)}. Pour un autre arrangement, répondez simplement à cet e-mail.`, "amber") : "";
+  const phone = await driverPhone();
+  let customerError: unknown = null;
+  try {
+    await send(m.email, `Réservation modifiée · ${m.after.pickupAtLocal}`, layout({
+      preheader: `${m.after.originLabel} → ${m.after.destLabel}, ${m.after.pickupAtLocal}.`,
+      badge: pill("Réservation modifiée", "green"),
+      title: "Votre modification est enregistrée",
+      body:
+        p(`Bonjour ${esc(firstName(m.name))}, voici votre trajet mis à jour. Le bon de commande est actualisé automatiquement.`) +
+        tripCard(m.after.originLabel, m.after.destLabel, m.after.pickupAtLocal) +
+        details + h2("Paiement") + priceBox(prices) + floorNote +
+        small(`Avant : ${esc(m.before.originLabel)} → ${esc(m.before.destLabel)}, ${esc(m.before.pickupAtLocal)} (${euro(m.before.priceCents)}).`) +
+        signature(phone),
+    }), { replyTo: CONTACT_EMAIL });
+  } catch (e) { customerError = e; }
+  const notify = process.env.MAIL_NOTIFY_TO;
+  if (notify) {
+    await sleep(700);
+    await send(notify, `Course modifiée · ${m.after.pickupAtLocal} · ${m.name}`, layout({
+      audience: "admin",
+      preheader: `${m.after.originLabel} → ${m.after.destLabel} · ${euro(m.after.priceCents)}`,
+      badge: pill("Modification par le client", "amber"),
+      title: m.name,
+      body:
+        h2("Nouveau trajet") + tripCard(m.after.originLabel, m.after.destLabel, m.after.pickupAtLocal) + details +
+        (m.notes ? quote(m.notes, "Note du client") : "") +
+        priceBox(prices) + (m.floor ? small(`Prix calculé ${euro(m.quotedCents)}, inférieur au montant déjà réglé : prix maintenu à ${euro(m.paidCents)}.`) : "") +
+        h2("Avant") + tripCard(m.before.originLabel, m.before.destLabel, m.before.pickupAtLocal) + small(`Ancien prix : ${euro(m.before.priceCents)}`) +
+        buttons(
+          button(`${SITE.url}/admin/reservations`, "Ouvrir dans l'administration", "dark"),
+          button(`${SITE.url}/admin/ics/${m.id}`, "Mettre à jour l'agenda", "light"),
+          button(`tel:${m.phone.replace(/\s/g, "")}`, "Appeler", "light"),
+        ),
+    }), { replyTo: m.email });
+  }
+  if (customerError) throw customerError;
+}
+
 export async function sendInvoiceEmail(b: { name: string; email: string; number: string; url: string }) {
   await send(b.email, `Votre facture ${b.number} · ${SITE.name}`, layout({
     preheader: `Facture n° ${b.number} disponible en ligne (imprimable et PDF).`,

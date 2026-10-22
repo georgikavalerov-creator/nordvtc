@@ -22,3 +22,13 @@ export async function claimByLink(id: string, k: string, _: { ok?: boolean; erro
   if (r.ok) revalidatePath(`/reservation/suivi/${id}`);
   return r;
 }
+
+/** Modification d'une réservation confirmée, sans compte (lien de suivi signé). */
+export async function modifyByLink(id: string, k: string, input: unknown, confirm: boolean): Promise<import("@/lib/modify").ModifyResult> {
+  if (!dbConfigured() || !/^[0-9a-f-]{36}$/.test(id) || !verifyTrack(id, k)) return { error: "Lien invalide." };
+  if (!allow(`modify:${id}`, 30, 15 * 60_000)) return { error: "Trop de tentatives. Réessayez dans quelques minutes." };
+  const { modifyBookingCore } = await import("@/lib/modify");
+  const r = await modifyBookingCore(id, input, confirm);
+  if (r.done) revalidatePath(`/reservation/suivi/${id}`);
+  return r;
+}
