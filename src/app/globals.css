@@ -2098,3 +2098,18 @@ html body .btn.is-pressed::before, html body .btn:active::before { transform: tr
 }
 .fx-on .statement .big-words .w:last-child::after { right: 0; }
 @media (prefers-reduced-motion: reduce) { .fx-on .statement .big-words .w { opacity: 1; transform: none; transition: none; } }
+
+/* ---------- FAQ ---------- */
+.faq { margin-top: 14px; }
+.faq-search input { width: 100%; height: 50px; margin-bottom: 12px; }
+.faq-tabs { display: flex; gap: 8px; overflow-x: auto; padding: 2px 0 10px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.faq-tabs::-webkit-scrollbar { display: none; }
+.faq-tabs .chip { white-space: nowrap; cursor: pointer; font-weight: 600; }
+.faq-tabs .chip.on { background: var(--c-blue, #1f5bff); border-color: var(--c-blue, #1f5bff); color: #fff; }
+.faq-n { opacity: .65; font-size: .8em; margin-left: 2px; }
+.faq-list details summary { cursor: pointer; font-weight: 600; }
+.faq-list details p { margin: 10px 0 0; }
+.faq-h { font-size: 1.25rem; margin: 26px 0 4px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+/* Heure : petite flèche de liste déroulante */
+.tf-select { -webkit-appearance: none; appearance: none; padding-right: 40px !important; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23556' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 16px center; }

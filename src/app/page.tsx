@@ -8,6 +8,8 @@ import { SERVICES } from "@/lib/services";
 import { FORFAITS } from "@/lib/forfaits";
 import { CAR_PICS, SERVICE_PIC, imgThumb, srcSetOf } from "@/lib/images";
 import { VILLES } from "@/lib/villes";
+import { FAQ_GROUPS, ALL_FAQ } from "@/lib/faq";
+import FaqList from "@/components/FaqList";
 import Icon, { iconFor } from "@/components/Icon";
 import MapMount from "@/components/MapMount";
 import CineMount from "@/components/CineMount";
@@ -20,32 +22,6 @@ import PaymentBadges from "@/components/PaymentBadges";
 
 const STATEMENT = "Un prix fixé avant de partir, jamais revu à la hausse. Un chauffeur qui suit votre vol ou votre train. Une seule personne au volant, de la réservation à l'arrivée.".split(" ");
 
-const FAQ = [
-  {
-    q: "Quelle est la différence entre un VTC et un taxi ?",
-    a: "Un VTC se réserve à l'avance et le prix est annoncé avant la course. Un taxi peut être hélé dans la rue et facture au compteur. Ici, vous connaissez le prix avant de confirmer.",
-  },
-  {
-    q: "Comment fonctionne le paiement ?",
-    a: "Vous réglez un acompte en ligne pour confirmer la réservation, puis le solde au chauffeur à bord. Vous pouvez aussi payer la totalité en ligne.",
-  },
-  {
-    q: "Puis-je réserver à la dernière minute ?",
-    a: "La réservation en ligne est possible avec un délai minimum indiqué dans le formulaire. Pour une course plus proche, contactez-nous directement.",
-  },
-  {
-    q: "Comment se passe un transfert aéroport ou gare ?",
-    a: "Vous indiquez votre numéro de vol ou de train à la réservation. Le chauffeur adapte la prise en charge à l'horaire réel.",
-  },
-  {
-    q: "Quelles zones desservez-vous ?",
-    a: "Lille et sa métropole, ainsi que les trajets longue distance vers Paris, Bruxelles et au-delà. Pour un trajet très long, nous établissons un devis.",
-  },
-  {
-    q: "Puis-je obtenir une facture ?",
-    a: "Oui, sur demande, pour les particuliers comme pour les entreprises.",
-  },
-];
 
 const TRIPS = [
   { from: "Lille", to: "Lesquin", fromQ: "Lille", toQ: "Aéroport de Lille-Lesquin", label: "Aéroport de Lille-Lesquin", price: "dès 68 €", img: "/img/dest-lesquin.webp", alt: "Terminal de l'aéroport de Lille-Lesquin", pos: "50% 55%" },
@@ -64,7 +40,7 @@ export default function Home() {
         data={{
           "@context": "https://schema.org",
           "@type": "FAQPage",
-          mainEntity: FAQ.map((f) => ({
+          mainEntity: ALL_FAQ.map((f) => ({
             "@type": "Question",
             name: f.q,
             acceptedAnswer: { "@type": "Answer", text: f.a },
@@ -314,12 +290,9 @@ export default function Home() {
         <div className="wrap" style={{ maxWidth: 820 }}>
           <span className="eyebrow">Vos questions</span>
           <h2>Questions fréquentes</h2>
-          {FAQ.map((f) => (
-            <details key={f.q}>
-              <summary>{f.q}</summary>
-              <p className="muted" style={{ marginTop: 10 }}>{f.a}</p>
-            </details>
-          ))}
+          <p className="muted">Tout ce qu'on nous demande le plus souvent, avant, pendant et après le trajet.</p>
+          <FaqList groups={FAQ_GROUPS} />
+          <p className="muted" style={{ marginTop: 18 }}>Vous ne trouvez pas votre réponse ? <Link href="/faq">Toutes les questions</Link> · <Link href="/contact">Nous écrire</Link></p>
         </div>
       </section>
 

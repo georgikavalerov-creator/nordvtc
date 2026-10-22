@@ -60,7 +60,7 @@ const localBusiness = {
   logo: `${SITE.url}/icon-512.png`,
   hasMap: "https://www.google.com/maps/search/?api=1&query=Nord+VTC+Lesquin",
   knowsLanguage: ["fr", "en"],
-  paymentAccepted: "Carte bancaire, Apple Pay, Google Pay, espèces",
+  paymentAccepted: "Carte bancaire, Apple Pay, Google Pay",
   currenciesAccepted: "EUR",
   ...(SITE.email ? { email: SITE.email } : {}),
   priceRange: "€€",

@@ -32,6 +32,7 @@ export default function Footer() {
           <ul style={{ marginTop: 8 }}>
             <li><Link href="/tarifs">Tarifs</Link></li>
             <li><Link href="/vtc">Villes desservies</Link></li>
+            <li><Link href="/faq">Questions fréquentes</Link></li>
             <li><Link href="/guide">Guide</Link></li>
             <li><Link href="/contact">Contact</Link></li>
             <li><Link href="/cgv">Conditions générales de vente</Link></li>
