@@ -2,6 +2,7 @@
 import { useActionState, useState } from "react";
 import AddressField, { type Place } from "@/components/AddressField";
 import { createManualBooking } from "./actions";
+import CompanyField from "@/components/CompanyField";
 
 export type ManualInitial = {
   name?: string; phone?: string; email?: string; date?: string; time?: string; passengers?: number; luggage?: number;
@@ -16,6 +17,9 @@ export default function ManualForm({ mode = "booking", action = createManualBook
   const [d, setD] = useState<Place | null>(initial?.dest ?? null);
   const tomorrow = new Date(Date.now() + 86_400_000).toISOString().slice(0, 10);
   const i = initial ?? {};
+  const [co, setCo] = useState(i.company ?? "");
+  const [coAddr, setCoAddr] = useState("");
+  const [coSiren, setCoSiren] = useState("");
   if (s && "url" in s && s.url) {
     return (
       <div className="adm-box imp-done">
@@ -40,9 +44,9 @@ export default function ManualForm({ mode = "booking", action = createManualBook
         <details>
           <summary style={{ cursor: "pointer" }}>Client professionnel (société) : facultatif</summary>
           <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", marginTop: 10 }}>
-            <label>Société<input name="company" defaultValue={i.company} /></label>
-            <label>Adresse de facturation<input name="billing_address" /></label>
-            <label>SIREN<input name="siren" inputMode="numeric" /></label>
+            <CompanyField label="Société" name="company" value={co} onChange={setCo} onPick={(c) => { setCo(c.name); setCoSiren(c.siren); if (c.address) setCoAddr(c.address); }} />
+            <label>Adresse de facturation<input name="billing_address" value={coAddr} onChange={(e) => setCoAddr(e.target.value)} /></label>
+            <label>SIREN<input name="siren" inputMode="numeric" value={coSiren} onChange={(e) => setCoSiren(e.target.value.replace(/\s/g, "").slice(0, 14))} /></label>
           </div>
         </details>
       )}

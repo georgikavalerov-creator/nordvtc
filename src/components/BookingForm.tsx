@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { track } from "@/lib/track";
 import AddressField, { type Place } from "./AddressField";
 import IconC from "./IconC";
+import CompanyField from "./CompanyField";
 
 type Quote = {
   distanceKm: number;
@@ -65,6 +66,18 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
   const [company, setCompany] = useState("");
   const [billAddr, setBillAddr] = useState("");
   const [siren, setSiren] = useState("");
+  // SIREN (9 chiffres) ou SIRET (14) saisi à la main : on complète la société et l'adresse depuis l'annuaire officiel.
+  async function lookupSiren(v: string) {
+    const d = v.replace(/\s/g, "");
+    if (!/^(\d{9}|\d{14})$/.test(d)) return;
+    try {
+      const r = await fetch(`/api/entreprises?q=${d}`);
+      const c = (await r.json()).results?.[0];
+      if (!c) return;
+      setCompany((x) => x || c.name);
+      setBillAddr((x) => x || c.address);
+    } catch { /* hors ligne */ }
+  }
   const [promoInput, setPromoInput] = useState("");
   const [promoApplied, setPromoApplied] = useState("");
   const [promoInfo, setPromoInfo] = useState<{ code: string; label: string; discountCents: number } | null>(null);
@@ -187,7 +200,7 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
           promo: promoInfo?.code,
           billingCompany: showPro ? company || undefined : undefined,
           billingAddress: showPro ? billAddr || undefined : undefined,
-          billingSiren: showPro ? siren.replace(/\s/g, "") || undefined : undefined,
+          billingSiren: showPro ? siren.replace(/\s/g, "").slice(0, 9) || undefined : undefined,
           accept: true,
         }),
       });
@@ -426,8 +439,9 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
         </label>
         {showPro && (
           <div className="bk-grid bk-2">
-            <label>Société<input value={company} onChange={(e) => setCompany(e.target.value)} maxLength={120} required={showPro} autoComplete="organization" /></label>
-            <label>SIREN (9 chiffres)<input value={siren} onChange={(e) => setSiren(e.target.value)} inputMode="numeric" maxLength={11} /></label>
+            <CompanyField label="Société" value={company} onChange={setCompany} required={showPro}
+              onPick={(c) => { setCompany(c.name); setSiren(c.siren.replace(/(\d{3})(\d{3})(\d{3})/, "$1 $2 $3")); if (c.address) setBillAddr(c.address); }} />
+            <label>SIREN ou SIRET<input value={siren} onChange={(e) => setSiren(e.target.value)} onBlur={() => lookupSiren(siren)} inputMode="numeric" maxLength={17} placeholder="Rempli automatiquement" /></label>
             <label style={{ gridColumn: "1 / -1" }}>Adresse de facturation<input value={billAddr} onChange={(e) => setBillAddr(e.target.value)} maxLength={300} required={showPro} autoComplete="street-address" /></label>
           </div>
         )}
