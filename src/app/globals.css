@@ -3368,3 +3368,14 @@ h2.bk-sub::before { content: ""; width: 4px; height: 1.1em; border-radius: 4px; 
 .acc-tabs > * { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 @media (max-width: 440px) { .acc-tabs > * { font-size: clamp(.72rem, 3.15vw, .9rem) !important; padding-left: 4px !important; padding-right: 4px !important; letter-spacing: -.01em; } }
 @media (max-width: 440px) { .acc-tabs { gap: 2px !important; padding: 3px !important; } .acc-tabs > * { padding-left: 2px !important; padding-right: 2px !important; letter-spacing: -.02em !important; } }
+
+/* Espace perso, mobile : menu en grille sur toute la largeur (plus de défilement ni de titres coupés) */
+@media (max-width: 900px) {
+  .acc-nav { display: block !important; overflow: visible !important; padding: 6px !important; }
+  .acc-nav-list { display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px !important; }
+  .acc-nav a { flex-direction: column; justify-content: center; text-align: center; gap: 5px !important; padding: 10px 4px !important; font-size: .8rem !important; line-height: 1.15; white-space: normal !important; min-width: 0; }
+  .acc-nav a span { overflow-wrap: anywhere; }
+  .acc-nav .acc-out { margin: 6px 0 0 !important; padding: 6px 0 0 !important; border-left: 0 !important; border-top: 1px solid #eceef3 !important; }
+  .acc-nav .acc-out button { width: 100%; text-align: center !important; padding: 8px !important; font-size: .85rem; }
+}
+@media (min-width: 600px) and (max-width: 900px) { .acc-nav-list { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
