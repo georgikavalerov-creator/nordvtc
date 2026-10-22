@@ -2236,3 +2236,8 @@ html body .btn.is-pressed::before, html body .btn:active::before { transform: tr
 .cta-actions { align-items: center; }
 .cta-actions .btn { margin: 0 !important; border: 2px solid transparent; }
 .cta-actions .btn.ghost-light { border-color: rgba(255,255,255,.55); }
+
+/* Flèches des boutons : visibles seulement au survol (souris) ou à l'appui (doigt / clic) */
+html:not(.in-app) .btn-arrow::after, html:not(.in-app) .quick-btn::after { max-width: 0; margin-left: 0; opacity: 0; overflow: hidden; vertical-align: bottom; transform: none; transition: max-width .3s var(--ease, ease), margin-left .3s var(--ease, ease), opacity .2s, transform .25s var(--ease, ease); }
+@media (hover: hover) { html:not(.in-app) .btn-arrow:hover::after, html:not(.in-app) .quick-btn:hover::after { max-width: 1.4em; margin-left: 10px; opacity: 1; transform: translateX(3px); } }
+html:not(.in-app) .btn-arrow:active::after, html:not(.in-app) .quick-btn:active::after, html:not(.in-app) .btn-arrow.is-pressed::after, html:not(.in-app) .quick-btn.is-pressed::after, html:not(.in-app) .btn-arrow:focus-visible::after, html:not(.in-app) .quick-btn:focus-visible::after { max-width: 1.4em; margin-left: 10px; opacity: 1; }
