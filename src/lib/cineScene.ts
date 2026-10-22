@@ -52,7 +52,7 @@ export function mountCine(root) {
       }
       return pts;
     });
-    const N = coarse || r.width < 700 ? 520 : 1100;
+    const N = coarse || r.width < 700 ? 300 : 1100; // moins de particules sur mobile : animation fluide sans saturer le processeur
     parts = [];
     for (let i = 0; i < N; i++) {
       const rr = Math.random() < 0.62 ? 0 : Math.random() < 0.5 ? 1 : 2;
