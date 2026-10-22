@@ -12,7 +12,9 @@ export default function CineMount({ target, near = false }: { target: string; ne
     let cancelled = false;
     const start = () => { if (!cancelled) stop = mountCine(el); };
     const w = window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number };
-    const go = () => (w.requestIdleCallback ? w.requestIdleCallback(start, { timeout: 1500 }) : window.setTimeout(start, 300));
+    // Haut de page : on laisse d'abord la page s'afficher et devenir utilisable, puis l'animation démarre.
+    const idle = () => (w.requestIdleCallback ? w.requestIdleCallback(start, { timeout: 1500 }) : window.setTimeout(start, 300));
+    const go = () => (near ? idle() : window.setTimeout(idle, 1200));
     // near : rien n'est préparé (ni téléchargé) avant que le bloc approche de l'écran.
     let io: IntersectionObserver | undefined;
     const arm = () => {
