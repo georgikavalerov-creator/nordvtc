@@ -12,7 +12,7 @@ export function DriverLogin() {
   return (
     <form action={act} className="form adm-box" style={{ display: "grid", gap: 12, maxWidth: 420 }}>
       <FaceIdLogin getOptions={driverPkLoginOptions} verify={driverPkLogin} next="/chauffeur" />
-      <label>E-mail<input name="email" type="email" required autoComplete="username" /></label>
+      <label>E-mail<input name="email" type="email" required autoComplete="username webauthn" /></label>
       <label>Mot de passe<input name="password" type="password" required autoComplete="current-password" /></label>
       <Msg s={s} />
       <button className="btn" disabled={pending}>{pending ? "Connexion…" : "Se connecter"}</button>

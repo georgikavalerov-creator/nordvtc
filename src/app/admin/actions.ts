@@ -431,7 +431,7 @@ export async function adminPkDelete(id: string) {
 }
 export async function adminPkLoginOptions() {
   const ip = ipFrom(await headers());
-  if (!(await guard(undefined, `admin-pk:${ip}`, 10, 15 * 60_000, "admin_login_blocked"))) throw new Error("Trop de tentatives. Réessayez plus tard.");
+  if (!(await guard(undefined, `admin-pk:${ip}`, 40, 15 * 60_000, "admin_login_blocked"))) throw new Error("Trop de tentatives. Réessayez plus tard.");
   return loginOptions("admin");
 }
 export async function adminPkLogin(resp: AuthenticationResponseJSON): Promise<{ ok?: boolean; error?: string }> {

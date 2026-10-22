@@ -15,7 +15,7 @@ export default function LoginForm() {
       {!state?.need2fa && <FaceIdLogin getOptions={adminPkLoginOptions} verify={adminPkLogin} next="/admin" />}
       <label>
         Mot de passe
-        <input name="password" type="password" required autoComplete="current-password" value={pw} onChange={(e) => setPw(e.target.value)} />
+        <input name="password" type="password" required autoComplete="current-password webauthn" value={pw} onChange={(e) => setPw(e.target.value)} />
       </label>
       {state?.need2fa && (
         <>

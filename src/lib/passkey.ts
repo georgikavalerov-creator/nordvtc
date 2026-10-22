@@ -61,8 +61,10 @@ export async function registrationOptions(owner: string, userName: string, displ
     userID: new TextEncoder().encode(owner),
     attestationType: "none",
     excludeCredentials: existing.map((c) => ({ id: c.id, transports: (c.transports ?? []) as AuthenticatorTransportFuture[] })),
-    authenticatorSelection: { residentKey: "required", userVerification: "required" },
+    authenticatorSelection: { residentKey: "required", userVerification: "required", authenticatorAttachment: "platform" },
   });
+  // Privilégier la clé de l'appareil (trousseau iCloud → Face ID) plutôt qu'un QR code ou une clé USB.
+  (opts as typeof opts & { hints?: string[] }).hints = ["client-device"];
   await keepChallenge(`reg-${owner}`, opts.challenge);
   return opts;
 }
@@ -87,6 +89,7 @@ export type PkPurpose = "admin" | "driver" | "user";
 export async function loginOptions(purpose: PkPurpose) {
   const { rpID } = await rp();
   const opts = await generateAuthenticationOptions({ rpID, userVerification: "required" });
+  (opts as typeof opts & { hints?: string[] }).hints = ["client-device"];
   await keepChallenge(`auth-${purpose}`, opts.challenge);
   return opts;
 }

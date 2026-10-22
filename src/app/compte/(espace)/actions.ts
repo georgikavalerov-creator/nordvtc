@@ -165,7 +165,7 @@ export async function clientPkDelete(id: string) {
 }
 export async function clientPkLoginOptions() {
   const ip = ipFrom(await headers());
-  if (!(await guard(undefined, `user-pk:${ip}`, 15, 15 * 60_000))) throw new Error("Trop de tentatives. Réessayez plus tard.");
+  if (!(await guard(undefined, `user-pk:${ip}`, 40, 15 * 60_000))) throw new Error("Trop de tentatives. Réessayez plus tard.");
   return loginOptions("user");
 }
 /** Connexion par Face ID : la clé est vérifiée, puis une session Supabase est ouverte pour ce compte. */

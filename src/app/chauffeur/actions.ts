@@ -141,7 +141,7 @@ export async function driverPkDelete(id: string) {
 }
 export async function driverPkLoginOptions() {
   const ip = ipFrom(await headers());
-  if (!(await guard(undefined, `driver-pk:${ip}`, 10, 15 * 60_000, "driver_login_blocked"))) throw new Error("Trop de tentatives. Réessayez plus tard.");
+  if (!(await guard(undefined, `driver-pk:${ip}`, 40, 15 * 60_000, "driver_login_blocked"))) throw new Error("Trop de tentatives. Réessayez plus tard.");
   return loginOptions("driver");
 }
 export async function driverPkLogin(resp: AuthenticationResponseJSON): Promise<{ ok?: boolean; error?: string }> {

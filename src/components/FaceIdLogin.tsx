@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { browserSupportsWebAuthn, startAuthentication } from "@simplewebauthn/browser";
+import { browserSupportsWebAuthn, browserSupportsWebAuthnAutofill, startAuthentication, WebAuthnAbortService } from "@simplewebauthn/browser";
 
 type Opts = Parameters<typeof startAuthentication>[0]["optionsJSON"];
 type Resp = Awaited<ReturnType<typeof startAuthentication>>;
@@ -22,6 +22,22 @@ export default function FaceIdLogin({ getOptions, verify, next }: { getOptions: 
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   useEffect(() => { setOk(browserSupportsWebAuthn()); setLabel(biometricLabel()); }, []);
+  // Clé proposée directement au-dessus du clavier dès qu'on touche le champ de connexion (un appui → Face ID).
+  useEffect(() => {
+    let live = true;
+    (async () => {
+      try {
+        if (!(await browserSupportsWebAuthnAutofill())) return;
+        if (!document.querySelector('input[autocomplete*="webauthn"]')) return;
+        const optionsJSON = await getOptions();
+        if (!live) return;
+        const resp = await startAuthentication({ optionsJSON, useBrowserAutofill: true });
+        const r = await verify(resp);
+        if (r.ok) window.location.href = next; else if (live) setErr(r.error ?? "Connexion impossible.");
+      } catch { /* proposition ignorée ou remplacée par le bouton */ }
+    })();
+    return () => { live = false; try { WebAuthnAbortService.cancelCeremony(); } catch {} };
+  }, [getOptions, verify, next]);
   if (!ok) return null;
   async function go() {
     setBusy(true); setErr("");

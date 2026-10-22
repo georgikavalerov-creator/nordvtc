@@ -84,7 +84,7 @@ export default function AuthForm({ next = "/compte", failed = false }: { next?: 
       </div>
       {mode !== "magic" ? (
         <form className="form" onSubmit={password}>
-          <label>Adresse e-mail<input type="email" required autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="vous@exemple.fr" /></label>
+          <label>Adresse e-mail<input type="email" required autoComplete="username webauthn" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="vous@exemple.fr" /></label>
           <label>{mode === "signup" ? "Créez votre mot de passe" : "Mot de passe"}
             <span className="pw-field">
               <input type={show ? "text" : "password"} required value={pw} onChange={(e) => setPw(e.target.value)} autoComplete={mode === "signup" ? "new-password" : "current-password"} minLength={mode === "signup" ? 10 : undefined} />
@@ -99,7 +99,7 @@ export default function AuthForm({ next = "/compte", failed = false }: { next?: 
         </form>
       ) : (
       <form className="form" onSubmit={magic}>
-        <label>Adresse e-mail<input type="email" required autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="vous@exemple.fr" /></label>
+        <label>Adresse e-mail<input type="email" required autoComplete="username webauthn" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="vous@exemple.fr" /></label>
         {error && <p className="error" role="alert">{error}</p>}
         <button className="btn" type="submit" disabled={busy}>{busy ? "Envoi…" : "Recevoir mon lien de connexion"}</button>
         <p className="muted" style={{ fontSize: ".85rem", margin: 0 }}>Pas de mot de passe à retenir : un lien sécurisé vous est envoyé. Premier passage ? Votre espace est créé automatiquement.</p>
