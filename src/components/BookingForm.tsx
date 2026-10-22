@@ -1,6 +1,7 @@
 "use client";
 
 import TimeField from "./TimeField";
+import DateField from "./DateField";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { track } from "@/lib/track";
 import AddressField, { type Place } from "./AddressField";
@@ -232,7 +233,7 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
       requestAnimationFrame(() => {
         const sel = e.origin || e.dest ? ".field-error" : e.when ? ".when-error" : e.ret ? ".ret-error" : ".flight-error";
         formRef.current?.querySelector<HTMLElement>(sel)?.scrollIntoView({ behavior: "smooth", block: "center" });
-        if (!e.origin && !e.dest && e.when) formRef.current?.querySelector<HTMLInputElement>(date ? ".tf input" : 'input[type="date"]')?.focus();
+        if (!e.origin && !e.dest && e.when) formRef.current?.querySelector<HTMLElement>(date ? ".pk-time input" : ".pk-field")?.focus();
         else formRef.current?.querySelector<HTMLInputElement>('input[aria-invalid="true"]')?.focus();
       });
       return false;
@@ -276,10 +277,10 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
           ))}
         </div>
         <div className="bk-grid bk-4">
-          <label>
+          <div className="tf-label">
             Date
-            <input type="date" required min={today()} value={date} onChange={(e) => { setDate(e.target.value); setErrors((x) => ({ ...x, when: undefined })); }} aria-invalid={!!errors.when && !date} />
-          </label>
+            <DateField value={date} min={today()} invalid={!!errors.when && !date} onChange={(v) => { setDate(v); setErrors((x) => ({ ...x, when: undefined })); }} />
+          </div>
           <div className="tf-label">
             Heure
             <TimeField value={time} invalid={!!errors.when && !time} onChange={(v) => { setTime(v); setErrors((x) => ({ ...x, when: undefined })); }} />
@@ -324,10 +325,10 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
         </label>
         {wantReturn && (
           <div className="bk-grid bk-2" style={{ marginTop: 8 }}>
-            <label>
+            <div className="tf-label">
               Date du retour
-              <input type="date" required min={date || today()} value={retDate} onChange={(e) => { setRetDate(e.target.value); setErrors((x) => ({ ...x, ret: undefined })); }} />
-            </label>
+              <DateField value={retDate} min={date || today()} ariaLabel="Date du retour" invalid={!!errors.ret && !retDate} onChange={(v) => { setRetDate(v); setErrors((x) => ({ ...x, ret: undefined })); }} />
+            </div>
             <div className="tf-label">
               Heure du retour
               <TimeField value={retTime} invalid={!!errors.ret && !retTime} onChange={(v) => { setRetTime(v); setErrors((x) => ({ ...x, ret: undefined })); }} />

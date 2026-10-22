@@ -2241,3 +2241,41 @@ html body .btn.is-pressed::before, html body .btn:active::before { transform: tr
 html:not(.in-app) .btn-arrow::after, html:not(.in-app) .quick-btn::after { max-width: 0; margin-left: 0; opacity: 0; overflow: hidden; vertical-align: bottom; transform: none; transition: max-width .3s var(--ease, ease), margin-left .3s var(--ease, ease), opacity .2s, transform .25s var(--ease, ease); }
 @media (hover: hover) { html:not(.in-app) .btn-arrow:hover::after, html:not(.in-app) .quick-btn:hover::after { max-width: 1.4em; margin-left: 10px; opacity: 1; transform: translateX(3px); } }
 html:not(.in-app) .btn-arrow:active::after, html:not(.in-app) .quick-btn:active::after, html:not(.in-app) .btn-arrow.is-pressed::after, html:not(.in-app) .quick-btn.is-pressed::after, html:not(.in-app) .btn-arrow:focus-visible::after, html:not(.in-app) .quick-btn:focus-visible::after { max-width: 1.4em; margin-left: 10px; opacity: 1; }
+
+/* ---------- Sélecteurs date et heure maison (même style que les champs) ---------- */
+.pk { position: relative; }
+.pk-field { width: 100%; height: 52px; display: flex; align-items: center; gap: 10px; padding: 0 16px; border-radius: 999px; border: 1.5px solid #b9c0cc; background: #fff; color: #0b1430; font: inherit; font-size: 16px; font-weight: 600; text-align: left; cursor: pointer; box-shadow: 0 1px 2px rgba(11,20,48,.06); transition: border-color .2s, box-shadow .2s; }
+.pk-field svg { flex: none; color: #1f5bff; }
+.pk-field span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pk-field.empty { color: #6b7385; font-weight: 500; }
+.pk-field:hover { border-color: #8892a3; }
+.pk-field:focus-visible, .pk-field[aria-expanded="true"], .pk-time:focus-within { border-color: #1f5bff; box-shadow: 0 0 0 4px rgba(31,91,255,.16); outline: none; }
+.pk-field[aria-invalid="true"] { border-color: #c4281c !important; }
+.pk-time input { all: unset; flex: 1; min-width: 0; font: inherit; font-size: 16px; font-weight: 600; color: inherit; cursor: text; }
+.pk-time input::placeholder { color: #6b7385; font-weight: 500; }
+.pk-pop { position: absolute; z-index: 60; top: calc(100% + 8px); left: 0; width: max(100%, 300px); max-width: calc(100vw - 24px); background: #fff; color: #0b1430; border: 1px solid rgba(11,20,48,.12); border-radius: 18px; box-shadow: 0 22px 50px -18px rgba(11,20,48,.45); padding: 12px; animation: pkIn .18s cubic-bezier(.2,.8,.2,1); }
+@keyframes pkIn { from { opacity: 0; transform: translateY(-6px); } }
+.pk-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.pk-head strong { text-transform: capitalize; font-size: .98rem; }
+.pk-head button { width: 36px; height: 36px; border-radius: 50%; border: 0; background: #f1f3f8; font-size: 1.3rem; cursor: pointer; color: #0b1430; }
+.pk-head button:disabled { opacity: .3; cursor: default; }
+.pk-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+.pk-week span { text-align: center; font-size: .72rem; font-weight: 700; color: #6b7385; padding: 4px 0; }
+.pk-grid button, .pk-hours button, .pk-mins button { height: 38px; border: 0; border-radius: 10px; background: none; color: #0b1430; font: inherit; font-size: .92rem; font-weight: 600; cursor: pointer; font-variant-numeric: tabular-nums; }
+.pk-grid button:hover, .pk-hours button:hover, .pk-mins button:hover { background: rgba(31,91,255,.1); }
+.pk-grid button.today { box-shadow: inset 0 0 0 1.5px #1f5bff; }
+.pk-grid button.on, .pk-hours button.on, .pk-mins button.on { background: #1f5bff; color: #fff; }
+.pk-grid button:disabled { color: #c2c7d2; background: none; cursor: default; }
+.pk-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 10px; }
+.pk-tabs button { height: 36px; border-radius: 10px; border: 1px solid #d7dbe4; background: #f6f7fa; font: inherit; font-size: .85rem; font-weight: 700; cursor: pointer; color: #0b1430; }
+.pk-tabs button.on { background: #0b1430; color: #fff; border-color: #0b1430; }
+.pk-tabs button:disabled { opacity: .45; cursor: default; }
+.pk-hours { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
+.pk-mins { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+.pk-fine { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 10px 0 8px; }
+.pk-fine strong { font-size: 1.25rem; font-variant-numeric: tabular-nums; }
+.pk-fine button { height: 36px; padding: 0 12px; border-radius: 10px; border: 1px solid #d7dbe4; background: #fff; font: inherit; font-size: .85rem; font-weight: 700; cursor: pointer; color: #0b1430; }
+.pk-ok { width: 100%; height: 42px; border: 0; border-radius: 12px; background: #1f5bff; color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+@media (max-width: 560px) { .pk-pop { position: fixed; left: 12px; right: 12px; top: auto; bottom: calc(12px + env(safe-area-inset-bottom, 0px)); width: auto; max-width: none; border-radius: 20px; padding: 14px; animation-name: pkUp; } .pk-grid button, .pk-hours button, .pk-mins button { height: 44px; } }
+@keyframes pkUp { from { opacity: 0; transform: translateY(16px); } }
+.bk-grid > .tf-label:nth-child(2) .pk-pop { left: auto; right: 0; }
