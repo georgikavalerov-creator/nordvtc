@@ -17,7 +17,7 @@ export function biometricLabel() {
   return "Face ID / Touch ID";
 }
 
-export default function FaceIdLogin({ getOptions, verify, next }: { getOptions: () => Promise<Opts>; verify: (r: Resp) => Promise<{ ok?: boolean; error?: string }>; next: string }) {
+export default function FaceIdLogin({ getOptions, verify, next, orText = "ou avec votre mot de passe" }: { getOptions: () => Promise<Opts>; verify: (r: Resp) => Promise<{ ok?: boolean; error?: string }>; next: string; orText?: string }) {
   const [ok, setOk] = useState(false);
   const [label, setLabel] = useState("Face ID / Touch ID");
   const [busy, setBusy] = useState(false);
@@ -60,7 +60,7 @@ export default function FaceIdLogin({ getOptions, verify, next }: { getOptions: 
         {busy ? "Vérification…" : `Se connecter avec ${label}`}
       </button>
       {err && <p className="error" role="alert">{err}</p>}
-      <p className="faceid-or"><span>ou avec votre mot de passe</span></p>
+      <p className="faceid-or"><span>{orText}</span></p>
     </div>
   );
 }

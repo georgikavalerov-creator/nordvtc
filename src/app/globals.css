@@ -2910,3 +2910,55 @@ h2.bk-sub::before { content: ""; width: 4px; height: 1.1em; border-radius: 4px; 
 @media (max-width: 520px) { .faceid-prompt { flex-wrap: wrap; } .faceid-prompt-act { width: 100%; grid-template-columns: 1fr auto; align-items: center; } .faceid-prompt .faceid-btn { width: 100%; } }
 .faceid-on { margin: 0; padding: 10px 14px; border-radius: 12px; background: #e9f9ef; color: #146c34; font-weight: 600; font-size: .92rem; }
 .faceid-here { font-style: normal; color: #1f5bff; font-weight: 700; }
+
+/* ===== Page de connexion client : carte + panneau de marque ===== */
+.auth-page { padding: 34px 0 56px; background: radial-gradient(700px 360px at 100% 0%, rgba(31,91,255,.12), transparent 70%), radial-gradient(600px 320px at 0% 100%, rgba(124,58,237,.09), transparent 70%), #f5f7fc; }
+.auth-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px; align-items: stretch; max-width: 1080px; }
+.auth-card { background: #fff; border-radius: 26px; padding: 30px 30px 24px; box-shadow: 0 30px 60px -36px rgba(15,23,42,.45), 0 0 0 1px rgba(15,23,42,.05); }
+.auth-card h1 { font-size: clamp(1.9rem, 4vw, 2.4rem); margin: 4px 0 6px; letter-spacing: -.02em; }
+.auth-sub { margin: 0 0 18px; font-size: .95rem; }
+.auth-card .authbox { background: none !important; box-shadow: none !important; border: 0 !important; padding: 0 !important; margin: 0; }
+.auth-legal { margin: 18px 0 0; font-size: .78rem; color: #6b7385; line-height: 1.45; }
+.auth-legal a { color: inherit; }
+/* sélecteur segmenté : lien e-mail / créer un compte / connexion */
+.authbox .acc-tabs { display: grid !important; grid-template-columns: repeat(3, 1fr); gap: 4px !important; padding: 4px; border-radius: 999px; background: #eef1f7; margin-bottom: 16px !important; }
+.authbox .acc-tabs .chip { justify-content: center; border: 0 !important; background: transparent !important; box-shadow: none !important; font-size: .86rem; padding: 9px 6px; white-space: nowrap; color: #3d4560; }
+.authbox .acc-tabs .chip.on { background: #1f5bff !important; color: #fff !important; box-shadow: 0 6px 14px -8px rgba(31,91,255,.9) !important; }
+.auth-card .auth-btn { min-height: 52px; }
+.auth-card .faceid-btn { min-height: 54px; font-size: 1.02rem; }
+/* panneau de marque */
+.auth-brand { position: relative; overflow: hidden; border-radius: 26px; padding: 30px; color: #fff; display: flex; flex-direction: column; gap: 18px;
+  background: radial-gradient(520px 300px at 0% 0%, rgba(31,91,255,.6), transparent 70%), radial-gradient(460px 280px at 100% 100%, rgba(124,58,237,.45), transparent 70%), radial-gradient(300px 200px at 90% 10%, rgba(14,165,164,.25), transparent 70%), #05070d; }
+.auth-brand-top { display: flex; align-items: center; gap: 12px; }
+.auth-avatar { width: 56px; height: 56px; border-radius: 50%; box-shadow: 0 0 0 3px rgba(255,255,255,.18); }
+.auth-brand-top strong { display: block; font-size: 1.05rem; letter-spacing: .02em; }
+.auth-brand-top span { font-size: .85rem; color: #b9c4e6; }
+.auth-brand h2 { color: #fff; font-size: clamp(1.35rem, 2.6vw, 1.75rem); line-height: 1.2; margin: 4px 0 0; letter-spacing: -.01em; }
+.auth-perks { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.auth-perks li { display: flex; gap: 12px; align-items: flex-start; }
+.auth-perk-ico { width: 42px; height: 42px; flex: none; border-radius: 12px; display: grid; place-items: center; background: rgba(255,255,255,.1); box-shadow: inset 0 0 0 1px rgba(255,255,255,.14); color: #9db7ff; }
+.auth-perks strong { display: block; font-size: .98rem; }
+.auth-perks small { display: block; color: #b9c4e6; font-size: .86rem; line-height: 1.4; margin-top: 2px; }
+.auth-rating { align-self: flex-start; color: #fff; background: rgba(255,255,255,.08) !important; border-color: rgba(245,179,1,.45) !important; }
+.auth-trust { margin: auto 0 0; display: flex; align-items: center; gap: 8px; font-size: .8rem; color: #9aa6c9; }
+@media (max-width: 860px) {
+  .auth-page { padding: 18px 0 40px; }
+  .auth-grid { grid-template-columns: 1fr; gap: 18px; }
+  .auth-card { padding: 22px 18px 18px; border-radius: 22px; }
+  .auth-brand { padding: 22px 18px; border-radius: 22px; }
+}
+@media (max-width: 380px) { .authbox .acc-tabs .chip { font-size: .76rem; padding: 9px 2px; } }
+/* Mode nuit : le panneau de marque garde ses couleurs (bloc ré-inversé) */
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .auth-brand { filter: invert(1) hue-rotate(180deg); } :root:not([data-theme="light"]) .auth-brand img { filter: none; } :root:not([data-theme="light"]) .auth-page { background: #f5f7fc; } }
+:root[data-theme="dark"] .auth-brand { filter: invert(1) hue-rotate(180deg); }
+:root[data-theme="dark"] .auth-brand img { filter: none; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .auth-brand .rb-stars { filter: none !important; } }
+:root[data-theme="dark"] .auth-brand .rb-stars { filter: none !important; }
+/* Retouches page de connexion */
+.auth-page .auth-card .authbox.callgate { background: none !important; box-shadow: none !important; border: 0 !important; padding: 0 !important; }
+.faceid-btn { white-space: nowrap; }
+@media (max-width: 420px) { .faceid-btn { font-size: .92rem !important; padding-left: 12px !important; padding-right: 12px !important; gap: 8px !important; } }
+@media (max-width: 340px) { .faceid-btn { font-size: .82rem !important; } }
+/* Mode nuit : le bouton Face ID garde son dégradé bleu-violet (ré-inversé) */
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .btn.faceid-btn:not(.danger):not(.trip-del) { filter: invert(1) hue-rotate(180deg); background: linear-gradient(135deg, #1f5bff, #7c3aed) !important; color: #fff !important; border-color: transparent !important; box-shadow: 0 0 0 3px rgba(122,162,255,.45), 0 12px 28px -10px rgba(124,58,237,.6) !important; } }
+:root[data-theme="dark"] .btn.faceid-btn:not(.danger):not(.trip-del) { filter: invert(1) hue-rotate(180deg); background: linear-gradient(135deg, #1f5bff, #7c3aed) !important; color: #fff !important; border-color: transparent !important; box-shadow: 0 0 0 3px rgba(122,162,255,.45), 0 12px 28px -10px rgba(124,58,237,.6) !important; }

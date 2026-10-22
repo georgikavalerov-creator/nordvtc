@@ -70,13 +70,13 @@ export default function AuthForm({ next = "/compte", failed = false }: { next?: 
   );
   return (
     <div className="callgate authbox">
-      <FaceIdLogin getOptions={clientPkLoginOptions} verify={clientPkLogin} next={next} />
+      <FaceIdLogin getOptions={clientPkLoginOptions} verify={clientPkLogin} next={next} orText="ou" />
       <div className="auth-social">
         <button type="button" className="btn auth-btn" onClick={() => oauth("google")}>{G} Continuer avec Google</button>
         <button type="button" className="btn auth-btn apple" onClick={() => oauth("apple")}>{A} Continuer avec Apple</button>
         {soon && <p className="notice" role="status" style={{ margin: 0 }}>La connexion avec Apple sera bientôt disponible. En attendant, utilisez Google ou votre adresse e-mail.</p>}
       </div>
-      <p className="auth-or"><span>ou avec votre e-mail</span></p>
+      <p className="auth-or"><span>ou avec votre adresse e-mail</span></p>
       <div className="acc-tabs" role="tablist" style={{ marginTop: 0 }}>
         {([["magic", "Lien e-mail"], ["signup", "Créer un compte"], ["login", "Connexion"]] as const).map(([k, l]) => (
           <button key={k} type="button" role="tab" aria-selected={mode === k} className={`chip${mode === k ? " on" : ""}`} onClick={() => { setMode(k); setError(""); setInfo(""); }}>{l}</button>
