@@ -26,7 +26,7 @@ export default async function Page() {
       <LogoUploader current={logo} save={saveLogo} remove={removeLogo} />
       <SettingsForm v={v} envPhone={Boolean(process.env.DRIVER_PHONE)} />
       <TiimeCatchUp />
-      <FaceIdManager list={await adminPkList()} getOptions={adminPkRegOptions} save={adminPkRegVerify} remove={adminPkDelete} />
+      <FaceIdManager scope="admin" list={await adminPkList()} getOptions={adminPkRegOptions} save={adminPkRegVerify} remove={adminPkDelete} />
       <TwoFactor enabled={!!tfa.enabled} />
       <TwoFactorChannels email={!!tfa.email} sms={!!tfa.sms} smsAvailable={otpConfigured()} phone={(v.driverPhone || process.env.DRIVER_PHONE || "").trim()} backup={(tfa.backup ?? []).length} />
       <div className="adm-box">

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { browserSupportsWebAuthn, startRegistration } from "@simplewebauthn/browser";
 import { biometricLabel } from "./FaceIdLogin";
+import { markHere, rememberId } from "@/lib/faceid-local";
 
 type Opts = Parameters<typeof startRegistration>[0]["optionsJSON"];
 type Resp = Awaited<ReturnType<typeof startRegistration>>;
@@ -10,7 +11,7 @@ type Resp = Awaited<ReturnType<typeof startRegistration>>;
 /** Invitation visible juste après la connexion : « Activer Face ID » en un geste (si pas encore activé). */
 export default function FaceIdPrompt({ count, getOptions, save, storeKey }: { count: number; getOptions: () => Promise<Opts>; save: (r: Resp, name: string) => Promise<{ ok?: boolean; error?: string }>; storeKey: string }) {
   const [show, setShow] = useState(false);
-  const [label, setLabel] = useState("Face ID");
+  const [label, setLabel] = useState("Face ID / Touch ID");
   const [msg, setMsg] = useState("");
   const [busy, setBusy] = useState(false);
   const router = useRouter();
@@ -27,11 +28,13 @@ export default function FaceIdPrompt({ count, getOptions, save, storeKey }: { co
     try {
       const ua = navigator.userAgent;
       const name = /iPhone/.test(ua) ? "iPhone" : /iPad/.test(ua) ? "iPad" : /Macintosh/.test(ua) ? "Mac" : /Android/.test(ua) ? "Téléphone Android" : /Windows/.test(ua) ? "PC Windows" : "Appareil";
-      const r = await save(await startRegistration({ optionsJSON: await getOptions() }), name);
-      if (r.error) setMsg(r.error); else { setMsg(`${label} activé ✓ La prochaine fois, connectez-vous en un regard.`); setTimeout(() => { setShow(false); router.refresh(); }, 2500); }
+      const resp = await startRegistration({ optionsJSON: await getOptions() });
+      const r = await save(resp, name);
+      if (r.error) setMsg(r.error); else { rememberId(resp.id); markHere(storeKey); setMsg(`${label} activé ✓ La prochaine fois, connectez-vous en un regard.`); setTimeout(() => { setShow(false); router.refresh(); }, 2500); }
     } catch (e) {
       const n = (e as Error)?.name ?? "";
-      setMsg(n === "InvalidStateError" ? `${label} est déjà activé sur cet appareil.` : n === "NotAllowedError" ? "Activation annulée." : "Activation impossible sur cet appareil.");
+      if (n === "InvalidStateError") { markHere(storeKey); setShow(false); return; }
+      setMsg(n === "NotAllowedError" ? "Activation annulée." : "Activation impossible sur cet appareil.");
     } finally { setBusy(false); }
   }
   return (

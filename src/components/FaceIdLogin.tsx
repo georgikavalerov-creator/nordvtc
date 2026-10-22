@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { rememberId } from "@/lib/faceid-local";
 import { browserSupportsWebAuthn, browserSupportsWebAuthnAutofill, startAuthentication, WebAuthnAbortService } from "@simplewebauthn/browser";
 
 type Opts = Parameters<typeof startAuthentication>[0]["optionsJSON"];
@@ -7,18 +8,18 @@ type Resp = Awaited<ReturnType<typeof startAuthentication>>;
 
 /** Libellé adapté à l'appareil : Face ID sur iPhone/iPad, empreinte sur Android, Windows Hello sur PC. */
 export function biometricLabel() {
-  if (typeof navigator === "undefined") return "Face ID";
+  // Le site ne peut pas savoir si l'appareil utilise le visage ou l'empreinte : on nomme les deux.
+  if (typeof navigator === "undefined") return "Face ID / Touch ID";
   const ua = navigator.userAgent;
-  if (/iPhone|iPad|iPod/.test(ua)) return "Face ID";
-  if (/Macintosh/.test(ua)) return navigator.maxTouchPoints > 1 ? "Face ID" : "Touch ID";
-  if (/Android/.test(ua)) return "l'empreinte digitale";
+  if (/iPhone|iPad|iPod|Macintosh/.test(ua)) return "Face ID / Touch ID";
+  if (/Android/.test(ua)) return "empreinte ou visage";
   if (/Windows/.test(ua)) return "Windows Hello";
-  return "Face ID";
+  return "Face ID / Touch ID";
 }
 
 export default function FaceIdLogin({ getOptions, verify, next }: { getOptions: () => Promise<Opts>; verify: (r: Resp) => Promise<{ ok?: boolean; error?: string }>; next: string }) {
   const [ok, setOk] = useState(false);
-  const [label, setLabel] = useState("Face ID");
+  const [label, setLabel] = useState("Face ID / Touch ID");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   useEffect(() => { setOk(browserSupportsWebAuthn()); setLabel(biometricLabel()); }, []);
@@ -33,7 +34,7 @@ export default function FaceIdLogin({ getOptions, verify, next }: { getOptions: 
         if (!live) return;
         const resp = await startAuthentication({ optionsJSON, useBrowserAutofill: true });
         const r = await verify(resp);
-        if (r.ok) window.location.href = next; else if (live) setErr(r.error ?? "Connexion impossible.");
+        if (r.ok) { rememberId(resp.id); window.location.href = next; } else if (live) setErr(r.error ?? "Connexion impossible.");
       } catch { /* proposition ignorée ou remplacée par le bouton */ }
     })();
     return () => { live = false; try { WebAuthnAbortService.cancelCeremony(); } catch {} };
@@ -45,7 +46,7 @@ export default function FaceIdLogin({ getOptions, verify, next }: { getOptions: 
       const optionsJSON = await getOptions();
       const resp = await startAuthentication({ optionsJSON });
       const r = await verify(resp);
-      if (r.ok) { window.location.href = next; return; }
+      if (r.ok) { rememberId(resp.id); window.location.href = next; return; }
       setErr(r.error ?? "Connexion impossible.");
     } catch (e) {
       const m = (e as Error)?.message ?? "";

@@ -21,7 +21,7 @@ export default async function Securite() {
       <form action="/auth/signout" method="post" style={{ marginTop: 14 }}><button className="btn ghost small">Se déconnecter</button></form>
 
       <h2 className="acc-h">Face ID</h2>
-      <FaceIdManager list={await listPasskeys(`user:${user.id}`)} getOptions={clientPkRegOptions} save={clientPkRegVerify} remove={clientPkDelete} />
+      <FaceIdManager scope={`u-${user.id.slice(0, 8)}`} list={await listPasskeys(`user:${user.id}`)} getOptions={clientPkRegOptions} save={clientPkRegVerify} remove={clientPkDelete} />
 
       <h2 className="acc-h">Mes données</h2>
       <p className="muted">Téléchargez une copie de vos informations : profil, adresses enregistrées et réservations (format JSON).</p>

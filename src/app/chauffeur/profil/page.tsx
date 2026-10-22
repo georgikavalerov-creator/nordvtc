@@ -21,7 +21,7 @@ export default async function Page() {
           <AvatarField avatar={(d as { photo?: string | null }).photo ?? null} name={d.name} save={saveDriverPhoto} hint="Votre photo de chauffeur, affichée dans votre espace. Recadrée automatiquement." />
           <LogoUploader current={(d as { logo?: string | null }).logo ?? null} save={saveDriverLogo} remove={removeDriverLogo} />
           <ProfileForm d={d} />
-          <FaceIdManager list={pk} getOptions={driverPkRegOptions} save={driverPkRegVerify} remove={driverPkDelete} />
+          <FaceIdManager scope={`d-${me?.id.slice(0, 8)}`} list={pk} getOptions={driverPkRegOptions} save={driverPkRegVerify} remove={driverPkDelete} />
           <PasswordForm />
         </>
       )}

@@ -3,6 +3,7 @@ import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { browserSupportsWebAuthn, startRegistration } from "@simplewebauthn/browser";
 import { biometricLabel } from "./FaceIdLogin";
+import { forgetId, isHere, localIds, markHere, rememberId } from "@/lib/faceid-local";
 
 type Opts = Parameters<typeof startRegistration>[0]["optionsJSON"];
 type Resp = Awaited<ReturnType<typeof startRegistration>>;
@@ -15,13 +16,16 @@ const deviceName = () => {
 const d = (s: string | null) => (s ? new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "short", year: "numeric" }).format(new Date(s)) : "jamais");
 
 /** Activer / retirer Face ID (clé d'accès) sur ses appareils. */
-export default function FaceIdManager({ list, getOptions, save, remove }: { list: Row[]; getOptions: () => Promise<Opts>; save: (r: Resp, name: string) => Promise<{ ok?: boolean; error?: string }>; remove: (id: string) => Promise<{ ok?: boolean; error?: string }> }) {
+export default function FaceIdManager({ list, getOptions, save, remove, scope }: { scope: string; list: Row[]; getOptions: () => Promise<Opts>; save: (r: Resp, name: string) => Promise<{ ok?: boolean; error?: string }>; remove: (id: string) => Promise<{ ok?: boolean; error?: string }> }) {
   const [supported, setSupported] = useState(true);
-  const [label, setLabel] = useState("Face ID");
+  const [label, setLabel] = useState("Face ID / Touch ID");
   const [msg, setMsg] = useState<{ ok?: string; error?: string }>({});
   const [pending, start] = useTransition();
   const router = useRouter();
+  const [here, setHere] = useState(false);
+  const [mine, setMine] = useState<string[]>([]);
   useEffect(() => { setSupported(browserSupportsWebAuthn()); setLabel(biometricLabel()); }, []);
+  useEffect(() => { setHere(isHere(scope, list.map((k) => k.id))); setMine(localIds()); }, [list, scope]);
 
   async function add() {
     setMsg({});
@@ -29,10 +33,11 @@ export default function FaceIdManager({ list, getOptions, save, remove }: { list
       const optionsJSON = await getOptions();
       const resp = await startRegistration({ optionsJSON });
       const r = await save(resp, deviceName());
-      if (r.error) setMsg({ error: r.error }); else { setMsg({ ok: `${label} activé sur cet appareil ✓` }); router.refresh(); }
+      if (r.error) setMsg({ error: r.error }); else { rememberId(resp.id); markHere(scope); setHere(true); setMsg({ ok: `${label} activé sur cet appareil ✓` }); router.refresh(); }
     } catch (e) {
       const n = (e as Error)?.name ?? "";
-      setMsg({ error: n === "InvalidStateError" ? `${label} est déjà activé sur cet appareil.` : n === "NotAllowedError" ? "Activation annulée." : "Activation impossible sur cet appareil." });
+      if (n === "InvalidStateError") { markHere(scope); setHere(true); setMsg({ ok: `${label} est déjà activé sur cet appareil ✓` }); return; }
+      setMsg({ error: n === "NotAllowedError" ? "Activation annulée." : "Activation impossible sur cet appareil." });
     }
   }
 
@@ -51,13 +56,15 @@ export default function FaceIdManager({ list, getOptions, save, remove }: { list
         <ul className="faceid-list">
           {list.map((k) => (
             <li key={k.id}>
-              <span><strong>{k.name}</strong><small className="muted">Ajouté le {d(k.created_at)} · dernière utilisation : {d(k.last_used_at)}</small></span>
-              <button type="button" className="btn small ghost" disabled={pending} onClick={() => start(async () => { await remove(k.id); router.refresh(); })}>Retirer</button>
+              <span><strong>{k.name}{mine.includes(k.id) && <em className="faceid-here"> · Cet appareil</em>}</strong><small className="muted">Ajouté le {d(k.created_at)} · dernière utilisation : {d(k.last_used_at)}</small></span>
+              <button type="button" className="btn small ghost" disabled={pending} onClick={() => start(async () => { await remove(k.id); if (mine.includes(k.id) || list.length === 1) { forgetId(k.id); markHere(scope, false); setHere(false); } router.refresh(); })}>Retirer</button>
             </li>
           ))}
         </ul>
       )}
-      {supported ? <button type="button" className="btn small" onClick={add}>Activer {label} sur cet appareil</button> : <p className="muted">Ce navigateur ne gère pas les clés d&apos;accès.</p>}
+      {!supported ? <p className="muted">Ce navigateur ne gère pas les clés d&apos;accès.</p>
+        : here ? <p className="faceid-on" role="status">✓ {label} est activé sur cet appareil. Pour un autre appareil, connectez-vous depuis celui-ci et activez-le.</p>
+        : <button type="button" className="btn small" onClick={add}>Activer {label} sur cet appareil</button>}
       {msg.error && <p className="error" role="alert">{msg.error}</p>}
       {msg.ok && <p className="notice okmsg" role="status">{msg.ok}</p>}
     </section>
