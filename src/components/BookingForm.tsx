@@ -61,6 +61,11 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
   const formRef = useRef<HTMLFormElement>(null);
   const [errors, setErrors] = useState<{ origin?: string; dest?: string; when?: string; ret?: string; flight?: string }>({});
   const [swapKey, setSwapKey] = useState(0);
+  // Textes saisis dans les champs (même sans adresse choisie dans la liste) : l'inversion les échange aussi.
+  const [oText, setOText] = useState(""), [dText, setDText] = useState("");
+  const [rfText, setRfText] = useState(""), [rtText, setRtText] = useState("");
+  const [turns, setTurns] = useState(0), [retTurns, setRetTurns] = useState(0);
+  const swapped = useRef(false);
   const [showPromo, setShowPromo] = useState(false);
   const [showPro, setShowPro] = useState(false);
   const [company, setCompany] = useState("");
@@ -223,8 +228,12 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
   const rest = quote ? totalPrice - (payMode === "full" ? totalFull : totalDeposit) : 0;
 
   function swap() {
+    swapped.current = true;
     setOrigin(dest);
     setDest(origin);
+    setOText(dest?.label ?? dText);
+    setDText(origin?.label ?? oText);
+    setTurns((t) => t + 1);
     setSwapKey((k) => k + 1);
     setErrors({});
   }
@@ -268,11 +277,11 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
 
       <div className="bk-pane">
         <div className="bk-route">
-          <AddressField key={`o${swapKey}`} label="Départ" value={origin} onChange={(p) => { setOrigin(p); setErrors((x) => ({ ...x, origin: undefined })); }} initialText={initialFrom} placeholder="Adresse, gare, aéroport…" error={errors.origin} />
+          <AddressField key={`o${swapKey}`} label="Départ" value={origin} onChange={(p) => { setOrigin(p); setErrors((x) => ({ ...x, origin: undefined })); }} initialText={swapped.current ? oText : initialFrom} autoResolve={!swapped.current} onText={setOText} placeholder="Adresse, gare, aéroport…" error={errors.origin} />
           <button type="button" className="bk-swap" onClick={swap} aria-label="Inverser le départ et l'arrivée" title="Inverser">
-            <IconC name="swap" size={20} />
+            <span className="bk-swap-i" style={{ transform: `rotate(${turns * 180}deg)` }}><IconC name="swap" size={20} /></span>
           </button>
-          <AddressField key={`d${swapKey}`} label="Arrivée" value={dest} onChange={(p) => { setDest(p); setErrors((x) => ({ ...x, dest: undefined })); }} initialText={initialTo} placeholder="Adresse, gare, aéroport…" error={errors.dest} />
+          <AddressField key={`d${swapKey}`} label="Arrivée" value={dest} onChange={(p) => { setDest(p); setErrors((x) => ({ ...x, dest: undefined })); }} initialText={swapped.current ? dText : initialTo} autoResolve={!swapped.current} onText={setDText} placeholder="Adresse, gare, aéroport…" error={errors.dest} />
         </div>
         {savedPlaces.length > 0 && (
           <div className="chips" style={{ margin: "-4px 0 12px" }} aria-label="Adresses enregistrées">
@@ -358,11 +367,11 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
         )}
         {wantReturn && retCustom && (
           <div className="bk-route" style={{ marginTop: 8 }}>
-            <AddressField key={`rf${retKey}`} label="Départ du retour" value={retFrom} onChange={(p) => { setRetFrom(p); setErrors((x) => ({ ...x, ret: undefined })); }} initialText={retFrom?.label ?? ""} placeholder="Adresse, gare, aéroport…" />
-            <button type="button" className="bk-swap" onClick={() => { const a = retFrom; setRetFrom(retTo); setRetTo(a); setRetKey((k) => k + 1); }} aria-label="Inverser les adresses du retour" title="Inverser">
-              <IconC name="swap" size={20} />
+            <AddressField key={`rf${retKey}`} label="Départ du retour" value={retFrom} onChange={(p) => { setRetFrom(p); setErrors((x) => ({ ...x, ret: undefined })); }} initialText={retFrom?.label ?? rfText} autoResolve={false} onText={setRfText} placeholder="Adresse, gare, aéroport…" />
+            <button type="button" className="bk-swap" onClick={() => { const a = retFrom, t = rfText; setRetFrom(retTo); setRetTo(a); setRfText(retTo?.label ?? rtText); setRtText(a?.label ?? t); setRetTurns((n) => n + 1); setRetKey((k) => k + 1); }} aria-label="Inverser les adresses du retour" title="Inverser">
+              <span className="bk-swap-i" style={{ transform: `rotate(${retTurns * 180}deg)` }}><IconC name="swap" size={20} /></span>
             </button>
-            <AddressField key={`rt${retKey}`} label="Arrivée du retour" value={retTo} onChange={(p) => { setRetTo(p); setErrors((x) => ({ ...x, ret: undefined })); }} initialText={retTo?.label ?? ""} placeholder="Adresse, gare, aéroport…" />
+            <AddressField key={`rt${retKey}`} label="Arrivée du retour" value={retTo} onChange={(p) => { setRetTo(p); setErrors((x) => ({ ...x, ret: undefined })); }} initialText={retTo?.label ?? rtText} autoResolve={false} onText={setRtText} placeholder="Adresse, gare, aéroport…" />
           </div>
         )}
         {wantReturn && retCustom && (

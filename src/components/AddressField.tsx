@@ -11,10 +11,14 @@ type Props = {
   initialText?: string;
   placeholder?: string;
   error?: string;
+  /** Texte saisi (même sans adresse choisie), pour que l'inversion départ/arrivée le conserve. */
+  onText?: (t: string) => void;
+  /** Recherche automatique du texte pré-rempli au premier affichage (désactivée après une inversion). */
+  autoResolve?: boolean;
 };
 
 // Champ d'adresse avec autocomplétion (via /api/places, qui appelle HERE côté serveur).
-export default function AddressField({ label, value, onChange, initialText = "", placeholder, error }: Props) {
+export default function AddressField({ label, value, onChange, initialText = "", placeholder, error, onText, autoResolve = true }: Props) {
   const id = useId();
   const [text, setText] = useState(value?.label ?? initialText);
   const [items, setItems] = useState<Place[]>([]);
@@ -38,11 +42,12 @@ export default function AddressField({ label, value, onChange, initialText = "",
 
   // Résout automatiquement un texte pré-rempli (liens depuis les pages de trajets).
   useEffect(() => {
-    if (resolvedInitial.current || !initialText) return;
+    if (resolvedInitial.current || !initialText || !autoResolve) return;
     resolvedInitial.current = true;
     search(initialText).then((r) => {
       if (r[0]) {
         setText(r[0].label);
+        onText?.(r[0].label);
         onChange(r[0]);
       }
     });
@@ -51,6 +56,7 @@ export default function AddressField({ label, value, onChange, initialText = "",
 
   function onInput(v: string) {
     setText(v);
+    onText?.(v);
     onChange(null);
     setActive(-1);
     if (timer.current) clearTimeout(timer.current);
@@ -68,6 +74,7 @@ export default function AddressField({ label, value, onChange, initialText = "",
 
   function pick(p: Place) {
     setText(p.label);
+    onText?.(p.label);
     onChange(p);
     setOpen(false);
     setItems([]);
