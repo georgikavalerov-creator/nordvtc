@@ -155,7 +155,7 @@ export default function Home() {
               {CAR_PICS.map((ph, i) => (
                 <figure key={ph.src} className={i === 0 ? "g-main" : ""}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={ph.src} srcSet={srcSetOf(ph.src)} sizes="(max-width: 760px) 100vw, 50vw" alt={ph.alt} loading={i === 0 ? "eager" : "lazy"} width={1400} height={790} style={{ objectPosition: ph.pos }} />
+                  <img src={ph.src} srcSet={srcSetOf(ph.src)} sizes="(max-width: 760px) 92vw, 50vw" alt={ph.alt} loading={i === 0 ? "eager" : "lazy"} width={1400} height={790} style={{ objectPosition: ph.pos }} />
                 </figure>
               ))}
             </div>

@@ -5,7 +5,13 @@ export type Pic = { src: string; alt: string; pos?: string };
 // Variantes allégées générées à côté de chaque photo : -sm (640 px) et -thumb (200 px).
 export const imgSm = (src: string) => src.replace(/\.webp$/, "-sm.webp");
 export const imgThumb = (src: string) => src.replace(/\.webp$/, "-thumb.webp");
-export const srcSetOf = (src: string, full = 1400) => `${imgThumb(src)} 200w, ${imgSm(src)} 640w, ${src} ${full}w`;
+// Version intermédiaire 1100 px (téléphones à écran haute densité) quand elle existe : évite de charger le 1400 px.
+const MD = new Set(["auris-3", "dest-bruxelles", "dest-cdg", "dest-flandres", "dest-lesquin", "dest-roubaix", "dest-touquet", "dest-zaventem", "lille", "svc-entreprises", "svc-lille-europe", "svc-sorties"]);
+const imgMd = (src: string) => src.replace(/\.webp$/, "-md.webp");
+export const srcSetOf = (src: string, full = 1400) => {
+  const name = src.split("/").pop()!.replace(/\.webp$/, "");
+  return `${imgThumb(src)} 200w, ${imgSm(src)} 640w${MD.has(name) ? `, ${imgMd(src)} 1100w` : ""}, ${src} ${full}w`;
+};
 
 export const PICS = {
   lille: { src: "/img/lille.webp", alt: "Grand'Place de Lille et sa grande roue, de nuit", pos: "50% 55%" },

@@ -84,7 +84,7 @@ export default async function ServicePage({ params }: Props) {
               <h1>{s.h1}</h1>
             </div>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img className="split-img" src={SERVICE_PIC[s.slug].src} srcSet={srcSetOf(SERVICE_PIC[s.slug].src)} sizes="(max-width: 760px) 100vw, 50vw" alt={SERVICE_PIC[s.slug].alt} width={1000} height={666} style={{ objectPosition: SERVICE_PIC[s.slug].pos }} />
+            <img className="split-img" src={SERVICE_PIC[s.slug].src} srcSet={srcSetOf(SERVICE_PIC[s.slug].src)} sizes="(max-width: 760px) 92vw, 50vw" fetchPriority="high" decoding="async" alt={SERVICE_PIC[s.slug].alt} width={1000} height={666} style={{ objectPosition: SERVICE_PIC[s.slug].pos }} />
           </div>
         </div>
       </section>

@@ -36,13 +36,18 @@ export default function CallGate() {
       setCountry(c);
     }).catch(() => {});
     try { const n = sessionStorage.getItem("nvtc-num"); if (n) { setNumber(n); setStep("done"); } } catch {}
-    if (SITEKEY) {
-      const s = document.createElement("script");
-      s.src = "https://challenges.cloudflare.com/turnstile/v0/api.js"; s.async = true;
-      s.onload = () => box.current && window.turnstile?.render(box.current, { sitekey: SITEKEY, callback: (t: string) => (captcha.current = t) });
-      document.head.appendChild(s);
-    }
   }, []);
+
+  // Anti-robots Cloudflare chargé seulement quand on commence à remplir le formulaire (≈ 800 Ko en moins au chargement).
+  const captchaLoaded = useRef(false);
+  function loadCaptcha() {
+    if (!SITEKEY || captchaLoaded.current) return;
+    captchaLoaded.current = true;
+    const s = document.createElement("script");
+    s.src = "https://challenges.cloudflare.com/turnstile/v0/api.js"; s.async = true;
+    s.onload = () => box.current && window.turnstile?.render(box.current, { sitekey: SITEKEY, callback: (t: string) => (captcha.current = t) });
+    document.head.appendChild(s);
+  }
 
   async function post(url: string, body: unknown) {
     setBusy(true); setError("");
@@ -89,7 +94,7 @@ export default function CallGate() {
     );
   }
   return (
-    <div className="callgate" id="appel">
+    <div className="callgate" id="appel" onFocusCapture={loadCaptcha} onPointerDownCapture={loadCaptcha}>
       <h2 style={{ fontSize: "1.4rem" }}>Appeler ou être rappelé</h2>
       <p className="muted">Laissez-moi vos coordonnées : mon numéro s'affiche aussitôt{otp ? " après un code reçu par SMS" : ""}, et je vous rappelle si je suis en course.</p>
       {step === "form" ? (
