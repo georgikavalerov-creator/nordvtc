@@ -277,7 +277,7 @@ export default function Home() {
 
       <DriverCard />
 
-      <section className="section">
+      <section className="section zones">
         <div className="wrap">
           <span className="eyebrow">Zones d'intervention</span>
           <h2>Lille et sa métropole, mais aussi Paris, Bruxelles et le littoral</h2>
