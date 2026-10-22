@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { getSiteSettings } from "@/lib/content";
 import { AdminPage } from "../gate";
 import { SettingsForm, TiimeCatchUp } from "../Forms";
+import TwoFactor from "../TwoFactor";
+import { get2fa } from "@/lib/totp";
 import LogoUploader from "@/components/LogoUploader";
 import { getLogo } from "@/lib/logo";
 import { removeLogo, saveLogo } from "../actions";
@@ -18,6 +20,7 @@ export default async function Page() {
       <LogoUploader current={logo} save={saveLogo} remove={removeLogo} />
       <SettingsForm v={v} envPhone={Boolean(process.env.DRIVER_PHONE)} />
       <TiimeCatchUp />
+      <TwoFactor enabled={!!(await get2fa()).enabled} />
       <div className="adm-box">
         <strong>Sécurité</strong>
         <p className="muted" style={{ marginBottom: 0 }}>Le mot de passe de l'administration se change dans les variables d'environnement (ADMIN_PASSWORD) de votre hébergeur. Changer ADMIN_SESSION_SECRET déconnecte toutes les sessions.</p>

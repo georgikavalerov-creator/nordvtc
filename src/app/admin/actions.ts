@@ -11,6 +11,7 @@ import { DEFAULT_PRICING } from "@/lib/pricing";
 import { sendInvoiceEmail } from "@/lib/mail";
 import { sendInvoiceToTiime, sendPendingToTiime } from "@/lib/tiime";
 import { after } from "next/server";
+import { get2fa, set2fa, check2faLogin, newSecret, otpauthUri, totpStep } from "@/lib/totp";
 import { docPath } from "@/lib/docsign";
 import { SITE } from "@/lib/site";
 import { getStripe, stripeConfigured } from "@/lib/stripe";
@@ -21,11 +22,17 @@ import { hashPassword, newPassword } from "@/lib/driver-auth";
 import { decideClaimCore } from "@/lib/claim";
 import { adminReply } from "@/lib/chat";
 
-export async function login(_: { error?: string } | undefined, form: FormData) {
+export async function login(_: { error?: string; need2fa?: boolean } | undefined, form: FormData): Promise<{ error?: string; need2fa?: boolean } | undefined> {
   const ip = ipFrom(await headers());
   // Anti force brute : 5 essais / 15 min par adresse IP, et 40 / heure au total (attaques réparties).
   if (!(await allowDurable(`admin-login:${ip}`, 5, 15 * 60_000)) || !(await allowDurable("admin-login:all", 40, 3_600_000))) return { error: "Trop de tentatives. Réessayez plus tard." };
   if (!checkPassword(String(form.get("password") ?? ""))) { await new Promise((r) => setTimeout(r, 600)); return { error: "Mot de passe incorrect." }; }
+  // Double authentification (si activée) : code à 6 chiffres de l'application, à usage unique.
+  if ((await get2fa()).enabled) {
+    const code = String(form.get("code") ?? "").trim();
+    if (!code) return { error: "Entrez le code à 6 chiffres de votre application d'authentification.", need2fa: true };
+    if (!(await check2faLogin(code))) { await new Promise((r) => setTimeout(r, 600)); return { error: "Code incorrect ou déjà utilisé.", need2fa: true }; }
+  }
   await startSession();
   redirect("/admin");
 }
@@ -326,4 +333,36 @@ export async function tiimeCatchUp(_: { error?: string; ok?: boolean | string } 
   const r = await sendPendingToTiime(25);
   if (r.failed && !r.sent) return { error: "Envoi impossible : vérifiez l'adresse Tiime dans les réglages." };
   return { ok: `${r.sent} facture(s) envoyée(s) à Tiime${r.left ? `, ${r.left} restante(s) : cliquez à nouveau` : ""}.` };
+}
+
+// ---------- Double authentification de l'administration ----------
+export async function start2fa(): Promise<{ uri: string; secret: string; qr: string } | { error: string }> {
+  if (!(await isAdmin())) redirect("/admin");
+  const t = await get2fa();
+  if (t.enabled) return { error: "Déjà activée." };
+  const secret = newSecret();
+  await set2fa({ ...t, pending: secret });
+  const uri = otpauthUri(secret);
+  const QR = (await import("qrcode")).default;
+  const qr = await QR.toString(uri, { type: "svg", margin: 1, width: 200, errorCorrectionLevel: "M" });
+  return { uri, secret, qr };
+}
+export async function confirm2fa(_: { error?: string; ok?: boolean | string } | undefined, form: FormData): Promise<{ error?: string; ok?: boolean | string }> {
+  if (!(await isAdmin())) redirect("/admin");
+  const t = await get2fa();
+  if (!t.pending) return { error: "Recommencez l'activation." };
+  const step = totpStep(t.pending, String(form.get("code") ?? ""));
+  if (step < 0) return { error: "Code incorrect : vérifiez l'heure de votre téléphone et réessayez." };
+  await set2fa({ secret: t.pending, enabled: true, lastStep: step });
+  revalidatePath("/admin/reglages");
+  return { ok: "Double authentification activée ✓ Le code sera demandé à chaque connexion." };
+}
+export async function disable2fa(_: { error?: string; ok?: boolean | string } | undefined, form: FormData): Promise<{ error?: string; ok?: boolean | string }> {
+  if (!(await isAdmin())) redirect("/admin");
+  const t = await get2fa();
+  if (!t.enabled || !t.secret) return { ok: true };
+  if (totpStep(t.secret, String(form.get("code") ?? "")) < 0) return { error: "Code incorrect." };
+  await set2fa({});
+  revalidatePath("/admin/reglages");
+  return { ok: "Double authentification désactivée." };
 }

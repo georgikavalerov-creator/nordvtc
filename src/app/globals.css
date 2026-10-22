@@ -2570,3 +2570,4 @@ ol.steps > li::before { box-shadow: 0 6px 14px -8px var(--c2) !important; }
 .co-src { padding: 6px 10px 4px; font-size: .72rem; color: var(--muted, #5e5e5e); border-top: 1px solid var(--line, #e6e6e6); margin-top: 2px; }
 .co-wait { position: absolute; right: 14px; bottom: 15px; width: 16px; height: 16px; border-radius: 50%; border: 2px solid #c9d2e6; border-top-color: #1f5bff; animation: coSpin .7s linear infinite; }
 @keyframes coSpin { to { transform: rotate(360deg); } }
+.tfa-qr svg { width: 200px; height: 200px; display: block; background: #fff; border-radius: 12px; padding: 6px; }
