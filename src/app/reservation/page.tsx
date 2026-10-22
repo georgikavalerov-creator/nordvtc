@@ -4,6 +4,8 @@ import BookingForm from "@/components/BookingForm";
 import Icon from "@/components/Icon";
 import { currentUser } from "@/lib/auth";
 import { getPlaces, getProfile } from "@/lib/account";
+import { suggestPlaces } from "@/lib/here";
+import { signPlace } from "@/lib/place-sign";
 import PaymentBadges from "@/components/PaymentBadges";
 
 export const metadata: Metadata = {
@@ -17,6 +19,13 @@ type Props = { searchParams: Promise<{ from?: string; to?: string }> };
 
 export default async function ReservationPage({ searchParams }: Props) {
   const { from = "", to = "" } = await searchParams;
+  // Liens depuis les cartes postales et les trajets proposés : adresses trouvées avant l'affichage.
+  const resolve = async (q: string) => {
+    const t = q.trim().slice(0, 120);
+    if (t.length < 3) return null;
+    try { const r = (await suggestPlaces(t))[0]; return r ? signPlace(r) : null; } catch { return null; }
+  };
+  const [initialOrigin, initialDest] = await Promise.all([resolve(from), resolve(to)]);
   const user = await currentUser();
   const [places, prof] = user ? await Promise.all([getPlaces(user.id), getProfile(user.id)]) : [[], null];
   return (
@@ -31,7 +40,7 @@ export default async function ReservationPage({ searchParams }: Props) {
       <section className="section">
         <div className="wrap booking-layout">
           <div>
-            <BookingForm initialFrom={from.slice(0, 120)} initialTo={to.slice(0, 120)} accountName={prof?.full_name ?? (user?.user_metadata?.full_name as string) ?? ""} accountEmail={user?.email ?? ""} accountPhone={prof?.phone ?? ""} defaultPassengers={prof?.default_passengers ?? 1} defaultChildSeat={prof?.default_child_seat ?? false} defaultPet={prof?.default_pet ?? false} savedPlaces={places} />
+            <BookingForm initialFrom={from.slice(0, 120)} initialTo={to.slice(0, 120)} initialOrigin={initialOrigin} initialDest={initialDest} accountName={prof?.full_name ?? (user?.user_metadata?.full_name as string) ?? ""} accountEmail={user?.email ?? ""} accountPhone={prof?.phone ?? ""} defaultPassengers={prof?.default_passengers ?? 1} defaultChildSeat={prof?.default_child_seat ?? false} defaultPet={prof?.default_pet ?? false} savedPlaces={places} />
           </div>
           <aside className="reassure">
             <h2>Réservez l'esprit tranquille</h2>

@@ -27,6 +27,7 @@ export default function AddressField({ label, value, onChange, initialText = "",
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const seq = useRef(0);
   const resolvedInitial = useRef(!!value);
+  const [resolving, setResolving] = useState(!value && !!initialText && autoResolve);
 
   async function search(q: string): Promise<Place[]> {
     const my = ++seq.current;
@@ -44,17 +45,19 @@ export default function AddressField({ label, value, onChange, initialText = "",
   useEffect(() => {
     if (resolvedInitial.current || !initialText || !autoResolve) return;
     resolvedInitial.current = true;
+    setResolving(true);
     search(initialText).then((r) => {
       if (r[0]) {
         setText(r[0].label);
         onText?.(r[0].label);
         onChange(r[0]);
       }
-    });
+    }).finally(() => setResolving(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function onInput(v: string) {
+    setResolving(false);
     setText(v);
     onText?.(v);
     onChange(null);
@@ -111,7 +114,8 @@ export default function AddressField({ label, value, onChange, initialText = "",
         aria-expanded={open}
         aria-controls={`${id}-list`}
         aria-autocomplete="list"
-        aria-invalid={!!error || (text.length > 2 && !value)}
+        aria-invalid={!!error || (text.length > 2 && !value && !resolving)}
+        aria-busy={resolving || undefined}
         aria-describedby={error ? `${id}-err` : undefined}
         inputMode="search"
         enterKeyHint="next"
@@ -136,7 +140,7 @@ export default function AddressField({ label, value, onChange, initialText = "",
           {error}
         </span>
       )}
-      {!error && text.length > 2 && !value && !open && (
+      {!error && text.length > 2 && !value && !open && !resolving && (
         <span className="muted" style={{ fontWeight: 400, fontSize: "0.82rem" }}>
           Choisissez une adresse dans la liste proposée.
         </span>

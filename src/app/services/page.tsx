@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import CtaBand from "@/components/CtaBand";
+import Icon from "@/components/Icon";
 import { SERVICES } from "@/lib/services";
 
 export const metadata: Metadata = {
@@ -11,6 +12,12 @@ export const metadata: Metadata = {
 };
 
 const ORDER = ["Aéroports", "Gares", "Longue distance", "Événements & pro"] as const;
+const THEME: Record<(typeof ORDER)[number], { icon: string; cls: string }> = {
+  "Aéroports": { icon: "plane", cls: "c-blue" },
+  "Gares": { icon: "train", cls: "c-teal" },
+  "Longue distance": { icon: "route", cls: "c-violet" },
+  "Événements & pro": { icon: "sparkle", cls: "c-amber" },
+};
 
 export default function ServicesPage() {
   return (
@@ -25,13 +32,13 @@ export default function ServicesPage() {
       <section className="section">
         <div className="wrap" style={{ display: "grid", gap: 48 }}>
           {ORDER.map((cat) => (
-            <div key={cat}>
-              <h2 style={{ fontSize: "1.5rem" }}>{cat}</h2>
+            <div key={cat} className={`svc-group ${THEME[cat].cls}`}>
+              <h2 className="svc-h"><span className="svc-ico"><Icon name={THEME[cat].icon} size={20} /></span>{cat}</h2>
               <div className="grid cols-3">
                 {SERVICES.filter((s) => s.category === cat).map((s) => (
-                  <Link key={s.slug} href={`/services/${s.slug}`} className="card">
+                  <Link key={s.slug} href={`/services/${s.slug}`} className="card svc-card">
                     <h3>{s.label}</h3>
-                    <p className="muted" style={{ marginBottom: 12 }}>{s.metaDescription.slice(0, 120).trim()}…</p>
+                    <p className="muted">{s.metaDescription.slice(0, 120).trim()}…</p>
                     <span className="more">Voir la page →</span>
                   </Link>
                 ))}

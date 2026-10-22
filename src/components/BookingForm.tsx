@@ -26,9 +26,9 @@ const today = () => {
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
 };
 
-export default function BookingForm({ initialFrom = "", initialTo = "", accountName = "", accountEmail = "", accountPhone = "", defaultPassengers = 1, defaultChildSeat = false, defaultPet = false, savedPlaces = [] }: { initialFrom?: string; initialTo?: string; accountName?: string; accountEmail?: string; accountPhone?: string; defaultPassengers?: number; defaultChildSeat?: boolean; defaultPet?: boolean; savedPlaces?: { id: string; kind: string; label: string; address: string; lat: number; lng: number }[] }) {
-  const [origin, setOrigin] = useState<Place | null>(null);
-  const [dest, setDest] = useState<Place | null>(null);
+export default function BookingForm({ initialFrom = "", initialTo = "", accountName = "", accountEmail = "", accountPhone = "", defaultPassengers = 1, defaultChildSeat = false, defaultPet = false, savedPlaces = [], initialOrigin = null, initialDest = null }: { initialFrom?: string; initialTo?: string; accountName?: string; accountEmail?: string; accountPhone?: string; defaultPassengers?: number; defaultChildSeat?: boolean; defaultPet?: boolean; initialOrigin?: Place | null; initialDest?: Place | null; savedPlaces?: { id: string; kind: string; label: string; address: string; lat: number; lng: number }[] }) {
+  const [origin, setOrigin] = useState<Place | null>(initialOrigin);
+  const [dest, setDest] = useState<Place | null>(initialDest);
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [passengers, setPassengers] = useState(defaultPassengers);

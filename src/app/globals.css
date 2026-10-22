@@ -503,7 +503,8 @@ html:not(.fx-on) .big-words .w { opacity: 1; }
 .fx-on .section.ink > .wrap { opacity: var(--enter); transform: translate3d(0, calc((1 - var(--enter)) * 40px), 0); }
 
 /* Bandeau final : zoom d'entrée */
-.fx-on .cta-band { transform: scale(calc(.86 + var(--enter) * .14)); opacity: calc(.3 + var(--enter) * .7); }
+/* Plein effet atteint à mi-parcours : en bas d'une page courte, le bandeau reste net (jamais délavé). */
+.fx-on .cta-band { transform: scale(min(1, calc(.9 + var(--enter) * .2))); opacity: min(1, calc(.35 + var(--enter) * 1.3)); }
 
 @media (prefers-reduced-motion: reduce) {
   .page-enter { animation: none; }
@@ -3527,3 +3528,40 @@ h2.bk-sub::before { content: ""; width: 4px; height: 1.1em; border-radius: 4px; 
 .mod-grid :is(input:not([type="checkbox"]), select, textarea) { background-color: #fff !important; border: 1.5px solid #c2c2c7 !important; color: #0b0b0c; }
 .mod-grid :is(input:not([type="checkbox"]), select, textarea):focus { border-color: #1f5bff !important; box-shadow: 0 0 0 4px rgba(31,91,255,.16); outline: none; }
 .mod-grid .muted { font-weight: 500; }
+
+/* ===================== Pages Trajets / Tarifs / Guide / Contact ===================== */
+/* Trajets : une couleur et une icône par catégorie */
+.svc-h { display: flex; align-items: center; gap: 12px; font-size: 1.5rem !important; margin-bottom: 16px !important; }
+.svc-ico { width: 40px; height: 40px; flex: none; display: grid; place-items: center; border-radius: 12px; background: var(--t); color: var(--c); }
+.svc-card { position: relative; display: grid !important; gap: 8px; align-content: start; background: #fff !important; border: 1px solid #e4e4e7 !important; border-radius: 20px !important; padding: 22px !important; overflow: hidden; transition: transform .2s, box-shadow .2s, border-color .2s; }
+.svc-card::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: var(--c); opacity: .85; }
+.svc-card h3 { margin: 0 !important; font-size: 1.12rem; }
+.svc-card p { margin: 0 !important; font-size: .93rem; line-height: 1.5; }
+.svc-card .more { margin-top: 6px; color: var(--c) !important; font-weight: 700; text-decoration: none !important; border: 0 !important; }
+@media (hover: hover) { .svc-card:hover { transform: translateY(-3px); border-color: var(--c) !important; box-shadow: 0 20px 40px -30px rgba(0,0,0,.45); } }
+/* Tarifs : pastilles d'icônes teintées (au lieu d'un carré noir) */
+.tf-know > div:nth-child(1) { --c: #1f5bff; --t: #eef3ff; } .tf-know > div:nth-child(2) { --c: #b45309; --t: #fff4e0; }
+.tf-know > div:nth-child(3) { --c: #15803d; --t: #e6f6ec; } .tf-know > div:nth-child(4) { --c: #6d28d9; --t: #f1eaff; }
+.tf-know-ico { background: var(--t) !important; color: var(--c) !important; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .svc-card, .tf-know > div, .tf-card, .tf-group .tf-rows, .gd-card, .gd-feature, .ct-card, .ct-quick a, .ct-info > div, .ct-who { background: #f3f3f3 !important; border-color: #d9d9dc !important; box-shadow: none !important; }
+  :root:not([data-theme="light"]) .svc-card:hover, .gd-card:hover, .tf-card:hover { border-color: var(--c, #1f5bff) !important; }
+  :root:not([data-theme="light"]) .tf-card-img { filter: invert(1) hue-rotate(180deg); }
+  :root:not([data-theme="light"]) .gd-feature-art { filter: invert(1) hue-rotate(180deg); }
+  :root:not([data-theme="light"]) .svc-ico, .tf-know-ico, .gd-tag, .ct-quick-ico { background: color-mix(in srgb, var(--t, #eef3ff) 35%, #ffffff) !important; }
+  :root:not([data-theme="light"]) .tf-nav a { background: #f3f3f3 !important; border-color: #d9d9dc !important; }
+  :root:not([data-theme="light"]) .tf-nav a.on, .tf-nav a:hover { border-color: #1f5bff !important; }
+  :root:not([data-theme="light"]) .tf-row:hover { background: #ebebeb !important; }
+}
+:root[data-theme="dark"] .svc-card, .tf-know > div, .tf-card, .tf-group .tf-rows, .gd-card, .gd-feature, .ct-card, .ct-quick a, .ct-info > div, .ct-who { background: #f3f3f3 !important; border-color: #d9d9dc !important; box-shadow: none !important; }
+:root[data-theme="dark"] .svc-card:hover, .gd-card:hover, .tf-card:hover { border-color: var(--c, #1f5bff) !important; }
+:root[data-theme="dark"] .tf-card-img { filter: invert(1) hue-rotate(180deg); }
+:root[data-theme="dark"] .gd-feature-art { filter: invert(1) hue-rotate(180deg); }
+:root[data-theme="dark"] .svc-ico, .tf-know-ico, .gd-tag, .ct-quick-ico { background: color-mix(in srgb, var(--t, #eef3ff) 35%, #ffffff) !important; }
+:root[data-theme="dark"] .tf-nav a { background: #f3f3f3 !important; border-color: #d9d9dc !important; }
+:root[data-theme="dark"] .tf-nav a.on, .tf-nav a:hover { border-color: #1f5bff !important; }
+:root[data-theme="dark"] .tf-row:hover { background: #ebebeb !important; }
+/* Bloc 1 mobile : la bande défilante laisse la place à l'ombre des timbres (plus d'ombre coupée) */
+@media (max-width: 900px) {
+  .hero-dests .hd-cards { padding-bottom: 30px !important; margin-bottom: -16px !important; scroll-padding-inline: 16px; }
+}
