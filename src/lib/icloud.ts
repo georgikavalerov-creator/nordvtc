@@ -37,6 +37,16 @@ export async function calendars() {
     .map((r) => ({ url: abs(tag(r, "href"), home), name: xmlText(tag(r, "displayname")) || "Calendrier" }));
 }
 
+export async function icloudDebug() {
+  const p1 = await dav(`${ROOT}/`, "PROPFIND", `<?xml version="1.0"?><d:propfind xmlns:d="DAV:"><d:prop><d:current-user-principal/></d:prop></d:propfind>`, "0");
+  const principal = abs(tag(p1.text, "current-user-principal"), p1.url);
+  const p2 = await dav(principal, "PROPFIND", `<?xml version="1.0"?><d:propfind xmlns:d="DAV:" xmlns:c="urn:ietf:params:xml:ns:caldav"><d:prop><c:calendar-home-set/></d:prop></d:propfind>`, "0");
+  const home = abs(tag(p2.text, "calendar-home-set"), p2.url);
+  const p3 = await dav(home, "PROPFIND", `<?xml version="1.0"?><d:propfind xmlns:d="DAV:" xmlns:c="urn:ietf:params:xml:ns:caldav"><d:prop><d:displayname/><d:resourcetype/><c:supported-calendar-component-set/></d:prop></d:propfind>`, "1");
+  const resp = tags(p3.text, "response");
+  return { len: p3.text.length, responses: resp.length, sample: resp.slice(0, 6).map((r) => r.replace(/\/\d{6,}\//g, "/…/").slice(0, 700)), head: p3.text.slice(0, 300).replace(/\/\d{6,}\//g, "/…/") };
+}
+
 // ---------- Lecture iCalendar ----------
 const unfold = (ics: string) => ics.replace(/\r?\n[ \t]/g, "");
 const icsVal = (v: string) => v.replace(/\\n/gi, "\n").replace(/\\,/g, ",").replace(/\\;/g, ";").replace(/\\\\/g, "\\").trim();
