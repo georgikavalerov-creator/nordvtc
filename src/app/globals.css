@@ -3157,3 +3157,23 @@ h2.bk-sub::before { content: ""; width: 4px; height: 1.1em; border-radius: 4px; 
   .hd-stamp small { order: -1; font-size: .55rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #6b7385; margin-bottom: 2px; }
 }
 @media (max-width: 900px) { .hero.cine > .wrap { padding-bottom: 118px !important; } }
+
+/* Mode nuit : cartes postales des destinations un peu adoucies (papier crème, moins éblouissant) */
+@media (prefers-color-scheme: dark) {
+:root:not([data-theme="light"]) .hero-dests .hd-cards a { background: #e9e6de !important; box-shadow: 0 1px 0 rgba(255,255,255,.06), 0 16px 30px -14px rgba(0,0,0,.85) !important; }
+:root:not([data-theme="light"]) .hero-dests .hd-cards .hd-img { filter: brightness(.92) saturate(.95); }
+:root:not([data-theme="light"]) .hd-stamp { background: #f3f0e8 !important; color: #2d5bd6 !important; border-color: #2d5bd6 !important; }
+:root:not([data-theme="light"]) .hd-pass .pass { background: #e9e6de !important; box-shadow: 0 1px 0 rgba(255,255,255,.06), 0 30px 54px -24px rgba(0,0,0,.9) !important; }
+:root:not([data-theme="light"]) .hd-pass .pass-wrap::before { background: #cbc8bf !important; }
+:root:not([data-theme="light"]) .hd-pass .pass-wrap::after { background: #d9d6ce !important; }
+:root:not([data-theme="light"]) .hd-pass .pass-photo img { filter: brightness(.92) saturate(.95); }
+:root:not([data-theme="light"]) .hd-pass .pass-note { color: #2d5bd6 !important; }
+}
+:root[data-theme="dark"] .hero-dests .hd-cards a { background: #e9e6de !important; box-shadow: 0 1px 0 rgba(255,255,255,.06), 0 16px 30px -14px rgba(0,0,0,.85) !important; }
+:root[data-theme="dark"] .hero-dests .hd-cards .hd-img { filter: brightness(.92) saturate(.95); }
+:root[data-theme="dark"] .hd-stamp { background: #f3f0e8 !important; color: #2d5bd6 !important; border-color: #2d5bd6 !important; }
+:root[data-theme="dark"] .hd-pass .pass { background: #e9e6de !important; box-shadow: 0 1px 0 rgba(255,255,255,.06), 0 30px 54px -24px rgba(0,0,0,.9) !important; }
+:root[data-theme="dark"] .hd-pass .pass-wrap::before { background: #cbc8bf !important; }
+:root[data-theme="dark"] .hd-pass .pass-wrap::after { background: #d9d6ce !important; }
+:root[data-theme="dark"] .hd-pass .pass-photo img { filter: brightness(.92) saturate(.95); }
+:root[data-theme="dark"] .hd-pass .pass-note { color: #2d5bd6 !important; }
