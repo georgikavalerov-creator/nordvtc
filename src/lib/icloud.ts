@@ -2,7 +2,7 @@
 // Identifiants : ICLOUD_APPLE_ID + ICLOUD_APP_PASSWORD (mot de passe d'application créé sur appleid.apple.com),
 // saisis comme secrets dans Cloudflare, jamais dans le code. ICLOUD_CALENDARS (facultatif) : noms des agendas à lire, séparés par des virgules.
 
-export type CalEvent = { uid: string; ref: string; calendar: string; title: string; location: string; notes: string; date: string; time: string; allDay: boolean; start: string };
+export type CalEvent = { uid: string; ref: string; calendar: string; title: string; location: string; notes: string; date: string; time: string; allDay: boolean; start: string; href?: string; recurring?: boolean };
 
 const ROOT = "https://caldav.icloud.com";
 export const icloudConfigured = () => !!(process.env.ICLOUD_APPLE_ID && process.env.ICLOUD_APP_PASSWORD);
@@ -82,9 +82,28 @@ export async function icloudEventsBetween(from: Date, to: Date, only?: string | 
   const cals = only ? all.filter((c) => c.url === only) : all.filter((c) => !wanted.length || wanted.includes(c.name.toLowerCase()));
   const body = `<?xml version="1.0"?><c:calendar-query xmlns:d="DAV:" xmlns:c="urn:ietf:params:xml:ns:caldav"><d:prop><c:calendar-data><c:expand start="${icalStamp(from)}" end="${icalStamp(to)}"/></c:calendar-data></d:prop><c:filter><c:comp-filter name="VCALENDAR"><c:comp-filter name="VEVENT"><c:time-range start="${icalStamp(from)}" end="${icalStamp(to)}"/></c:comp-filter></c:comp-filter></c:filter></c:calendar-query>`;
   const lists = await Promise.all(cals.map(async (c) => {
-    try { const r = await dav(c.url, "REPORT", body, "1"); return tags(r.text, "calendar-data").flatMap((d) => parseEvents(xmlText(d), c.name)); }
+    try {
+      const r = await dav(c.url, "REPORT", body, "1");
+      // Chaque réponse = un fichier d'événement de l'agenda (son adresse sert à le supprimer depuis l'administration).
+      return tags(r.text, "response").flatMap((resp) => {
+        const href = abs(tag(resp, "href"), r.url);
+        const data = xmlText(tag(resp, "calendar-data"));
+        if (!data) return [];
+        const list = parseEvents(data, c.name);
+        return list.map((e) => ({ ...e, href, recurring: list.length > 1 || /RRULE|RECURRENCE-ID/.test(data) }));
+      });
+    }
     catch (e) { if ((e as Error).message === "AUTH") throw e; console.error("icloud cal", c.name, e); return []; }
   }));
   const seen = new Set<string>();
   return lists.flat().filter((e) => !seen.has(e.ref) && seen.add(e.ref)).sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+}
+
+/** Supprime un événement de l'agenda iCloud (son fichier entier : une série répétée disparaît en entier). */
+export async function deleteIcloudEvent(href: string): Promise<void> {
+  if (!/^https:\/\/[a-z0-9-]+\.icloud\.com\//i.test(href) && !href.startsWith(ROOT)) throw new Error("Adresse invalide");
+  const r = await fetch(href, { method: "DELETE", headers: { Authorization: auth() }, cache: "no-store" });
+  if (r.status === 401) throw new Error("AUTH");
+  if (r.status === 403) throw new Error("READONLY");
+  if (!r.ok && r.status !== 404) throw new Error(`CalDAV ${r.status}`);
 }

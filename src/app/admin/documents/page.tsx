@@ -4,11 +4,12 @@ import { db, dbConfigured } from "@/lib/supabase";
 import { docPath } from "@/lib/docsign";
 import { AdminPage } from "../gate";
 import { euro, fmtDT, type Booking } from "../lib";
+import DriverPick, { type DriverOpt } from "../DriverPick";
 
 export const metadata: Metadata = { title: "Administration · Documents", robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
 
-type Row = Booking & { order_number?: string | null; invoice_number?: string | null; billing_company?: string | null };
+type Row = Booking & { order_number?: string | null; invoice_number?: string | null; billing_company?: string | null; driver_id?: string | null };
 type Props = { searchParams: Promise<{ q?: string; type?: string; mois?: string }> };
 
 const clean = (s: string) => s.replace(/[,()%*]/g, "").trim().slice(0, 60);
@@ -30,6 +31,7 @@ export default async function Page({ searchParams }: Props) {
     if (type === "a-facturer") req = req.eq("status", "confirmed");
     rows = ((await req).data as Row[]) ?? [];
   }
+  const drivers: DriverOpt[] = dbConfigured() ? ((await db().from("drivers").select("id,name").eq("active", true).order("name")).data as DriverOpt[]) ?? [] : [];
   const invoiced = rows.filter((b) => b.invoice_number);
   const total = invoiced.reduce((n, b) => n + b.price_cents, 0);
   const months = Array.from({ length: 12 }, (_, i) => { const d = new Date(); d.setMonth(d.getMonth() - i, 1); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`; });
@@ -62,15 +64,16 @@ export default async function Page({ searchParams }: Props) {
       </div>
       <div className="table-wrap adm-box adm-table">
         <table>
-          <thead><tr><th>Course</th><th>Client</th><th>N°</th><th>Prix</th><th>Documents</th></tr></thead>
+          <thead><tr><th>Course</th><th>Client</th><th>N°</th><th>Prix</th><th>Chauffeur sur le bon</th><th>Documents</th></tr></thead>
           <tbody>
-            {rows.length === 0 && <tr><td colSpan={5} className="muted">Aucun document pour cette recherche.</td></tr>}
+            {rows.length === 0 && <tr><td colSpan={6} className="muted">Aucun document pour cette recherche.</td></tr>}
             {rows.map((b) => (
               <tr key={b.id}>
                 <td>{fmtDT(b.pickup_at)}<br /><span className="muted">{b.origin_label.split(",")[0]} → {b.dest_label.split(",")[0]}</span></td>
                 <td>{b.customer_name}{b.billing_company && <><br /><span className="muted">{b.billing_company}</span></>}</td>
                 <td><span className="muted">{b.order_number ?? "—"}</span>{b.invoice_number && <><br /><strong>{b.invoice_number}</strong></>}</td>
                 <td>{euro(b.price_cents)}</td>
+                <td><DriverPick compact bookingId={b.id} current={b.driver_id ?? null} drivers={drivers} /></td>
                 <td>
                   <div className="adm-actions">
                     <a className="btn ghost small" href={docPath("bon", b.id)} target="_blank" rel="noopener">Bon</a>

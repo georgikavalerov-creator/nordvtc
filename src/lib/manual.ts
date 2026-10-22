@@ -32,6 +32,9 @@ const parisInstant = (date: string, time: string) =>
   new Date(`${date}T${time}:00${new Intl.DateTimeFormat("en", { timeZone: "Europe/Paris", timeZoneName: "longOffset" }).formatToParts(new Date(`${date}T12:00:00Z`)).find((x) => x.type === "timeZoneName")?.value.replace("GMT", "") || "+01:00"}`);
 
 export async function createManual(form: FormData, driver: Driver | null): Promise<{ error: string } | { id: string; goto?: string }> {
+  // Administration : chauffeur choisi pour le bon (ses nom, SIRET, carte VTC… y figurent à la place des miens).
+  const pick = String(form.get("driver_id") ?? "");
+  if (!driver && /^[0-9a-f-]{36}$/.test(pick)) driver = ((await db().from("drivers").select("*").eq("id", pick).maybeSingle()).data as Driver | null) ?? null;
   let o, d;
   try { o = placeSchema.parse(JSON.parse(String(form.get("origin")))); d = placeSchema.parse(JSON.parse(String(form.get("dest")))); }
   catch { return { error: "Choisissez les adresses de départ et d'arrivée dans la liste proposée." }; }

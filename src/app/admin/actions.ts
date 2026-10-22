@@ -150,7 +150,7 @@ export async function saveBookingMeta(form: FormData) {
   if (!id.success) return;
   await db().from("bookings").update({
     admin_note: String(form.get("admin_note") ?? "").slice(0, 1000) || null,
-    driver: String(form.get("driver") ?? "").slice(0, 80) || null,
+    ...(form.has("driver") ? { driver: String(form.get("driver") ?? "").slice(0, 80) || null } : {}),
   }).eq("id", id.data);
   await pushBookingToIcloud(id.data);
   wipe();
@@ -519,4 +519,66 @@ export async function quickBon(ref: string, date: string): Promise<{ url?: strin
   if ("error" in r) return { error: r.error };
   wipe();
   return { url: docPath("bon", r.id), id: r.id };
+}
+
+// ---------- Chauffeur affiché sur le bon de commande ----------
+/** Met un chauffeur (ou moi-même) sur une course : ses coordonnées et mentions légales apparaissent sur le bon. */
+export async function assignDriver(form: FormData) {
+  if (!(await isAdmin())) redirect("/admin");
+  const id = z.string().uuid().safeParse(form.get("id"));
+  if (!id.success) return;
+  const pick = String(form.get("driver_id") ?? "");
+  let driver: { id: string; name: string } | null = null;
+  if (/^[0-9a-f-]{36}$/.test(pick)) driver = (await db().from("drivers").select("id,name").eq("id", pick).maybeSingle()).data;
+  await db().from("bookings").update({ driver_id: driver?.id ?? null, driver: driver?.name ?? null }).eq("id", id.data);
+  await pushBookingToIcloud(id.data);
+  wipe();
+}
+
+/** Coordonnées et mentions légales d'un chauffeur, saisies depuis l'administration. */
+export async function adminSaveDriver(_: { ok?: boolean; error?: string } | undefined, form: FormData): Promise<{ ok?: boolean; error?: string }> {
+  if (!(await isAdmin())) redirect("/admin");
+  const id = z.string().uuid().safeParse(form.get("id"));
+  if (!id.success) return { error: "Chauffeur introuvable." };
+  const s = (k: string, max: number) => String(form.get(k) ?? "").trim().slice(0, max) || null;
+  const siret = s("siret", 20)?.replace(/\s/g, "") ?? null;
+  if (siret && !/^\d{14}$/.test(siret)) return { error: "SIRET : 14 chiffres." };
+  const registre = s("registre", 20)?.toUpperCase() ?? null;
+  if (registre && !/^EVTC\d{9}$/.test(registre)) return { error: "N° de registre : « EVTC » suivi de 9 chiffres." };
+  const name = s("name", 100);
+  if (!name || name.length < 2) return { error: "Nom obligatoire." };
+  const { error } = await db().from("drivers").update({
+    name, phone: s("phone", 30), company: s("company", 120), legal_form: s("legal_form", 120), siret, address: s("address", 250),
+    registre, carte_vtc: s("carte_vtc", 40), vehicule: s("vehicule", 80), plaque: s("plaque", 15)?.toUpperCase() ?? null, insurer: s("insurer", 250), vat_note: s("vat_note", 200),
+  }).eq("id", id.data);
+  if (error) return { error: "Enregistrement impossible." };
+  revalidatePath("/admin/chauffeurs");
+  return { ok: true };
+}
+
+/** Retire un événement de la liste des courses (il reste dans l'agenda iPhone). */
+export async function ignoreAgendaEvent(ref: string): Promise<{ ok?: boolean; error?: string }> {
+  if (!(await isAdmin())) return { error: "Non autorisé." };
+  if (!ref.startsWith("ical:")) return { error: "Événement invalide." };
+  const { ignoreRef } = await import("@/lib/icloud-push");
+  await ignoreRef(ref.slice(0, 200));
+  revalidatePath("/admin/calendrier");
+  return { ok: true };
+}
+
+/** Supprime l'événement de l'agenda iPhone lui-même. */
+export async function deleteAgendaEvent(ref: string, date: string): Promise<{ ok?: boolean; error?: string }> {
+  if (!(await isAdmin())) return { error: "Non autorisé." };
+  if (!ref.startsWith("ical:") || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return { error: "Événement invalide." };
+  const [{ icloudEventsBetween, deleteIcloudEvent }, { getIcloudSource }] = await Promise.all([import("@/lib/icloud"), import("@/lib/icloud-push")]);
+  const day = new Date(`${date}T12:00:00Z`);
+  const ev = (await icloudEventsBetween(new Date(day.getTime() - 36 * 3600_000), new Date(day.getTime() + 36 * 3600_000), (await getIcloudSource())?.url)).find((e) => e.ref === ref);
+  if (!ev?.href) return { error: "Événement introuvable (déjà supprimé ?)." };
+  try { await deleteIcloudEvent(ev.href); }
+  catch (e) {
+    const m = (e as Error).message;
+    return { error: m === "READONLY" ? "Cet agenda est en lecture seule (agenda partagé) : utilisez « Ignorer »." : m === "AUTH" ? "iCloud refuse la connexion." : "Suppression impossible pour le moment." };
+  }
+  revalidatePath("/admin/calendrier");
+  return { ok: true };
 }

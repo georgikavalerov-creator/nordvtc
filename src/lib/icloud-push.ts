@@ -72,3 +72,15 @@ export async function syncAllToIcloud(): Promise<{ ok: number; failed: number }>
   }
   return { ok, failed };
 }
+
+/** Événements de l'agenda que le chauffeur a choisi d'ignorer (pas des courses). */
+export async function getIgnoredRefs(): Promise<string[]> {
+  if (!dbConfigured()) return [];
+  const { data } = await db().from("settings").select("value").eq("key", "agenda_ignored").maybeSingle();
+  return Array.isArray(data?.value) ? (data!.value as string[]) : [];
+}
+export async function ignoreRef(ref: string, on = true) {
+  const cur = await getIgnoredRefs();
+  const next = on ? [ref, ...cur.filter((r) => r !== ref)].slice(0, 800) : cur.filter((r) => r !== ref);
+  await db().from("settings").upsert({ key: "agenda_ignored", value: next, updated_at: new Date().toISOString() });
+}

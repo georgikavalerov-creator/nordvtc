@@ -5,6 +5,7 @@ import { AdminPage } from "../gate";
 import { ClaimDecision, RefundForm } from "../Forms";
 import { claimFileUrl, purgeOldClaims, type Claim } from "@/lib/claim";
 import CalButtons from "../CalButtons";
+import DriverPick, { type DriverOpt } from "../DriverPick";
 import { saveBookingMeta, setStatus } from "../actions";
 import { STATUS, euro, fmtDT, type Booking } from "../lib";
 import { tollCostEur } from "@/lib/here";
@@ -30,6 +31,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ q
     if (error) err = "Lecture des réservations impossible.";
     rows = (data as Booking[]) ?? [];
   } else err = "Supabase n'est pas configuré.";
+  const drivers: DriverOpt[] = dbConfigured() ? ((await db().from("drivers").select("id,name").eq("active", true).order("name")).data as DriverOpt[]) ?? [] : [];
   if (q) rows = rows.filter((b) => [b.customer_name, b.customer_email, b.customer_phone, b.origin_label, b.dest_label, b.id].join(" ").toLowerCase().includes(q));
 
   // Demandes d'annulation sur justificatif en attente
@@ -132,9 +134,9 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ q
                   )}
                 </div>
                 <div style={{ display: "grid", gap: 14 }}>
+                  <DriverPick bookingId={b.id} current={(b as Booking & { driver_id?: string | null }).driver_id ?? null} drivers={drivers} />
                   <form action={saveBookingMeta} className="form" style={{ display: "grid", gap: 6 }}>
                     <input type="hidden" name="id" value={b.id} />
-                    <label>Chauffeur<input name="driver" defaultValue={b.driver ?? ""} placeholder="Moi, Rémy, Stéphanie…" /></label>
                     <label>Note interne (invisible du client)<textarea name="admin_note" style={{ minHeight: 60 }} defaultValue={b.admin_note ?? ""} /></label>
                     <button className="btn ghost small">Enregistrer</button>
                   </form>

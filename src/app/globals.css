@@ -3772,3 +3772,14 @@ input[type="file"][hidden] { display: none !important; }
 .adm .adm-box:has(table), .adm .table-wrap { overflow-x: auto; }
 .adm .adm-box table { min-width: 560px; }
 .adm input[type="date"], .adm input[type="time"] { padding-right: 10px !important; }
+.drv-pick label { display: grid; gap: 6px; }
+.drv-pick.compact select { min-height: 38px !important; font-size: .85rem; padding: 6px 10px; min-width: 150px; }
+.drv-legal { border: 1px solid #e4e4e7; border-radius: 14px; padding: 10px 14px; }
+.drv-legal summary { cursor: pointer; font-weight: 700; font-size: .92rem; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .drv-legal { border-color: #d9d9dc; } }
+:root[data-theme="dark"] .drv-legal { border-color: #d9d9dc; }
+.ag-act { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+.ag-more { display: flex; gap: 10px; font-size: .82rem; }
+.ag-more .linklike { color: #5e5e5e; font-size: .82rem; }
+.ag-more .ag-del { color: #b42318; }
+.ag-ask { display: flex; gap: 6px; }

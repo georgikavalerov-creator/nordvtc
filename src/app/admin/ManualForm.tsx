@@ -11,7 +11,7 @@ export type ManualInitial = {
 };
 
 // stay : après création, on reste sur la page (import de plusieurs courses) et on affiche le lien du bon.
-export default function ManualForm({ mode = "booking", action = createManualBooking, initial, stay = false }: { mode?: "booking" | "bon"; action?: typeof createManualBooking; initial?: ManualInitial; stay?: boolean }) {
+export default function ManualForm({ mode = "booking", action = createManualBooking, initial, stay = false, drivers = [] }: { mode?: "booking" | "bon"; action?: typeof createManualBooking; initial?: ManualInitial; stay?: boolean; drivers?: { id: string; name: string }[] }) {
   const [s, act, pending] = useActionState(action, undefined);
   const [o, setO] = useState<Place | null>(initial?.origin ?? null);
   const [d, setD] = useState<Place | null>(initial?.dest ?? null);
@@ -78,6 +78,14 @@ export default function ManualForm({ mode = "booking", action = createManualBook
       <label className="inline"><input type="checkbox" name="child_seat" /> <span>Siège enfant</span></label>
       <label className="inline"><input type="checkbox" name="pet" /> <span>Animal de compagnie</span></label>
       <label>Remarque du client<textarea name="notes" style={{ minHeight: 60 }} defaultValue={i.notes} /></label>
+      {drivers.length > 0 && (
+        <label>Chauffeur sur le bon (ses nom, SIRET, carte VTC et véhicule y figurent)
+          <select name="driver_id" defaultValue="">
+            <option value="">Moi (Nord VTC)</option>
+            {drivers.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
+          </select>
+        </label>
+      )}
       <strong>Prix</strong>
       <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))" }}>
         <label>Prix (€) — vide = calculé automatiquement<input name="price" inputMode="decimal" placeholder="auto" defaultValue={i.price ? String(i.price).replace(".", ",") : ""} /></label>

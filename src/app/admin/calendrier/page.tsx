@@ -7,7 +7,7 @@ import AgendaCourses, { type AgendaItem } from "../AgendaCourses";
 import { icloudEventsBetween, type CalEvent } from "@/lib/icloud";
 import { pairUp } from "@/lib/pair-events";
 import { docPath } from "@/lib/docsign";
-import { getIcloudSource, getIcloudTarget, listIcloudCalendars } from "@/lib/icloud-push";
+import { getIcloudSource, getIcloudTarget, getIgnoredRefs, listIcloudCalendars } from "@/lib/icloud-push";
 import { icloudConfigured } from "@/lib/icloud";
 import { fmtDT, ymd, type Booking } from "../lib";
 import { agendaToken } from "@/lib/ics";
@@ -52,7 +52,10 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ m
   let agenda: { ref: string; dep: CalEvent; arr: CalEvent | null }[] = [];
   let agendaError = "";
   if (icloudOn && source) {
-    try { agenda = pairUp(await icloudEventsBetween(new Date(from), new Date(to), source.url)).filter((c) => c.dep.date.startsWith(base) && !c.dep.allDay); } // les événements « journée entière » ne sont pas des courses
+    try {
+      const ignored = new Set(await getIgnoredRefs().catch(() => []));
+      agenda = pairUp(await icloudEventsBetween(new Date(from), new Date(to), source.url)).filter((c) => c.dep.date.startsWith(base) && !c.dep.allDay && !ignored.has(c.ref));
+    } // les événements « journée entière » ne sont pas des courses
     catch { agendaError = "Agenda iCloud injoignable pour le moment."; }
   }
   const madeFrom = new Map<string, string>();
@@ -64,6 +67,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ m
     ref: c.ref, date: c.dep.date, time: c.dep.allDay ? "" : c.dep.time, title: c.dep.title,
     route: [c.dep.location, c.arr?.location || c.arr?.title].filter(Boolean).join(" → "),
     done: madeFrom.has(c.ref) ? { url: docPath("bon", madeFrom.get(c.ref)!) } : undefined,
+    recurring: !!c.dep.recurring,
   }));
   const tok = agendaToken();
   const host = SITE.url.replace(/^https?:\/\//, "");
