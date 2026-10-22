@@ -1965,3 +1965,30 @@ html.in-app .hero.cine h1 { color: var(--app-navy); }
 .tf-arrows button { all: unset; cursor: pointer; font-size: .55rem; line-height: 1; padding: 4px 5px; border-radius: 6px; color: var(--ink); opacity: .65; }
 .tf-arrows button:hover { opacity: 1; background: rgba(0,0,0,.08); }
 @media (pointer: coarse) { .tf { height: 52px; } .tf .tf-col input { width: 2.4ch !important; font-size: 1.15rem; height: 40px !important; } .tf-arrows button { padding: 6px 8px; } }
+
+/* Destinations dans le hero : colonne de droite sur ordinateur, bandeau défilant sous le formulaire sur mobile */
+.hero-dests { position: relative; z-index: 2; animation: cineIn 1s .7s cubic-bezier(.2,.8,.2,1) both; }
+.hero-dests .hd-title { margin: 0 0 12px; font: 500 .72rem/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .2em; text-transform: uppercase; color: #8aa0d8; }
+.hero-dests ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.hero-dests a { display: flex; align-items: center; gap: 14px; padding: 8px 14px 8px 8px; border-radius: 16px; color: #fff; text-decoration: none; background: rgba(8,12,28,.55); border: 1px solid rgba(255,255,255,.14); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); transition: transform .2s, background .2s, border-color .2s; }
+.hero-dests a:hover { transform: translateX(-4px); background: rgba(20,30,70,.7); border-color: #9db7ff; }
+.hero-dests .hd-img { flex: none; width: 64px; height: 64px; border-radius: 12px; background-size: cover; background-color: #14204a; }
+.hero-dests .hd-txt { display: grid; gap: 4px; min-width: 0; flex: 1; }
+.hero-dests .hd-txt b { font-weight: 600; font-size: .98rem; line-height: 1.2; }
+.hero-dests .hd-txt small { color: #b4c0e4; font-size: .85rem; }
+.hero-dests .hd-go { flex: none; font-size: 1.2rem; color: #9db7ff; }
+@media (min-width: 1000px) {
+  .hero.cine > .wrap { display: grid; grid-template-columns: minmax(0, 600px) minmax(300px, 380px); justify-content: space-between; align-items: center; gap: 48px; }
+  .hero.cine > .wrap > div { max-width: none; }
+}
+@media (max-width: 999px) {
+  .hero-dests { margin-top: 22px; }
+  .hero-dests ul { display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; margin: 0 -20px; padding: 2px 20px 8px; scrollbar-width: none; }
+  .hero-dests ul::-webkit-scrollbar { display: none; }
+  .hero-dests li { flex: none; width: min(72vw, 250px); scroll-snap-align: start; }
+  .hero-dests a { padding: 6px 12px 6px 6px; gap: 10px; }
+  .hero-dests .hd-img { width: 52px; height: 52px; }
+  .hero-dests .hd-txt b { font-size: .9rem; }
+  .hero-dests .hd-go { display: none; }
+  .hero.cine > .wrap { padding-bottom: 150px; }
+}

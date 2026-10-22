@@ -8,7 +8,6 @@ import { SERVICES } from "@/lib/services";
 import { FORFAITS } from "@/lib/forfaits";
 import { CAR_PICS, SERVICE_PIC } from "@/lib/images";
 import Icon, { iconFor } from "@/components/Icon";
-import TripPass from "@/components/TripPass";
 import MapMount from "@/components/MapMount";
 import CineMount from "@/components/CineMount";
 import HeroBooking from "@/components/HeroBooking";
@@ -48,12 +47,12 @@ const FAQ = [
 ];
 
 const TRIPS = [
-  { from: "Lille", to: "Lesquin", fromQ: "Lille", toQ: "Aéroport de Lille-Lesquin", label: "Aéroport de Lille-Lesquin", price: "dès 70 €", img: "/img/dest-lesquin.webp", alt: "Terminal de l'aéroport de Lille-Lesquin", pos: "50% 55%" },
-  { from: "Lille", to: "Zaventem", fromQ: "Lille", toQ: "Aéroport de Bruxelles-National, Zaventem", label: "Aéroport de Bruxelles", price: "dès 242 €", img: "/img/dest-zaventem.webp", alt: "Tapis roulant de l'aéroport de Bruxelles", pos: "50% 50%" },
-  { from: "Lille", to: "Roissy-CDG", fromQ: "Lille", toQ: "Aéroport Paris-Charles-de-Gaulle", label: "Aéroport Paris-Charles-de-Gaulle", price: "dès 451 €", img: "/img/dest-cdg.webp", alt: "Avions sur le tarmac de Paris-Charles-de-Gaulle", pos: "45% 60%" },
-  { from: "Domicile", to: "Flandres", fromQ: "", toQ: "Gare de Lille-Flandres", label: "Gare de Lille-Flandres", price: "35 – 80 €", img: "/img/dest-flandres.webp", alt: "Façade de la gare de Lille-Flandres", pos: "50% 50%" },
-  { from: "Lille", to: "Roubaix", fromQ: "Lille", toQ: "Roubaix", label: "Roubaix", price: "dès 70 €", img: "/img/dest-roubaix.webp", alt: "Hôtel de ville de Roubaix", pos: "50% 45%" },
-  { from: "Lille", to: "Le Touquet", fromQ: "Lille", toQ: "Le Touquet-Paris-Plage", label: "Le Touquet-Paris-Plage", price: "dès 365 €", img: "/img/dest-touquet.webp", alt: "Dunes et plage du Touquet-Paris-Plage", pos: "50% 50%" },
+  { from: "Lille", to: "Lesquin", fromQ: "Lille", toQ: "Aéroport de Lille-Lesquin", label: "Aéroport de Lille-Lesquin", price: "dès 68 €", img: "/img/dest-lesquin.webp", alt: "Terminal de l'aéroport de Lille-Lesquin", pos: "50% 55%" },
+  { from: "Lille", to: "Zaventem", fromQ: "Lille", toQ: "Aéroport de Bruxelles-National, Zaventem", label: "Aéroport de Bruxelles", price: "dès 321 €", img: "/img/dest-zaventem.webp", alt: "Tapis roulant de l'aéroport de Bruxelles", pos: "50% 50%" },
+  { from: "Lille", to: "Roissy-CDG", fromQ: "Lille", toQ: "Aéroport Paris-Charles-de-Gaulle", label: "Aéroport Paris-Charles-de-Gaulle", price: "dès 481 €", img: "/img/dest-cdg.webp", alt: "Avions sur le tarmac de Paris-Charles-de-Gaulle", pos: "45% 60%" },
+  { from: "Domicile", to: "Flandres", fromQ: "", toQ: "Gare de Lille-Flandres", label: "Gare de Lille-Flandres", price: "dès 25 €", img: "/img/dest-flandres.webp", alt: "Façade de la gare de Lille-Flandres", pos: "50% 50%" },
+  { from: "Lille", to: "Roubaix", fromQ: "Lille", toQ: "Roubaix", label: "Roubaix", price: "dès 55 €", img: "/img/dest-roubaix.webp", alt: "Hôtel de ville de Roubaix", pos: "50% 45%" },
+  { from: "Lille", to: "Le Touquet", fromQ: "Lille", toQ: "Le Touquet-Paris-Plage", label: "Le Touquet-Paris-Plage", price: "dès 373 €", img: "/img/dest-touquet.webp", alt: "Dunes et plage du Touquet-Paris-Plage", pos: "50% 50%" },
 ];
 
 export default function Home() {
@@ -92,6 +91,20 @@ export default function Home() {
               <Link href="/tarifs">Voir la grille de tarifs</Link>
             </p>
           </div>
+          <aside className="hero-dests" aria-label="Trajets les plus demandés">
+            <p className="hd-title">Trajets les plus demandés</p>
+            <ul>
+              {TRIPS.map((t) => (
+                <li key={t.to}>
+                  <Link href={`/reservation?${new URLSearchParams({ from: t.fromQ, to: t.toQ }).toString()}`}>
+                    <span className="hd-img" style={{ backgroundImage: `url(${t.img})`, backgroundPosition: t.pos }} role="img" aria-label={t.alt} />
+                    <span className="hd-txt"><b>{t.label}</b><small>{t.price}</small></span>
+                    <span className="hd-go" aria-hidden="true">→</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </aside>
         </div>
         <div className="cine-stats">
           <div><small>Prix</small><b>Figé</b></div>
@@ -143,18 +156,6 @@ export default function Home() {
       <MapMount target="cine-story" />
 
       <TrustBar />
-
-      <section className="section" data-fx="" suppressHydrationWarning>
-        <div className="wrap">
-          <div className="section-head">
-            <span className="eyebrow">Exemples de trajets</span>
-            <h2>Vos trajets les plus demandés</h2>
-          </div>
-          <div className="hero-visual">
-            <TripPass trips={TRIPS} />
-          </div>
-        </div>
-      </section>
 
       <section className="section vehicle" data-fx="" suppressHydrationWarning>
         <div className="wrap">
