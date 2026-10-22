@@ -13,7 +13,7 @@ export function mountCine(root) {
   const num = root.querySelector(".story-num");
   const xmin = parseFloat(root.dataset.xmin || "0.40");
   const MONO = "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
-  let W = 0, H = 0, dpr = 1, visible = true, raf = 0, parts = [], routes = [], mx = 0.5, my = 0.5;
+  let W = 0, H = 0, dpr = 1, visible = true, raf = 0, parts = [], routes = [], mx = 0.5, my = 0.5, glow = null, GM = 0;
   const t0 = performance.now();
   let chap = -1, chapStart = 0;
 
@@ -35,6 +35,14 @@ export function mountCine(root) {
     W = Math.max(1, Math.round(r.width * dpr));
     H = Math.max(1, Math.round(r.height * dpr));
     canvas.width = W; canvas.height = H;
+    GM = Math.round(24 * dpr);
+    glow = document.createElement("canvas");
+    const gw = Math.max(1, Math.round((W + 2 * GM) / 4)), gh = Math.max(1, Math.round((H + 2 * GM) / 4));
+    glow.width = gw; glow.height = gh;
+    const gx = glow.getContext("2d"), cxg = ((W * 0.72 + GM) / (W + 2 * GM)) * gw, cyg = ((H * 0.4 + GM) / (H + 2 * GM)) * gh;
+    const gg = gx.createRadialGradient(cxg, cyg, 0, cxg, cyg, (Math.max(W, H) * 0.6) / 4);
+    gg.addColorStop(0, "rgba(70,110,255,.20)"); gg.addColorStop(1, "rgba(70,110,255,0)");
+    gx.fillStyle = gg; gx.fillRect(0, 0, gw, gh);
     const portrait = r.width < r.height * 0.9;
     // coordonnées normalisées → zone utile (à droite du texte sur grand écran, en haut sur mobile)
     const map = portrait ? (p) => [0.08 + 0.84 * p[0], 0.06 + 0.46 * p[1]] : (p) => [xmin + (0.96 - xmin) * p[0], 0.10 + 0.78 * p[1]];
@@ -86,10 +94,8 @@ export function mountCine(root) {
     const main = routes[0], hi = clamp(Math.floor(clamp(p.head, 0, 1) * (main.length - 1)), 0, main.length - 1);
     const headU = clamp(p.head, 0, 1);
 
-    // lueur d'ambiance
-    const g = ctx.createRadialGradient(W * 0.72 + px, H * 0.4 + py, 0, W * 0.72 + px, H * 0.4 + py, Math.max(W, H) * 0.6);
-    g.addColorStop(0, "rgba(70,110,255,.20)"); g.addColorStop(1, "rgba(70,110,255,0)");
-    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    // lueur d'ambiance : dégradé pré-calculé en basse résolution (identique à l'œil), simplement recopié à chaque image
+    if (glow) ctx.drawImage(glow, -GM + px, -GM + py, W + 2 * GM, H + 2 * GM);
 
     // traits fins des routes
     for (let r = 0; r < routes.length; r++) {
@@ -101,6 +107,7 @@ export function mountCine(root) {
     }
 
     // particules
+    let lastHot = null;
     for (let i = 0; i < parts.length; i++) {
       const a = parts[i], pts = routes[a.r];
       const f = ease(p.build * 1.35 - (1 - a.u) * 0.35);
@@ -109,16 +116,18 @@ export function mountCine(root) {
       const spread = 1 + (1 - f) * 2.5;
       const x = sx + (q.x + q.nx * a.off * dpr * spread - sx) * f + px * (0.4 + a.sz * 0.2);
       const y = sy + (q.y + q.ny * a.off * dpr * spread - sy) * f + py * (0.4 + a.sz * 0.2);
-      let al = 0.16 + 0.14 * Math.sin(time * 1.4 + a.ph), col = "130,160,235";
+      let al = 0.16 + 0.14 * Math.sin(time * 1.4 + a.ph), hot = false;
       if (a.r === 0 && f > 0.5) {
         const d = headU - a.u;
-        if (d >= 0) { al = Math.max(0.3, 1 - d * 1.3); col = "185,210,255"; }
+        if (d >= 0) { al = Math.max(0.3, 1 - d * 1.3); hot = true; }
         else al = 0.28;
       } else if (f > 0.5) al = 0.2;
-      ctx.fillStyle = "rgba(" + col + "," + al.toFixed(3) + ")";
+      if (hot !== lastHot) { ctx.fillStyle = hot ? "rgb(185,210,255)" : "rgb(130,160,235)"; lastHot = hot; }
+      ctx.globalAlpha = al;
       const s = a.sz * dpr;
       ctx.fillRect(x, y, s, s);
     }
+    ctx.globalAlpha = 1;
 
     // point lumineux + faisceau
     if (p.build > 0.35) {

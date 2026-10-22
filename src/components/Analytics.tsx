@@ -11,7 +11,7 @@ export default function Analytics() {
     <>
       {/* File d'attente : les événements envoyés avant le chargement du script ne sont pas perdus. */}
       <Script id="plausible-queue" strategy="afterInteractive">{`window.plausible=window.plausible||function(){(window.plausible.q=window.plausible.q||[]).push(arguments)}`}</Script>
-      <Script defer data-domain={domain} src="https://plausible.io/js/script.tagged-events.js" strategy="afterInteractive" />
+      <Script defer data-domain={domain} src="https://plausible.io/js/script.js" strategy="lazyOnload" />
     </>
   );
 }
