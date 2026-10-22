@@ -9,7 +9,8 @@ const Msg = ({ s }: { s: R }) => (s?.error ? <p className="error">{s.error}</p> 
 export function SettingsForm({ v, envPhone }: { v: Partial<SiteSettings>; envPhone: boolean }) {
   const [s, act, pending] = useActionState(saveSettings, undefined);
   return (
-    <form action={act} className="form adm-box" style={{ display: "grid", gap: 12, maxWidth: 640 }}>
+    <form action={act} className="form adm-box adm-cols">
+      <strong className="adm-span">Informations du site</strong>
       <label>E-mail de contact (mentions légales, contact)<input name="email" type="email" defaultValue={v.email ?? ""} placeholder="contact@nordvtc.fr" /></label>
       <label>Téléphone des mentions légales (obligatoire, masqué aux robots)<input name="legalPhone" defaultValue={v.legalPhone ?? ""} placeholder="07 68 24 15 98" /></label>
       <label>Numéro révélé après le formulaire « Appeler / être rappelé »<input name="driverPhone" defaultValue={v.driverPhone ?? ""} placeholder={envPhone ? "(variable DRIVER_PHONE utilisée si vide)" : "07 …"} /></label>
@@ -20,9 +21,9 @@ export function SettingsForm({ v, envPhone }: { v: Partial<SiteSettings>; envPho
       <label>Site web du médiateur<input name="mediatorUrl" type="url" defaultValue={v.mediatorUrl ?? ""} placeholder="https://…" /></label>
       <label>Adresse postale du médiateur<input name="mediatorAddress" defaultValue={v.mediatorAddress ?? ""} /></label>
       <label>Adresse de dépôt Tiime (chaque facture y est envoyée en PDF)<input name="tiimeEmail" type="email" defaultValue={v.tiimeEmail ?? ""} placeholder="votre-adresse@…tiime…" /></label>
-      <small className="muted" style={{ marginTop: -6 }}>Dans Tiime : bloc « Déposer ici un document » en bas à gauche (web) ou Réglages → Gestion des documents (appli). Cliquez sur l&apos;adresse pour la copier.</small>
-      <Msg s={s} />
-      <button className="btn" disabled={pending}>{pending ? "Enregistrement…" : "Enregistrer"}</button>
+      <small className="muted adm-span" style={{ marginTop: -6 }}>Dans Tiime : bloc « Déposer ici un document » en bas à gauche (web) ou Réglages → Gestion des documents (appli). Cliquez sur l&apos;adresse pour la copier.</small>
+      <div className="adm-span"><Msg s={s} /></div>
+      <button className="btn adm-save" disabled={pending}>{pending ? "Enregistrement…" : "Enregistrer"}</button>
     </form>
   );
 }

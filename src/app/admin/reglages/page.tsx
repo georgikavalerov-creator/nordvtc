@@ -2,13 +2,10 @@ import type { Metadata } from "next";
 import { getSiteSettings } from "@/lib/content";
 import { AdminPage } from "../gate";
 import { SettingsForm, TiimeCatchUp } from "../Forms";
-import TwoFactor, { TwoFactorChannels } from "../TwoFactor";
-import { otpConfigured } from "@/lib/callback";
 import { get2fa } from "@/lib/totp";
 import LogoUploader from "@/components/LogoUploader";
 import { getLogo } from "@/lib/logo";
-import { adminPkDelete, adminPkList, adminPkRegOptions, adminPkRegVerify, removeLogo, saveAdminPhoto, saveLogo } from "../actions";
-import FaceIdManager from "@/components/FaceIdManager";
+import { removeLogo, saveAdminPhoto, saveLogo } from "../actions";
 import AvatarField from "@/components/AvatarField";
 import { getAdminPhoto } from "@/lib/admin-photo";
 
@@ -26,13 +23,10 @@ export default async function Page() {
       <LogoUploader current={logo} save={saveLogo} remove={removeLogo} />
       <SettingsForm v={v} envPhone={Boolean(process.env.DRIVER_PHONE)} />
       <TiimeCatchUp />
-      <FaceIdManager scope="admin" list={await adminPkList()} getOptions={adminPkRegOptions} save={adminPkRegVerify} remove={adminPkDelete} />
-      <TwoFactor enabled={!!tfa.enabled} />
-      <TwoFactorChannels email={!!tfa.email} sms={!!tfa.sms} smsAvailable={otpConfigured()} phone={(v.driverPhone || process.env.DRIVER_PHONE || "").trim()} backup={(tfa.backup ?? []).length} />
-      <div className="adm-box">
-        <strong>Sécurité</strong>
-        <p className="muted" style={{ marginBottom: 0 }}>Le mot de passe de l'administration se change dans les variables d'environnement (ADMIN_PASSWORD) de votre hébergeur. Changer ADMIN_SESSION_SECRET déconnecte toutes les sessions.</p>
-      </div>
+      <a href="/admin/securite#protection" className="adm-box adm-link">
+        <strong>Face ID et double authentification</strong>
+        <span className="muted">{tfa.enabled ? "Double authentification activée" : "Double authentification à activer"} · réglages dans l&apos;onglet Sécurité →</span>
+      </a>
     </AdminPage>
   );
 }

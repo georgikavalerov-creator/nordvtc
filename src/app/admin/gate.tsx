@@ -38,9 +38,13 @@ export async function AdminPage({ title, children, actions }: { title: string; c
           </div>
         </div>
         <FaceIdPrompt count={(await listPasskeys("admin").catch(() => [])).length} getOptions={adminPkRegOptions} save={adminPkRegVerify} storeKey="admin" />
-        <AdminNav />
-        <AdminChatWatch initial={await adminUnread().catch(() => ({ count: 0, messages: 0, latest: null }))} />
-        {children}
+        <div className="adm-layout">
+          <AdminNav />
+          <div className="adm-main">
+            <AdminChatWatch initial={await adminUnread().catch(() => ({ count: 0, messages: 0, latest: null }))} />
+            {children}
+          </div>
+        </div>
       </div>
     </section>
   );

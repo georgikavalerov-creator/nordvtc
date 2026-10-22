@@ -41,6 +41,20 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ m
   const feed = `${host}/api/agenda/${tok}`;
   return (
     <AdminPage title="Calendrier">
+      <div className="adm-box adm-sync">
+        <strong>Vos courses dans l&apos;agenda de votre téléphone</strong>
+        <p className="muted" style={{ margin: "6px 0 10px" }}>Un seul geste : toutes vos courses confirmées apparaissent dans votre agenda et se mettent à jour toutes seules (annulations comprises), avec client, téléphone, adresses, prix et rappels 1 h et 15 min avant.</p>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <a className="btn small" href={`webcal://${feed}`}> S'abonner sur iPhone (Calendrier iOS)</a>
+          <a className="btn small" href={`https://calendar.google.com/calendar/r?cid=${encodeURIComponent(`webcal://${feed}`)}`} target="_blank" rel="noopener">S'abonner sur Android (Google Agenda)</a>
+        </div>
+        <p className="muted" style={{ fontSize: ".82rem", margin: "10px 0 0" }}>
+          Lien privé, à ne pas partager : <code style={{ wordBreak: "break-all" }}>https://{feed}</code><br />
+          Les courses en attente de paiement n'y figurent pas. iPhone : actualisation en quelques minutes à 1 h ; Google Agenda : jusqu'à 12 h (utilisez « Google Agenda » sur une course pour l'ajouter tout de suite).
+        </p>
+        {!tok && <p className="notice">Renseignez ADMIN_SESSION_SECRET pour activer le lien.</p>}
+      </div>
+
       <div style={{ display: "flex", alignItems: "center", gap: 12, justifyContent: "space-between" }}>
         <Link className="btn ghost small" href={`/admin/calendrier?m=${key(prev)}`}>← {MONTHS[prev.getMonth()]}</Link>
         <strong style={{ fontSize: "1.2rem", textTransform: "capitalize" }}>{MONTHS[M - 1]} {Y}</strong>
@@ -66,20 +80,6 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ m
         })}
       </div>
       <small className="muted">Vert = confirmée · gris = terminée · hachuré = indisponible (aucune réservation en ligne possible).</small>
-
-      <div className="adm-box">
-        <strong>Synchroniser mon agenda (automatique)</strong>
-        <p className="muted" style={{ margin: "6px 0 10px" }}>Un seul geste : toutes vos courses confirmées apparaissent dans votre agenda et se mettent à jour toutes seules (annulations comprises), avec client, téléphone, adresses, prix et rappels 1 h et 15 min avant.</p>
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          <a className="btn small" href={`webcal://${feed}`}>S'abonner sur iPhone</a>
-          <a className="btn small" href={`https://calendar.google.com/calendar/r?cid=${encodeURIComponent(`webcal://${feed}`)}`} target="_blank" rel="noopener">S'abonner sur Android (Google Agenda)</a>
-        </div>
-        <p className="muted" style={{ fontSize: ".82rem", margin: "10px 0 0" }}>
-          Lien privé, à ne pas partager : <code style={{ wordBreak: "break-all" }}>https://{feed}</code><br />
-          Les courses en attente de paiement n'y figurent pas. iPhone : actualisation en quelques minutes à 1 h ; Google Agenda : jusqu'à 12 h (utilisez « Google Agenda » sur une course pour l'ajouter tout de suite).
-        </p>
-        {!tok && <p className="notice">Renseignez ADMIN_SESSION_SECRET pour activer le lien.</p>}
-      </div>
 
       <div className="adm-box">
         <strong>Bloquer des dates (congés, maintenance, jours complets)</strong>

@@ -3,6 +3,9 @@ import Link from "next/link";
 import { db, dbConfigured } from "@/lib/supabase";
 import { AdminPage } from "./gate";
 import { STATUS, euro, fmtDT, net, ymd, type Booking } from "./lib";
+import { agendaToken } from "@/lib/ics";
+import { get2fa } from "@/lib/totp";
+import { SITE } from "@/lib/site";
 
 export const metadata: Metadata = { title: "Administration", robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
@@ -36,9 +39,18 @@ export default async function Dashboard() {
   const max = Math.max(1, ...months.map((m) => m.ca));
   const top = Object.entries(live.reduce<Record<string, number>>((a, b) => ((a[b.dest_label] = (a[b.dest_label] ?? 0) + 1), a), {})).sort((a, b) => b[1] - a[1]).slice(0, 5);
 
+  const tok = agendaToken();
+  const feed = tok ? `webcal://${SITE.url.replace(/^https?:\/\//, "")}/api/agenda/${tok}` : "/admin/calendrier";
+  const tfa = await get2fa().catch(() => ({ enabled: false }));
   return (
     <AdminPage title="Tableau de bord">
       {!dbConfigured() && <p className="notice">Connectez Supabase pour voir vos données.</p>}
+      <nav className="adm-quick" aria-label="Raccourcis">
+        <Link href="/admin/reservations/nouvelle"><b>+ Bon de commande</b><span>Course prise hors du site</span></Link>
+        <Link href="/admin/documents"><b>Documents</b><span>Bons, notes et factures</span></Link>
+        <a href={feed}><b>Agenda iPhone</b><span>Abonnement automatique</span></a>
+        <Link href="/admin/securite#protection" className={tfa.enabled ? "" : "warn"}><b>Double authentification</b><span>{tfa.enabled ? "Activée" : "À activer"}</span></Link>
+      </nav>
       <div className="adm-kpis">
         <div className="adm-kpi"><b>{todays.length}</b><span>course(s) aujourd'hui</span></div>
         <div className="adm-kpi"><b>{upcoming.length}</b><span>à venir (confirmées)</span></div>

@@ -2,6 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { AdminPage } from "../gate";
 import { db, dbConfigured } from "@/lib/supabase";
+import TwoFactor, { TwoFactorChannels } from "../TwoFactor";
+import { otpConfigured } from "@/lib/callback";
+import { get2fa } from "@/lib/totp";
+import { getSiteSettings } from "@/lib/content";
+import FaceIdManager from "@/components/FaceIdManager";
+import { adminPkDelete, adminPkList, adminPkRegOptions, adminPkRegVerify } from "../actions";
 
 export const metadata: Metadata = { title: "Administration · Sécurité", robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
@@ -35,8 +41,19 @@ export default async function Securite({ searchParams }: { searchParams: Promise
     top = [...m.values()].sort((a, b) => b.n - a.n).slice(0, 10);
   }
   const high = events.filter((e) => e.severity === "high").length;
+  const [tfa, v] = await Promise.all([get2fa().catch(() => ({} as Awaited<ReturnType<typeof get2fa>>)), getSiteSettings()]);
   return (
     <AdminPage title="Sécurité">
+      <div id="protection" className="adm-protect">
+        <h2 className="adm-h">Protection de votre accès</h2>
+        <FaceIdManager scope="admin" list={await adminPkList().catch(() => [])} getOptions={adminPkRegOptions} save={adminPkRegVerify} remove={adminPkDelete} />
+        <div className="adm-duo">
+          <TwoFactor enabled={!!tfa.enabled} />
+          <TwoFactorChannels email={!!tfa.email} sms={!!tfa.sms} smsAvailable={otpConfigured()} phone={(v.driverPhone || process.env.DRIVER_PHONE || "").trim()} backup={(tfa.backup ?? []).length} />
+        </div>
+        <p className="muted adm-note">Le mot de passe de l&apos;administration se change dans les variables d&apos;environnement (ADMIN_PASSWORD) de votre hébergeur. Changer ADMIN_SESSION_SECRET déconnecte toutes les sessions.</p>
+      </div>
+      <h2 className="adm-h">Journal des alertes</h2>
       <div className="adm-box sec-intro">
         <p>Chaque tentative suspecte est enregistrée : adresse IP, pays et ville, réseau / fournisseur d&apos;accès (ASN), navigateur, page visée et <b>Ray ID</b> Cloudflare. En cas d&apos;attaque, téléchargez le journal et joignez-le à votre plainte (pharos.interieur.gouv.fr ou commissariat) ou transmettez-le à Cloudflare. Conservation : 12 mois.</p>
         <div className="sec-actions">
