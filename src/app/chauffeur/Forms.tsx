@@ -1,6 +1,7 @@
 "use client";
 import { useActionState } from "react";
-import { changeDriverPassword, loginDriver, saveDriverProfile } from "./actions";
+import { changeDriverPassword, driverPkLogin, driverPkLoginOptions, loginDriver, saveDriverProfile } from "./actions";
+import FaceIdLogin from "@/components/FaceIdLogin";
 import type { Driver } from "@/lib/driver-auth";
 
 const Msg = ({ s, ok = "Enregistré ✓" }: { s: { error?: string; ok?: boolean } | undefined; ok?: string }) =>
@@ -10,6 +11,7 @@ export function DriverLogin() {
   const [s, act, pending] = useActionState(loginDriver, undefined);
   return (
     <form action={act} className="form adm-box" style={{ display: "grid", gap: 12, maxWidth: 420 }}>
+      <FaceIdLogin getOptions={driverPkLoginOptions} verify={driverPkLogin} next="/chauffeur" />
       <label>E-mail<input name="email" type="email" required autoComplete="username" /></label>
       <label>Mot de passe<input name="password" type="password" required autoComplete="current-password" /></label>
       <Msg s={s} />

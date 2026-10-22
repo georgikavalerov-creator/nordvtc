@@ -1,7 +1,8 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { login, sendCode } from "./actions";
+import { adminPkLogin, adminPkLoginOptions, login, sendCode } from "./actions";
+import FaceIdLogin from "@/components/FaceIdLogin";
 
 export default function LoginForm() {
   const [state, action, pending] = useActionState(login, undefined);
@@ -11,6 +12,7 @@ export default function LoginForm() {
   const ask = async (via: "email" | "sms") => { setInfo("Envoi…"); const r = await sendCode(via); setInfo(r.ok || r.error || ""); };
   return (
     <form action={action} className="form ticket" style={{ maxWidth: 440 }}>
+      {!state?.need2fa && <FaceIdLogin getOptions={adminPkLoginOptions} verify={adminPkLogin} next="/admin" />}
       <label>
         Mot de passe
         <input name="password" type="password" required autoComplete="current-password" value={pw} onChange={(e) => setPw(e.target.value)} />

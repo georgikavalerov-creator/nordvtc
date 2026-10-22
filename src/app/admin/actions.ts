@@ -1,4 +1,6 @@
 "use server";
+import { deletePasskey, listPasskeys, loginOptions, loginVerify, registrationOptions, registrationVerify } from "@/lib/passkey";
+import type { AuthenticationResponseJSON, RegistrationResponseJSON } from "@simplewebauthn/server";
 import { checkPhoto } from "@/lib/photo";
 
 import { revalidatePath } from "next/cache";
@@ -403,5 +405,39 @@ export async function saveAdminPhoto(dataUrl: string | null): Promise<{ ok?: boo
     : await db().from("settings").delete().eq("key", "admin_photo");
   if (error) return { error: "Enregistrement impossible." };
   revalidatePath("/admin", "layout");
+  return { ok: true };
+}
+
+// ---------- Face ID / clé d'accès (administration) ----------
+export async function adminPkRegOptions() {
+  if (!(await isAdmin())) throw new Error("non autorisé");
+  return registrationOptions("admin", "admin@nordvtc.fr", "Administration Nord VTC");
+}
+export async function adminPkRegVerify(resp: RegistrationResponseJSON, name: string) {
+  if (!(await isAdmin())) return { error: "Session expirée, reconnectez-vous." };
+  const r = await registrationVerify("admin", resp, name);
+  revalidatePath("/admin/reglages");
+  return r;
+}
+export async function adminPkList() {
+  if (!(await isAdmin())) return [];
+  return listPasskeys("admin");
+}
+export async function adminPkDelete(id: string) {
+  if (!(await isAdmin())) return { error: "Session expirée." };
+  await deletePasskey("admin", id);
+  revalidatePath("/admin/reglages");
+  return { ok: true };
+}
+export async function adminPkLoginOptions() {
+  const ip = ipFrom(await headers());
+  if (!(await guard(undefined, `admin-pk:${ip}`, 10, 15 * 60_000, "admin_login_blocked"))) throw new Error("Trop de tentatives. Réessayez plus tard.");
+  return loginOptions("admin");
+}
+export async function adminPkLogin(resp: AuthenticationResponseJSON): Promise<{ ok?: boolean; error?: string }> {
+  const owner = await loginVerify("admin", resp).catch(() => null);
+  if (owner !== "admin") { await logSecurity("admin_login_fail", undefined, { method: "face-id" }); return { error: "Face ID non reconnu pour cet appareil. Utilisez votre mot de passe." }; }
+  await logSecurity("admin_login_ok", undefined, { method: "face-id" });
+  await startSession();
   return { ok: true };
 }

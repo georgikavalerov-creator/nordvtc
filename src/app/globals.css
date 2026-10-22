@@ -2888,3 +2888,16 @@ h2.bk-sub::before { content: ""; width: 4px; height: 1.1em; border-radius: 4px; 
 .hero.cine h1 .ln2 { animation-delay: .12s; }
 .hero.cine .lead { animation-duration: .7s; animation-delay: .2s; }
 .hero.cine .quick { animation-duration: .7s; animation-delay: .28s; }
+
+/* Face ID / clé d'accès */
+.faceid-login { display: grid; gap: 10px; }
+.faceid-btn { width: 100%; justify-content: center; gap: 10px; background: linear-gradient(135deg, #1f5bff, #7c3aed) !important; border-color: transparent !important; color: #fff !important; }
+.faceid-or { display: flex; align-items: center; gap: 10px; margin: 4px 0 0; font-size: .82rem; color: #6b7385; }
+.faceid-or::before, .faceid-or::after { content: ""; flex: 1; height: 1px; background: #dfe3ea; }
+.faceid-box { display: grid; gap: 14px; }
+.faceid-head { display: flex; gap: 14px; align-items: flex-start; }
+.faceid-ico { width: 48px; height: 48px; flex: none; border-radius: 14px; display: grid; place-items: center; color: #fff; background: linear-gradient(135deg, #1f5bff, #7c3aed); box-shadow: 0 10px 22px -12px rgba(31,91,255,.8); }
+.faceid-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.faceid-list li { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; background: #f6f7fb; }
+.faceid-list li span { display: grid; gap: 2px; }
+.faceid-list small { font-size: .8rem; }

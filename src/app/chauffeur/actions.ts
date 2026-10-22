@@ -1,4 +1,6 @@
 "use server";
+import { deletePasskey, listPasskeys, loginOptions, loginVerify, registrationOptions, registrationVerify } from "@/lib/passkey";
+import type { AuthenticationResponseJSON, RegistrationResponseJSON } from "@simplewebauthn/server";
 import { checkPhoto } from "@/lib/photo";
 
 import { revalidatePath } from "next/cache";
@@ -114,5 +116,41 @@ export async function saveDriverPhoto(dataUrl: string | null): Promise<{ error?:
   const { error } = await db().from("drivers").update({ photo: dataUrl }).eq("id", d.id);
   if (error) return { error: "Enregistrement impossible." };
   revalidatePath("/chauffeur", "layout");
+  return { ok: true };
+}
+
+// ---------- Face ID / clé d'accès (espace chauffeur) ----------
+export async function driverPkRegOptions() {
+  const d = await currentDriver();
+  if (!d) throw new Error("non autorisé");
+  return registrationOptions(`driver:${d.id}`, d.email ?? d.name, `${d.name} · Nord VTC`);
+}
+export async function driverPkRegVerify(resp: RegistrationResponseJSON, name: string) {
+  const d = await currentDriver();
+  if (!d) return { error: "Session expirée, reconnectez-vous." };
+  const r = await registrationVerify(`driver:${d.id}`, resp, name);
+  revalidatePath("/chauffeur/profil");
+  return r;
+}
+export async function driverPkDelete(id: string) {
+  const d = await currentDriver();
+  if (!d) return { error: "Session expirée." };
+  await deletePasskey(`driver:${d.id}`, id);
+  revalidatePath("/chauffeur/profil");
+  return { ok: true };
+}
+export async function driverPkLoginOptions() {
+  const ip = ipFrom(await headers());
+  if (!(await guard(undefined, `driver-pk:${ip}`, 10, 15 * 60_000, "driver_login_blocked"))) throw new Error("Trop de tentatives. Réessayez plus tard.");
+  return loginOptions("driver");
+}
+export async function driverPkLogin(resp: AuthenticationResponseJSON): Promise<{ ok?: boolean; error?: string }> {
+  const owner = await loginVerify("driver", resp).catch(() => null);
+  const id = owner?.startsWith("driver:") ? owner.slice(7) : null;
+  const drv = id ? (await db().from("drivers").select("id,email,active").eq("id", id).maybeSingle()).data : null;
+  if (!drv || !drv.active) { await logSecurity("driver_login_fail", undefined, { method: "face-id" }); return { error: "Face ID non reconnu pour cet appareil. Utilisez votre mot de passe." }; }
+  await logSecurity("driver_login_ok", undefined, { email: drv.email, method: "face-id" });
+  await startDriverSession(drv.id);
+  await db().from("drivers").update({ last_login_at: new Date().toISOString() }).eq("id", drv.id);
   return { ok: true };
 }

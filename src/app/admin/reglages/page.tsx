@@ -7,7 +7,8 @@ import { otpConfigured } from "@/lib/callback";
 import { get2fa } from "@/lib/totp";
 import LogoUploader from "@/components/LogoUploader";
 import { getLogo } from "@/lib/logo";
-import { removeLogo, saveAdminPhoto, saveLogo } from "../actions";
+import { adminPkDelete, adminPkList, adminPkRegOptions, adminPkRegVerify, removeLogo, saveAdminPhoto, saveLogo } from "../actions";
+import FaceIdManager from "@/components/FaceIdManager";
 import AvatarField from "@/components/AvatarField";
 import { getAdminPhoto } from "@/lib/admin-photo";
 
@@ -25,6 +26,7 @@ export default async function Page() {
       <LogoUploader current={logo} save={saveLogo} remove={removeLogo} />
       <SettingsForm v={v} envPhone={Boolean(process.env.DRIVER_PHONE)} />
       <TiimeCatchUp />
+      <FaceIdManager list={await adminPkList()} getOptions={adminPkRegOptions} save={adminPkRegVerify} remove={adminPkDelete} />
       <TwoFactor enabled={!!tfa.enabled} />
       <TwoFactorChannels email={!!tfa.email} sms={!!tfa.sms} smsAvailable={otpConfigured()} phone={(v.driverPhone || process.env.DRIVER_PHONE || "").trim()} backup={(tfa.backup ?? []).length} />
       <div className="adm-box">

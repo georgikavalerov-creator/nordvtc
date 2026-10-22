@@ -17,6 +17,8 @@
     "@fontsource-variable/rethink-sans": "^5.3.0",
     "@fontsource/caveat": "^5.3.0",
     "@opennextjs/cloudflare": "^1.20.13",
+    "@simplewebauthn/browser": "^13.3.0",
+    "@simplewebauthn/server": "^13.3.3",
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.117.3",
     "@types/qrcode": "^1.5.5",
