@@ -2365,3 +2365,12 @@ html:not(.in-app) .btn-arrow:active::after, html:not(.in-app) .quick-btn:active:
 .hero.cine .cine-frame { display: none; }
 @media (max-width: 900px) { .hero.cine > .wrap { padding-top: 22px; } }
 @media (max-width: 560px) { .hero.cine > .wrap { padding-top: 18px; } }
+
+/* Discussion : accusés « Distribué » / « Lu » */
+.chat-msg time { display: flex; align-items: center; justify-content: flex-end; gap: 4px; }
+.chat-tick { flex: none; }
+.chat-msg.from-me .chat-tick.is-sent { opacity: .75; }
+.chat-msg.from-me .chat-tick.is-read { color: #9ff0ff; opacity: 1; }
+.chat-msg.is-pending { opacity: .7; }
+.chat-status { display: block; margin-top: 2px; text-align: right; font-size: .68rem; font-weight: 600; letter-spacing: .01em; opacity: .85; }
+.chat-status.is-read { opacity: 1; }

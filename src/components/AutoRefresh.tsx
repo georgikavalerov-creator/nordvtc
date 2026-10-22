@@ -8,6 +8,7 @@ export default function AutoRefresh({ every = 4000, max = 15 }: { every?: number
   useEffect(() => {
     let n = 0;
     const t = setInterval(() => {
+      if (document.hidden) return; // onglet en arrière-plan : rien (évite aussi de marquer des messages « lus »)
       if (++n > max) return clearInterval(t);
       router.refresh();
     }, every);

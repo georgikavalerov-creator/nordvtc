@@ -5,6 +5,7 @@ import { db, dbConfigured } from "@/lib/supabase";
 import { AdminPage } from "../gate";
 import { closeChat } from "../actions";
 import ReplyForm from "./ReplyForm";
+import ChatTicks, { statusLabel } from "@/components/ChatTicks";
 
 export const metadata: Metadata = { title: "Administration · Messages", robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
@@ -67,12 +68,17 @@ export default async function Messages({ searchParams }: { searchParams: Promise
                 </form>
               </div>
               <div className="adm-msgs">
-                {msgs.map((m) => (
-                  <div key={m.id} className={`chat-msg ${m.sender === "admin" ? "from-me" : "from-them"}`}>
-                    <p>{m.body}</p>
-                    <time>{fmt(m.created_at)}</time>
-                  </div>
-                ))}
+                {msgs.map((m) => {
+                  const st = new Date(cur!.visitor_seen_at) >= new Date(m.created_at) ? "read" : "sent";
+                  const last = m === [...msgs].reverse().find((x) => x.sender === "admin");
+                  return (
+                    <div key={m.id} className={`chat-msg ${m.sender === "admin" ? "from-me" : "from-them"}`}>
+                      <p>{m.body}</p>
+                      <time>{fmt(m.created_at)}{m.sender === "admin" && <ChatTicks status={st} />}</time>
+                      {last && <span className={`chat-status is-${st}`}>{statusLabel(st, st === "read" ? cur!.visitor_seen_at : null)}</span>}
+                    </div>
+                  );
+                })}
               </div>
               <ReplyForm thread={cur.id} />
               <p className="muted" style={{ fontSize: ".8rem", margin: 0 }}>

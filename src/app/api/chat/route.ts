@@ -17,7 +17,7 @@ export async function GET(req: Request) {
   const after = Math.max(0, Number(u.searchParams.get("after")) || 0);
   const messages = await messagesAfter(t.id, after);
   if (u.searchParams.get("seen") === "1") await db().from("chat_threads").update({ visitor_seen_at: new Date().toISOString() }).eq("id", t.id);
-  return NextResponse.json({ messages, hasEmail: !!t.visitor_email }, { headers: H });
+  return NextResponse.json({ messages, hasEmail: !!t.visitor_email, adminSeenAt: t.admin_seen_at ?? null }, { headers: H });
 }
 
 // POST { action: "start" | "send" | "email", … }

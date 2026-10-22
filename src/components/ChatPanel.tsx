@@ -3,8 +3,9 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { forgetChat, loadChat, saveChat } from "@/lib/chat-client";
 import IconC from "./IconC";
+import ChatTicks, { statusLabel, type ChatStatus } from "./ChatTicks";
 
-type Msg = { id: number; created_at: string; sender: "visitor" | "admin"; body: string };
+type Msg = { id: number; created_at: string; sender: "visitor" | "admin"; body: string; pending?: boolean };
 const SUGGEST = ["Quel prix pour l'aéroport de Lesquin ?", "Puis-je réserver pour ce soir ?", "J'ai beaucoup de bagages", "Je voudrais un devis"];
 const hhmm = (iso: string) => new Intl.DateTimeFormat("fr-FR", { hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
 
@@ -27,9 +28,12 @@ export default function ChatPanel({ open, onClose, raised, anchor }: { open: boo
   const [askEmail, setAskEmail] = useState(false);
   const [err, setErr] = useState("");
   const [sending, setSending] = useState(false);
+  const [adminSeen, setAdminSeen] = useState<string | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const lastId = msgs.length ? msgs[msgs.length - 1].id : 0;
+  const lastId = msgs.filter((m) => !m.pending).reduce((a, m) => Math.max(a, m.id), 0);
+  const lastMine = [...msgs].reverse().find((m) => m.sender === "visitor");
+  const stOf = (m: Msg): ChatStatus => m.pending ? "pending" : adminSeen && new Date(adminSeen) >= new Date(m.created_at) ? "read" : "sent";
 
   const poll = useCallback(async (after: number) => {
     const s = loadChat();
@@ -40,8 +44,9 @@ export default function ChatPanel({ open, onClose, raised, anchor }: { open: boo
       if (!r.ok) return;
       const d = await r.json();
       setHasEmail(!!d.hasEmail);
+      setAdminSeen(d.adminSeenAt ?? null);
       if (d.messages.length) {
-        setMsgs((m) => { const ids = new Set(m.map((x) => x.id)); return [...m, ...d.messages.filter((x: Msg) => !ids.has(x.id))]; });
+        setMsgs((m) => { const ids = new Set(m.map((x) => x.id)); const real = m.filter((x) => !x.pending); return [...real, ...d.messages.filter((x: Msg) => !ids.has(x.id))]; });
         saveChat({ ...s, seen: d.messages[d.messages.length - 1].id });
       }
     } catch { /* hors ligne */ }
@@ -67,17 +72,18 @@ export default function ChatPanel({ open, onClose, raised, anchor }: { open: boo
     if (!message || sending) return;
     setSending(true); setErr("");
     const s = loadChat();
+    const tmp: Msg = { id: -Date.now(), created_at: new Date().toISOString(), sender: "visitor", body: message, pending: true };
+    setMsgs((m) => [...m, tmp]); setText("");
     try {
       const r = await fetch("/api/chat", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify(s ? { action: "send", id: s.id, token: s.token, message } : { action: "start", message, name, email, page: location.pathname, website: (document.getElementById("chat-hp") as HTMLInputElement | null)?.value || "" }),
       });
       const d = await r.json();
-      if (!r.ok) { setErr(d.error || "Message non envoyé."); return; }
+      if (!r.ok) { setErr(d.error || "Message non envoyé."); setMsgs((m) => m.filter((x) => x.id !== tmp.id)); setText(message); return; }
       if (!s && d.id) { saveChat({ id: d.id, token: d.token, seen: 0 }); if (email) setHasEmail(true); else setAskEmail(true); }
-      setText("");
       await poll(lastIdRef.current);
-    } catch { setErr("Pas de connexion : réessayez."); } finally { setSending(false); }
+    } catch { setErr("Pas de connexion : réessayez."); setMsgs((m) => m.filter((x) => x.id !== tmp.id)); setText(message); } finally { setSending(false); }
   }
 
   async function saveEmail() {
@@ -119,9 +125,10 @@ export default function ChatPanel({ open, onClose, raised, anchor }: { open: boo
           </p>
         )}
         {msgs.map((m) => (
-          <div key={m.id} className={`chat-msg ${m.sender === "admin" ? "from-them" : "from-me"}`}>
+          <div key={m.id} className={`chat-msg ${m.sender === "admin" ? "from-them" : "from-me"}${m.pending ? " is-pending" : ""}`}>
             <p>{m.body}</p>
-            <time>{hhmm(m.created_at)}</time>
+            <time>{hhmm(m.created_at)}{m.sender === "visitor" && <ChatTicks status={stOf(m)} />}</time>
+            {m === lastMine && <span className={`chat-status is-${stOf(m)}`} aria-live="polite">{statusLabel(stOf(m), stOf(m) === "read" ? adminSeen : null)}</span>}
           </div>
         ))}
         {askEmail && !hasEmail && (
