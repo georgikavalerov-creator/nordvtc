@@ -1,3 +1,5 @@
+import Icon from "@/components/Icon";
+
 // Comparatif objectif avec les applications de VTC (sans citer de marque) : ce qui change concrètement pour le client.
 const ROWS: [string, string, string][] = [
   ["Prix", "Fixé à la réservation, jamais revu à la hausse", "Peut grimper avec la demande, la météo ou l'heure"],
@@ -13,14 +15,14 @@ const ROWS: [string, string, string][] = [
 ];
 
 const PERKS: [string, string][] = [
-  ["💧", "Bouteille d'eau offerte"],
-  ["⏱️", "À l'heure, toujours"],
-  ["🔌", "Chargeurs à bord"],
-  ["🧳", "Aide aux bagages"],
-  ["👶", "Siège enfant sur demande"],
-  ["✈️", "Suivi de vol gratuit"],
-  ["🔇", "Hybride silencieuse"],
-  ["🧾", "Facture fournie"],
+  ["water", "Bouteille d'eau offerte"],
+  ["timer", "À l'heure, toujours"],
+  ["plug", "Chargeurs à bord"],
+  ["suitcase", "Aide aux bagages"],
+  ["baby", "Siège enfant sur demande"],
+  ["plane", "Suivi de vol gratuit"],
+  ["leaf", "Hybride silencieuse"],
+  ["receipt", "Facture fournie"],
 ];
 
 export default function AppCompare() {
@@ -34,7 +36,7 @@ export default function AppCompare() {
         </div>
         <ul className="perks" aria-label="Inclus dans chaque course">
           {PERKS.map(([i, t]) => (
-            <li key={t}><span aria-hidden="true">{i}</span>{t}</li>
+            <li key={t}><Icon name={i} size={20} />{t}</li>
           ))}
         </ul>
         <div className="cmp" role="table" aria-label="Comparatif Nord VTC et applications de VTC">
@@ -46,7 +48,7 @@ export default function AppCompare() {
           {ROWS.map(([k, us, them]) => (
             <div key={k} className="cmp-row" role="row">
               <span role="rowheader" className="cmp-k">{k}</span>
-              <span role="cell" className="cmp-us"><b aria-hidden="true">✓</b>{us}</span>
+              <span role="cell" className="cmp-us"><Icon name="check" size={18} />{us}</span>
               <span role="cell" className="cmp-them">{them}</span>
             </div>
           ))}

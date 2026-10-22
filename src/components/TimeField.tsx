@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import IconC from "./IconC";
 
 // Heure à la minute près, en deux touches : on choisit l'heure dans une grille, puis les minutes
 // (raccourcis de 5 en 5 + boutons −1 / +1 pour la minute exacte). On peut aussi taper « 1435 » directement.
@@ -30,7 +31,7 @@ export default function TimeField({ value, onChange, invalid, label = "Heure" }:
   return (
     <div className="pk" ref={box}>
       <div className={`pk-field pk-time${value ? "" : " empty"}`} aria-invalid={invalid || undefined}>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5" /><path d="M12 7.5V12l3 2" /></svg>
+        <IconC name="clock" size={20} />
         <input
           inputMode="numeric" aria-label={label} placeholder="Choisir…" autoComplete="off"
           value={typed ?? show(value)}

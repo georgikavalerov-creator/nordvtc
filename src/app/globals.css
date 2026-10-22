@@ -2352,3 +2352,9 @@ html:not(.in-app) .btn-arrow:active::after, html:not(.in-app) .quick-btn:active:
   .ft { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)) !important; }
   .site-footer.ft ul a, .ft-legal a { min-height: 34px; }
 }
+
+/* Icônes duotone */
+.ico-d { flex: none; vertical-align: -0.2em; }
+.perks li .ico-d { color: #1f5bff; }
+.cmp-row .cmp-us .ico-d { color: #1f5bff; margin-right: 8px; vertical-align: -0.25em; }
+.iconbox .ico .ico-d { color: #1f5bff; }

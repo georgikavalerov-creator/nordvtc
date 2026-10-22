@@ -3,6 +3,7 @@ import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { loadChat, saveChat } from "@/lib/chat-client";
+import IconC from "./IconC";
 
 // Bouton de discussion discret : rien ne s'ouvre tout seul, aucun son, aucune bulle publicitaire.
 // La fenêtre (et son code) n'est chargée qu'au premier clic. Un point bleu signale seulement une vraie réponse non lue.
@@ -94,9 +95,9 @@ export default function ChatButton() {
         onClick={() => { if (justDragged.current) { justDragged.current = false; return; } setLoaded(true); setOpen((o) => !o); setUnread(false); }}
       >
         {open ? (
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+          <IconC name="x" size={22} />
         ) : (
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z" /></svg>
+          <IconC name="chat" size={24} />
         )}
         {unread && !open && <span className="chat-dot" aria-hidden="true" />}
       </button>

@@ -5,6 +5,7 @@ import DateField from "./DateField";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { track } from "@/lib/track";
 import AddressField, { type Place } from "./AddressField";
+import IconC from "./IconC";
 
 type Quote = {
   distanceKm: number;
@@ -256,7 +257,7 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
         <div className="bk-route">
           <AddressField key={`o${swapKey}`} label="Départ" value={origin} onChange={(p) => { setOrigin(p); setErrors((x) => ({ ...x, origin: undefined })); }} initialText={initialFrom} placeholder="Adresse, gare, aéroport…" error={errors.origin} />
           <button type="button" className="bk-swap" onClick={swap} aria-label="Inverser le départ et l'arrivée" title="Inverser">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M7 4v16M7 20l-4-4M7 20l4-4M17 20V4M17 4l-4 4M17 4l4 4"/></svg>
+            <IconC name="swap" size={20} />
           </button>
           <AddressField key={`d${swapKey}`} label="Arrivée" value={dest} onChange={(p) => { setDest(p); setErrors((x) => ({ ...x, dest: undefined })); }} initialText={initialTo} placeholder="Adresse, gare, aéroport…" error={errors.dest} />
         </div>
@@ -308,7 +309,7 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
             N° de vol ou de train <span className="muted">(facultatif)</span>
             <span className="date-chips" role="radiogroup" aria-label="Type de transport">
               {(["Avion", "Train"] as const).map((t) => (
-                <button key={t} type="button" role="radio" aria-checked={transport === t} className={`chip${transport === t ? " on" : ""}`} onClick={() => { setTransport(transport === t ? "" : t); setErrors((x) => ({ ...x, flight: undefined })); }}>{t === "Avion" ? "✈ Avion" : "🚆 Train"}</button>
+                <button key={t} type="button" role="radio" aria-checked={transport === t} className={`chip${transport === t ? " on" : ""}`} onClick={() => { setTransport(transport === t ? "" : t); setErrors((x) => ({ ...x, flight: undefined })); }}><IconC name={t === "Avion" ? "plane" : "train"} size={16} /> {t}</button>
               ))}
             </span>
             <input value={flight} maxLength={20} aria-label="Numéro de vol ou de train" aria-invalid={!!errors.flight} onChange={(e) => { setFlight(e.target.value); setErrors((x) => ({ ...x, flight: undefined })); }} placeholder={transport === "Avion" ? "Ex. AF1234" : transport === "Train" ? "Ex. TGV 7123" : "Choisissez avion ou train"} />
@@ -346,7 +347,7 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
           <div className="bk-route" style={{ marginTop: 8 }}>
             <AddressField key={`rf${retKey}`} label="Départ du retour" value={retFrom} onChange={(p) => { setRetFrom(p); setErrors((x) => ({ ...x, ret: undefined })); }} initialText={retFrom?.label ?? ""} placeholder="Adresse, gare, aéroport…" />
             <button type="button" className="bk-swap" onClick={() => { const a = retFrom; setRetFrom(retTo); setRetTo(a); setRetKey((k) => k + 1); }} aria-label="Inverser les adresses du retour" title="Inverser">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M7 4v16M7 20l-4-4M7 20l4-4M17 20V4M17 4l-4 4M17 4l4 4"/></svg>
+              <IconC name="swap" size={20} />
             </button>
             <AddressField key={`rt${retKey}`} label="Arrivée du retour" value={retTo} onChange={(p) => { setRetTo(p); setErrors((x) => ({ ...x, ret: undefined })); }} initialText={retTo?.label ?? ""} placeholder="Adresse, gare, aéroport…" />
           </div>

@@ -1,5 +1,6 @@
 "use client";
 import { useActionState, useState } from "react";
+import IconC from "./IconC";
 
 type R = { ok?: boolean; error?: string } | undefined;
 
@@ -29,8 +30,8 @@ export default function ClaimCancel({ action, status }: { action: (prev: R, form
       </p>
       <fieldset className="date-chips" style={{ border: 0, padding: 0, margin: "0 0 10px" }}>
         <legend className="muted" style={{ fontSize: ".85rem", marginBottom: 4 }}>Qu'est-ce qui a été annulé ?</legend>
-        <label className="chip"><input type="radio" name="kind" value="train" required /> 🚆 Mon train</label>
-        <label className="chip"><input type="radio" name="kind" value="avion" required /> ✈ Mon vol</label>
+        <label className="chip"><input type="radio" name="kind" value="train" required /> <IconC name="train" size={16} /> Mon train</label>
+        <label className="chip"><input type="radio" name="kind" value="avion" required /> <IconC name="plane" size={16} /> Mon vol</label>
       </fieldset>
       <label>
         Justificatif (PDF ou photo, 10 Mo max)
