@@ -2468,3 +2468,6 @@ a.card.svc:hover .chip.chip-color { background: #fff; color: inherit; transform:
 @media (min-width: 761px) { .cmp-row > .cmp-k { align-items: flex-start; } }
 .iconbox .ico { width: 76px; height: 76px; }
 @media (max-width: 900px) { .iconbox .ico { width: 56px; height: 56px; } .iconbox .ico .ico-c { width: 30px; height: 30px; } }
+.reassure-phone { text-align: center; }
+.brand .brand-tag { font-size: 10px; }
+@media (max-width: 560px) { .brand .brand-tag { font-size: 10px; letter-spacing: .16em; } }
