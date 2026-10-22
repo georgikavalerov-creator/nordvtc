@@ -8,7 +8,11 @@ const KEY = () => {
 
 export type Place = { label: string; lat: number; lng: number };
 
+// Requêtes que HERE comprend mal (« Aéroport de Lille-Lesquin » renvoie un parking) : on interroge le bon lieu.
+const ALIASES: [RegExp, string][] = [[/^a[ée]roport( de)? lille[\s-]*(lesquin)?(,.*)?$/i, "Aéroport de Lille"], [/^a[ée]roport( de)? lesquin$/i, "Aéroport de Lille"]];
+
 export async function suggestPlaces(q: string): Promise<Place[]> {
+  q = ALIASES.find(([re]) => re.test(q.trim()))?.[1] ?? q;
   const url = new URL("https://discover.search.hereapi.com/v1/discover");
   url.searchParams.set("at", "50.6292,3.0573"); // centre de Lille
   url.searchParams.set("q", q);
