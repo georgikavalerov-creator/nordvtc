@@ -54,8 +54,30 @@ export const iconFor = (slug: string, category: string) =>
 
 export const ICON_NAMES = Object.keys(P);
 
-export default function Icon({ name, size = 22 }: { name: string; size?: number }) {
-  return (
-    <svg className="ico-d" width={size} height={size} viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false" dangerouslySetInnerHTML={{ __html: P[name] ?? P.route }} />
-  );
+// Palette par icône : [teinte claire (aplat), teinte foncée (trait)]. Icônes en couleur par défaut.
+const PAL: Record<string, [string, string]> = {
+  euro: ["#34d399", "#047857"], calendarCheck: ["#60a5fa", "#1d4ed8"], calendar: ["#60a5fa", "#1d4ed8"],
+  plane: ["#38bdf8", "#0369a1"], train: ["#f87171", "#b91c1c"], seal: ["#fbbf24", "#b45309"], badge: ["#60a5fa", "#1e40af"],
+  water: ["#22d3ee", "#0e7490"], drop: ["#22d3ee", "#0e7490"], timer: ["#fb923c", "#c2410c"], clock: ["#fb923c", "#c2410c"],
+  plug: ["#a78bfa", "#6d28d9"], bolt: ["#facc15", "#a16207"], suitcase: ["#f59e0b", "#92400e"], briefcase: ["#f59e0b", "#92400e"],
+  baby: ["#f472b6", "#be185d"], leaf: ["#4ade80", "#15803d"], receipt: ["#818cf8", "#4338ca"], globe: ["#2dd4bf", "#0f766e"],
+  shield: ["#34d399", "#065f46"], check: ["#4ade80", "#15803d"], lock: ["#a5b4fc", "#3730a3"], phone: ["#4ade80", "#15803d"],
+  mail: ["#fca5a5", "#c2410c"], pin: ["#f87171", "#dc2626"], undo: ["#2dd4bf", "#0f766e"], star: ["#fcd34d", "#b45309"],
+  heart: ["#fda4af", "#e11d48"], wifi: ["#93c5fd", "#1d4ed8"], route: ["#a5b4fc", "#4338ca"], car: ["#93c5fd", "#1e40af"],
+  chat: ["#93c5fd", "#1d4ed8"], user: ["#c4b5fd", "#6d28d9"], users: ["#c4b5fd", "#6d28d9"], handshake: ["#fcd34d", "#b45309"],
+  headset: ["#93c5fd", "#1d4ed8"], steering: ["#cbd5e1", "#334155"], gift: ["#f9a8d4", "#be185d"], mapTrifold: ["#86efac", "#15803d"],
+  tag: ["#fdba74", "#c2410c"], crown: ["#fde047", "#a16207"], sparkle: ["#f0abfc", "#a21caf"], house: ["#93c5fd", "#1d4ed8"],
+  x: ["#cbd5e1", "#64748b"],
+};
+
+export default function Icon({ name, size = 22, mono = false }: { name: string; size?: number; mono?: boolean }) {
+  const body = P[name] ?? P.route;
+  if (mono) {
+    return <svg className="ico-d" width={size} height={size} viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false" dangerouslySetInnerHTML={{ __html: body }} />;
+  }
+  const [light, deep] = PAL[name] ?? ["#93c5fd", "#1d4ed8"];
+  const id = `icg-${name}`;
+  const html = `<defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${light}" stop-opacity=".45"/><stop offset="1" stop-color="${light}" stop-opacity=".95"/></linearGradient></defs>` +
+    body.replace(/opacity="0\.2"/g, `fill="url(#${id})"`);
+  return <svg className="ico-d ico-c" width={size} height={size} viewBox="0 0 256 256" fill={deep} aria-hidden="true" focusable="false" dangerouslySetInnerHTML={{ __html: html }} />;
 }

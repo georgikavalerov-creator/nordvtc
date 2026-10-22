@@ -49,7 +49,7 @@ export default function AppCompare() {
             <div key={k} className="cmp-row" role="row">
               <span role="rowheader" className="cmp-k">{k}</span>
               <span role="cell" className="cmp-us"><Icon name="check" size={18} /><span>{us}</span></span>
-              <span role="cell" className="cmp-them"><Icon name="x" size={16} /><span>{them}</span></span>
+              <span role="cell" className="cmp-them"><Icon name="x" size={16} mono /><span>{them}</span></span>
             </div>
           ))}
         </div>

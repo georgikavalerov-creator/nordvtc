@@ -2459,3 +2459,9 @@ a.card.svc:hover .chip.chip-color { background: #fff; color: inherit; transform:
 @media (max-width: 900px) {
   .story-copy::before { inset: -130px -90px -70px -90px; }
 }
+
+/* Icônes en couleur dans tous les blocs : pastilles blanches, l'icône garde ses couleurs au survol */
+.iconbox .ico, .trust-ico { background: #fff; box-shadow: 0 6px 16px -10px rgba(15,23,42,.45), inset 0 0 0 1px rgba(15,23,42,.06); }
+@media (hover: hover) { .trust-item:hover .trust-ico { background: #fff; transform: scale(1.08); } }
+.perks li { background: #fff; box-shadow: inset 0 0 0 1px rgba(15,23,42,.08); }
+.ico-c { flex: none; }
