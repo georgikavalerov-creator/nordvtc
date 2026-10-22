@@ -18,8 +18,10 @@ export async function GET(req: Request) {
   url.searchParams.set("minimal", "true");
   url.searchParams.set("include", "siege,matching_etablissements");
   try {
-    const r = await fetch(url, { headers: { Accept: "application/json" }, cf: { cacheTtl: 86400, cacheEverything: true } } as RequestInit);
-    if (!r.ok) return NextResponse.json({ results: [] });
+    // L'annuaire limite le débit (7 requêtes/s) : on retente une fois en cas de refus passager.
+    let r = await fetch(url, { headers: { Accept: "application/json", "User-Agent": "nordvtc.fr (contact@nordvtc.fr)" } });
+    if (r.status === 429 || r.status >= 500) { await new Promise((ok) => setTimeout(ok, 700)); r = await fetch(url, { headers: { Accept: "application/json", "User-Agent": "nordvtc.fr (contact@nordvtc.fr)" } }); }
+    if (!r.ok) return NextResponse.json({ results: [] }, { headers: { "x-upstream": String(r.status), "Cache-Control": "no-store" } });
     const d = (await r.json()) as { results?: { siren: string; nom_complet?: string; nom_raison_sociale?: string; etat_administratif?: string; siege?: { siret?: string; adresse?: string; libelle_commune?: string }; matching_etablissements?: { siret?: string; adresse?: string; libelle_commune?: string }[] }[] };
     const results: Company[] = (d.results ?? []).map((x) => {
       const est = /^\d{14}$/.test(digits) ? x.matching_etablissements?.find((e) => e.siret === digits) ?? x.siege : x.siege;
@@ -33,7 +35,7 @@ export async function GET(req: Request) {
       };
     }).filter((c) => c.name && c.siren);
     return NextResponse.json({ results }, { headers: { "Cache-Control": "public, max-age=3600" } });
-  } catch {
-    return NextResponse.json({ results: [] });
+  } catch (e) {
+    return NextResponse.json({ results: [] }, { headers: { "x-upstream": `err:${(e as Error).message.slice(0, 60)}`, "Cache-Control": "no-store" } });
   }
 }
