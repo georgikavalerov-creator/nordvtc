@@ -2,6 +2,11 @@
 // Aucune photo de voiture tant que les vraies photos de votre véhicule (Toyota Auris) ne sont pas ajoutées.
 export type Pic = { src: string; alt: string; pos?: string };
 
+// Variantes allégées générées à côté de chaque photo : -sm (640 px) et -thumb (200 px).
+export const imgSm = (src: string) => src.replace(/\.webp$/, "-sm.webp");
+export const imgThumb = (src: string) => src.replace(/\.webp$/, "-thumb.webp");
+export const srcSetOf = (src: string, full = 1400) => `${imgThumb(src)} 200w, ${imgSm(src)} 640w, ${src} ${full}w`;
+
 export const PICS = {
   lille: { src: "/img/lille.webp", alt: "Grand'Place de Lille et sa grande roue, de nuit", pos: "50% 55%" },
 } satisfies Record<string, Pic>;

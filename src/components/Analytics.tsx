@@ -2,7 +2,7 @@ import Script from "next/script";
 
 // Mesure d'audience sans cookie (Plausible). Domaine : variable NEXT_PUBLIC_PLAUSIBLE_DOMAIN, sinon PLAUSIBLE_DOMAIN ci-dessous.
 // Mettre "" pour désactiver.
-const PLAUSIBLE_DOMAIN = "";
+const PLAUSIBLE_DOMAIN = "nordvtc.fr";
 
 export default function Analytics() {
   const domain = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN || PLAUSIBLE_DOMAIN;

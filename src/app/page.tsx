@@ -6,7 +6,7 @@ import JsonLd from "@/components/JsonLd";
 import { CONTENT } from "@/lib/service-content";
 import { SERVICES } from "@/lib/services";
 import { FORFAITS } from "@/lib/forfaits";
-import { CAR_PICS, SERVICE_PIC } from "@/lib/images";
+import { CAR_PICS, SERVICE_PIC, imgThumb, srcSetOf } from "@/lib/images";
 import Icon, { iconFor } from "@/components/Icon";
 import MapMount from "@/components/MapMount";
 import CineMount from "@/components/CineMount";
@@ -97,7 +97,7 @@ export default function Home() {
               {TRIPS.map((t) => (
                 <li key={t.to}>
                   <Link href={`/reservation?${new URLSearchParams({ from: t.fromQ, to: t.toQ }).toString()}`}>
-                    <span className="hd-img" style={{ backgroundImage: `url(${t.img})`, backgroundPosition: t.pos }} role="img" aria-label={t.alt} />
+                    <span className="hd-img" style={{ backgroundImage: `url(${imgThumb(t.img)})`, backgroundPosition: t.pos }} role="img" aria-label={t.alt} />
                     <span className="hd-txt"><b>{t.label}</b><small>{t.price}</small></span>
                     <span className="hd-go" aria-hidden="true">→</span>
                   </Link>
@@ -176,7 +176,7 @@ export default function Home() {
               {CAR_PICS.map((ph, i) => (
                 <figure key={ph.src} className={i === 0 ? "g-main" : ""}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={ph.src} alt={ph.alt} loading={i === 0 ? "eager" : "lazy"} width={1400} height={790} style={{ objectPosition: ph.pos }} />
+                  <img src={ph.src} srcSet={srcSetOf(ph.src)} sizes="(max-width: 760px) 100vw, 50vw" alt={ph.alt} loading={i === 0 ? "eager" : "lazy"} width={1400} height={790} style={{ objectPosition: ph.pos }} />
                 </figure>
               ))}
             </div>
@@ -212,7 +212,7 @@ export default function Home() {
               <Link key={s.slug} href={`/services/${s.slug}`} className="card svc">
                 <div className="thumb">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={SERVICE_PIC[s.slug].src} alt={SERVICE_PIC[s.slug].alt} loading="lazy" width={1000} height={666} style={{ objectPosition: SERVICE_PIC[s.slug].pos }} />
+                  <img src={SERVICE_PIC[s.slug].src} srcSet={srcSetOf(SERVICE_PIC[s.slug].src)} sizes="(max-width: 760px) 130px, 420px" alt={SERVICE_PIC[s.slug].alt} loading="lazy" width={1000} height={666} style={{ objectPosition: SERVICE_PIC[s.slug].pos }} />
                   <span className="chip"><Icon name={iconFor(s.slug, s.category)} /></span>
                 </div>
                 <div className="body">
