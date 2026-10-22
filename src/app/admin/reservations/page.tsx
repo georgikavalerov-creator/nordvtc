@@ -3,7 +3,7 @@ import { db, dbConfigured } from "@/lib/supabase";
 import { docPath } from "@/lib/docsign";
 import { AdminPage } from "../gate";
 import { ClaimDecision, RefundForm } from "../Forms";
-import { claimFileUrl, type Claim } from "@/lib/claim";
+import { claimFileUrl, purgeOldClaims, type Claim } from "@/lib/claim";
 import CalButtons from "../CalButtons";
 import { saveBookingMeta, setStatus } from "../actions";
 import { STATUS, euro, fmtDT, type Booking } from "../lib";
@@ -35,6 +35,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ q
   // Demandes d'annulation sur justificatif en attente
   let claims: (Claim & { url: string; b?: { customer_name: string; origin_label: string; dest_label: string; pickup_at: string; paid_cents: number; refunded_cents: number } })[] = [];
   if (dbConfigured()) {
+    await purgeOldClaims();
     const { data } = await db().from("cancel_claims").select("*, b:bookings(customer_name,origin_label,dest_label,pickup_at,paid_cents,refunded_cents)").eq("status", "pending").order("created_at");
     claims = await Promise.all(((data as typeof claims) ?? []).map(async (c) => ({ ...c, url: await claimFileUrl(c.file_path) })));
   }

@@ -86,3 +86,17 @@ export async function decideClaimCore(claimId: string, accept: boolean): Promise
   await sendClaimDecision({ id: b.id, name: b.customer_name, email: b.customer_email, trip, accepted: true, refundedCents: refunded }).catch((e) => console.error("claim mail", e));
   return { ok: `Annulée et ${(refunded / 100).toFixed(2).replace(".", ",")} € remboursés.` };
 }
+
+/** Confidentialité : les justificatifs sont supprimés 1 an après leur dépôt (la demande reste, sans le fichier). */
+export async function purgeOldClaims(): Promise<void> {
+  try {
+    const before = new Date(Date.now() - 365 * 86_400_000).toISOString();
+    const { data } = await db().from("cancel_claims").select("id,file_path").lt("created_at", before).neq("file_path", "").limit(100);
+    if (!data?.length) return;
+    const { error } = await db().storage.from(BUCKET).remove(data.map((c) => c.file_path));
+    if (error) { console.error("claim purge", error); return; }
+    await db().from("cancel_claims").update({ file_path: "" }).in("id", data.map((c) => c.id));
+  } catch (e) {
+    console.error("claim purge", e);
+  }
+}
