@@ -1983,7 +1983,7 @@ html.in-app .hero.cine h1 { color: var(--app-navy); }
 }
 @media (max-width: 999px) {
   .hero-dests { margin-top: 22px; }
-  .hero-dests ul { display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; margin: 0 -20px; padding: 2px 20px 8px; scrollbar-width: none; }
+  .hero-dests ul { display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-left: 20px; margin: 0 -20px; padding: 2px 20px 8px; scrollbar-width: none; }
   .hero-dests ul::-webkit-scrollbar { display: none; }
   .hero-dests li { flex: none; width: min(72vw, 250px); scroll-snap-align: start; }
   .hero-dests a { padding: 6px 12px 6px 6px; gap: 10px; }
