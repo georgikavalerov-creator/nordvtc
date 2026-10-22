@@ -2618,3 +2618,13 @@ ol.steps > li::before { box-shadow: 0 6px 14px -8px var(--c2) !important; }
 .ck-row b { font-weight: 700; }
 .ck-row small, .ck-row span { font-weight: 400; }
 .ck-row > span:first-child > b { font-weight: 700; }
+
+/* Bloc 2 en mode nuit : le texte est blanc, donc nuage bleu nuit (au lieu du nuage blanc du mode jour) */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .story-copy::before {
+    background: radial-gradient(closest-side, rgba(4,8,22,.9) 0%, rgba(4,8,22,.84) 55%, rgba(4,8,22,.5) 78%, rgba(4,8,22,0) 100%);
+  }
+}
+:root[data-theme="dark"] .story-copy::before {
+  background: radial-gradient(closest-side, rgba(4,8,22,.9) 0%, rgba(4,8,22,.84) 55%, rgba(4,8,22,.5) 78%, rgba(4,8,22,0) 100%);
+}
