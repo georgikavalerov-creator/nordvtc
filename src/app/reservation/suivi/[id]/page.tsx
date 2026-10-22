@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import AutoRefresh from "@/components/AutoRefresh";
-import { fmtDate, STATUS } from "@/lib/account";
+import CancelTrip from "@/components/CancelTrip";
+import { cancelPolicy, fmtDate, STATUS } from "@/lib/account";
 import { docPath, verifyTrack } from "@/lib/docsign";
 import { euro } from "@/lib/pricing";
 import { db, dbConfigured } from "@/lib/supabase";
 import { getSiteSettings } from "@/lib/content";
+import { cancelByLink } from "./actions";
 
 export const metadata: Metadata = { title: "Suivi de ma réservation", robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
@@ -26,6 +28,7 @@ export default async function Suivi({ params, searchParams }: Props) {
   const st = STATUS[b.status] ?? { label: b.status, cls: "" };
   const rest = Math.max(0, b.price_cents - b.paid_cents);
   const pending = b.status === "pending_payment";
+  const pol = cancelPolicy(b.pickup_at, b.paid_cents);
   const phone = (await getSiteSettings()).driverPhone || process.env.DRIVER_PHONE || "";
   return (
     <section className="section">
@@ -55,12 +58,21 @@ export default async function Suivi({ params, searchParams }: Props) {
             Réglé en ligne : {euro(b.paid_cents)}{b.status === "confirmed" && rest > 0 ? ` · reste ${euro(rest)} à régler à bord` : ""}
           </p>
         </article>
-        <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 18 }}>
+        <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 18, alignItems: "flex-start" }}>
           {["confirmed", "completed"].includes(b.status) && (
             <Link href={docPath("bon", b.id)} className="btn">Bon de commande</Link>
           )}
-          <Link href="/contact" className="btn ghost">Modifier ou annuler</Link>
+          <Link href="/contact" className="btn ghost">Modifier ma réservation</Link>
+          {b.status === "confirmed" && pol.canCancel && (
+            <CancelTrip
+              id={b.id}
+              refundLabel={pol.refundCents > 0 ? euro(pol.refundCents) : null}
+              keptLabel={pol.keptCents > 0 ? euro(pol.keptCents) : null}
+              action={cancelByLink.bind(null, b.id, k as string)}
+            />
+          )}
         </div>
+        {b.status === "cancelled" && <p className="notice" role="status" style={{ marginTop: 14 }}>Cette réservation est annulée. Un e-mail de confirmation vous a été envoyé.</p>}
         <p className="muted" style={{ marginTop: 18, fontSize: ".9rem" }}>
           Conservez ce lien : il vous permet de retrouver votre réservation sans compte.
           {phone ? ` Une question ? Appelez le ${phone} ou répondez à l'e-mail de confirmation.` : " Une question ? Répondez à l'e-mail de confirmation."}

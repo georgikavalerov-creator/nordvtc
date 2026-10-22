@@ -3,7 +3,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { cancelBooking } from "@/app/compte/(espace)/actions";
 
-export default function CancelTrip({ id, refundLabel, keptLabel }: { id: string; refundLabel: string | null; keptLabel: string | null }) {
+export default function CancelTrip({ id, refundLabel, keptLabel, action }: { id: string; refundLabel: string | null; keptLabel: string | null; action?: () => Promise<{ ok?: boolean; error?: string }> }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [err, setErr] = useState("");
@@ -17,7 +17,7 @@ export default function CancelTrip({ id, refundLabel, keptLabel }: { id: string;
       </p>
       {err && <p className="error" role="alert">{err}</p>}
       <div className="trip-actions">
-        <button type="button" className="btn small danger" disabled={pending} onClick={() => start(async () => { const r = await cancelBooking(id); if (r.error) setErr(r.error); else router.refresh(); })}>{pending ? "Annulation…" : "Oui, annuler"}</button>
+        <button type="button" className="btn small danger" disabled={pending} onClick={() => start(async () => { const r = await (action ? action() : cancelBooking(id)); if (r.error) setErr(r.error); else router.refresh(); })}>{pending ? "Annulation…" : "Oui, annuler"}</button>
         <button type="button" className="btn small ghost" disabled={pending} onClick={() => { setOpen(false); setErr(""); }}>Garder ma réservation</button>
       </div>
     </div>

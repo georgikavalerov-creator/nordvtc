@@ -5,9 +5,7 @@ import { z } from "zod";
 import { currentUser, authClient } from "@/lib/auth";
 import { db, dbConfigured } from "@/lib/supabase";
 import { normalizePhone } from "@/lib/callback";
-import { cancelPolicy, fmtDate } from "@/lib/account";
-import { getStripe, stripeConfigured } from "@/lib/stripe";
-import { sendCancellationEmails } from "@/lib/mail";
+import { cancelBookingCore } from "@/lib/cancel";
 
 async function me() {
   const u = await currentUser();
@@ -83,36 +81,14 @@ export async function deleteAccount(f: FormData) {
   redirect("/?compte=supprime");
 }
 
-/** Annulation en un clic : rembourse via Stripe si la prise en charge est dans plus de 24 h. */
+/** Annulation en un clic depuis l'espace client (le compte doit être propriétaire de la réservation). */
 export async function cancelBooking(bookingId: string): Promise<{ ok?: boolean; error?: string; refunded?: number }> {
   const u = await me();
   if (!/^[0-9a-f-]{36}$/.test(bookingId)) return { error: "Réservation introuvable." };
-  const { data: b } = await db().from("bookings").select("*").eq("id", bookingId).maybeSingle();
+  const { data: b } = await db().from("bookings").select("id,user_id,customer_email").eq("id", bookingId).maybeSingle();
   const mine = b && (b.user_id === u.id || (u.email_confirmed_at && b.customer_email?.toLowerCase() === (u.email ?? "").toLowerCase()));
   if (!b || !mine) return { error: "Réservation introuvable." };
-  if (b.status !== "confirmed") return { error: "Cette réservation ne peut plus être annulée en ligne." };
-  const pol = cancelPolicy(b.pickup_at, b.paid_cents);
-  if (!pol.canCancel) return { error: "Le trajet a déjà commencé : contactez-nous." };
-  if (pol.refundCents > 0 && (!stripeConfigured() || !b.stripe_payment_intent)) return { error: "Remboursement automatique indisponible : contactez-nous, nous annulons et remboursons pour vous." };
-
-  // On « réserve » l'annulation d'abord (un double clic ne peut pas rembourser deux fois).
-  const { data: claimed } = await db().from("bookings")
-    .update({ status: "cancelled", cancelled_at: new Date().toISOString(), refunded_cents: pol.refundCents, user_id: u.id })
-    .eq("id", bookingId).eq("status", "confirmed").select("id").maybeSingle();
-  if (!claimed) return { error: "Cette réservation vient d'être modifiée." };
-
-  if (pol.refundCents > 0) {
-    try {
-      await getStripe().refunds.create({ payment_intent: b.stripe_payment_intent, amount: pol.refundCents, metadata: { booking_id: bookingId } }, { idempotencyKey: `cancel-${bookingId}` });
-    } catch (e) {
-      console.error("refund", e);
-      await db().from("bookings").update({ status: "confirmed", cancelled_at: null, refunded_cents: 0 }).eq("id", bookingId);
-      return { error: "Le remboursement a échoué : votre réservation est conservée. Contactez-nous." };
-    }
-  }
-  try {
-    await sendCancellationEmails({ id: b.id, name: b.customer_name, email: b.customer_email, originLabel: b.origin_label, destLabel: b.dest_label, pickupAtLocal: fmtDate(b.pickup_at), refundedCents: pol.refundCents, keptCents: pol.keptCents });
-  } catch (e) { console.error("cancel mail", e); }
-  revalidatePath("/compte", "layout");
-  return { ok: true, refunded: pol.refundCents };
+  const r = await cancelBookingCore(bookingId, u.id);
+  if (r.ok) revalidatePath("/compte", "layout");
+  return r;
 }
