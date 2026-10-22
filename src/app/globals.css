@@ -2485,3 +2485,5 @@ a.card.svc:hover .chip.chip-color { background: #fff; color: inherit; transform:
 /* Bouton « Voir mon prix » de fin d'animation : plus d'air au-dessus de la barre de progression */
 .chap .btn { margin-bottom: 26px; }
 @media (max-width: 900px) { .chap .btn { margin-top: 12px; margin-bottom: 30px; } }
+
+.story .cine-frame { display: none; }
