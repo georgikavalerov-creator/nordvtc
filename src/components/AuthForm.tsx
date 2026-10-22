@@ -18,8 +18,11 @@ export default function AuthForm({ next = "/compte", failed = false }: { next?: 
   const [error, setError] = useState(failed ? "La connexion a échoué ou le lien a expiré. Réessayez." : "");
   const redirectTo = () => `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`;
 
+  const [soon, setSoon] = useState(false);
   async function oauth(provider: "google" | "apple") {
     setError("");
+    if (provider === "apple") { setSoon(true); return; } // Apple : pas encore configuré
+    setSoon(false);
     const { error } = await browserClient().auth.signInWithOAuth({ provider, options: { redirectTo: redirectTo() } });
     if (error) setError("Connexion indisponible pour le moment.");
   }
@@ -68,6 +71,7 @@ export default function AuthForm({ next = "/compte", failed = false }: { next?: 
       <div className="auth-social">
         <button type="button" className="btn auth-btn" onClick={() => oauth("google")}>{G} Continuer avec Google</button>
         <button type="button" className="btn auth-btn apple" onClick={() => oauth("apple")}>{A} Continuer avec Apple</button>
+        {soon && <p className="notice" role="status" style={{ margin: 0 }}>La connexion avec Apple sera bientôt disponible. En attendant, utilisez Google ou votre adresse e-mail.</p>}
       </div>
       <p className="auth-or"><span>ou avec votre e-mail</span></p>
       <div className="acc-tabs" role="tablist" style={{ marginTop: 0 }}>
