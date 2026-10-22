@@ -14,15 +14,16 @@ import CtaTracker from "@/components/CtaTracker";
 import PricingFx from "@/components/PricingFx";
 import { THEME_INIT } from "@/components/ThemeToggle";
 import { SITE } from "@/lib/site";
+import { VILLES } from "@/lib/villes";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
   title: {
-    default: "Chauffeur privé à Lille : prix fixé, aéroport et gares | Nord VTC",
+    default: "VTC Lille : chauffeur privé à prix fixé, aéroport et gares | Nord VTC",
     template: "%s | Nord VTC",
   },
   description:
-    "Chauffeur privé à Lille : prix fixé avant la course, même chauffeur du début à la fin, suivi de vol. Aéroport de Lesquin, gares, Paris, Bruxelles.",
+    "VTC à Lille et dans la métropole : chauffeur privé, prix fixé avant la course, suivi de vol. Aéroport de Lille-Lesquin, gares, Paris, Bruxelles. Réservation en 3 minutes.",
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",
@@ -52,8 +53,15 @@ const localBusiness = {
     "Chauffeur privé (VTC) à Lille : transferts aéroport, gares et trajets longue distance sur réservation.",
   areaServed: [
     { "@type": "City", name: "Lille" },
+    ...VILLES.map((v) => ({ "@type": "City", name: v.name })),
     { "@type": "AdministrativeArea", name: "Métropole européenne de Lille" },
   ],
+  image: `${SITE.url}/opengraph-image`,
+  logo: `${SITE.url}/icon-512.png`,
+  hasMap: "https://www.google.com/maps/search/?api=1&query=Nord+VTC+Lesquin",
+  knowsLanguage: ["fr", "en"],
+  paymentAccepted: "Carte bancaire, Apple Pay, Google Pay, espèces",
+  currenciesAccepted: "EUR",
   ...(SITE.email ? { email: SITE.email } : {}),
   priceRange: "€€",
   address: { "@type": "PostalAddress", streetAddress: "2 rue Charles Devendeville", postalCode: "59810", addressLocality: "Lesquin", addressCountry: "FR" },

@@ -7,6 +7,7 @@ import { CONTENT } from "@/lib/service-content";
 import { SERVICES } from "@/lib/services";
 import { FORFAITS } from "@/lib/forfaits";
 import { CAR_PICS, SERVICE_PIC, imgThumb, srcSetOf } from "@/lib/images";
+import { VILLES } from "@/lib/villes";
 import Icon, { iconFor } from "@/components/Icon";
 import MapMount from "@/components/MapMount";
 import CineMount from "@/components/CineMount";
@@ -299,6 +300,12 @@ export default function Home() {
           <h2>Lille et sa métropole, mais aussi Paris, Bruxelles et le littoral</h2>
           <p className="muted prose">
             Lille, Roubaix, Tourcoing, Villeneuve-d'Ascq, La Madeleine, Lambersart, Lesquin, Seclin, Armentières et toute la métropole européenne de Lille. Au-delà : Lens, Arras, Valenciennes, Dunkerque, Le Touquet, ainsi que Paris, Bruxelles et les aéroports voisins.
+          </p>
+          <p className="chips" style={{ marginTop: 14 }}>
+            {VILLES.map((v) => (
+              <Link key={v.slug} href={`/vtc/${v.slug}`} className="chip">VTC {v.name}</Link>
+            ))}
+            <Link href="/vtc" className="chip">Toutes les villes →</Link>
           </p>
         </div>
       </section>
