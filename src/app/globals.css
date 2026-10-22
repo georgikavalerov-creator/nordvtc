@@ -1951,3 +1951,17 @@ html.in-app .hero.cine h1 { color: var(--app-navy); }
 .btn-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin-top: 18px; align-items: stretch; }
 .btn-row .btn { width: 100%; justify-content: center; text-align: center; box-sizing: border-box; }
 .btn-row .cancel-box { grid-column: 1 / -1; }
+
+/* Sélecteur d'heure (flèches, molette, glissement tactile) */
+.tf-label { font-size: .8rem; font-weight: 700; display: grid; gap: 5px; }
+.tf { display: flex; align-items: center; justify-content: center; gap: 4px; height: 46px; border: 1.5px solid var(--line); border-radius: 12px; background: #f3f3f3; padding: 0 6px; min-width: 0; }
+.tf[aria-invalid="true"] { border-color: #c4281c; background: #fff; }
+.tf:focus-within { border-color: var(--ink); background: #fff; }
+.tf b { font-size: 1.05rem; line-height: 1; }
+.tf-col { display: inline-flex; align-items: center; }
+.tf .tf-col input { width: 2.2ch !important; height: 30px !important; min-width: 0; padding: 0 !important; border: 0 !important; background: transparent !important; box-shadow: none !important; text-align: center; font-size: 1rem; font-weight: 600; touch-action: none; user-select: none; }
+.tf .tf-col input:focus { outline: none; }
+.tf-arrows { display: inline-flex; flex-direction: column; margin-left: 2px; }
+.tf-arrows button { all: unset; cursor: pointer; font-size: .55rem; line-height: 1; padding: 4px 5px; border-radius: 6px; color: var(--ink); opacity: .65; }
+.tf-arrows button:hover { opacity: 1; background: rgba(0,0,0,.08); }
+@media (pointer: coarse) { .tf { height: 52px; } .tf .tf-col input { width: 2.4ch !important; font-size: 1.15rem; height: 40px !important; } .tf-arrows button { padding: 6px 8px; } }

@@ -1,5 +1,6 @@
 "use client";
 
+import TimeField from "./TimeField";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { track } from "@/lib/track";
 import AddressField, { type Place } from "./AddressField";
@@ -209,7 +210,7 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
         requestAnimationFrame(() => {
           const el = formRef.current?.querySelector<HTMLElement>(e.origin || e.dest ? ".field-error" : ".when-error");
           el?.scrollIntoView({ behavior: "smooth", block: "center" });
-          if (!e.origin && !e.dest) formRef.current?.querySelector<HTMLInputElement>(date ? 'input[type="time"]' : 'input[type="date"]')?.focus();
+          if (!e.origin && !e.dest) formRef.current?.querySelector<HTMLInputElement>(date ? '.tf input' : 'input[type="date"]')?.focus();
           else formRef.current?.querySelector<HTMLInputElement>('input[aria-invalid="true"]')?.focus();
         });
         return;
@@ -275,10 +276,10 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
             Date
             <input type="date" required min={today()} value={date} onChange={(e) => { setDate(e.target.value); setErrors((x) => ({ ...x, when: undefined })); }} aria-invalid={!!errors.when && !date} />
           </label>
-          <label>
+          <div className="tf-label">
             Heure
-            <input type="time" required value={time} onChange={(e) => { setTime(e.target.value); setErrors((x) => ({ ...x, when: undefined })); }} aria-invalid={!!errors.when && !time} />
-          </label>
+            <TimeField value={time} invalid={!!errors.when && !time} onChange={(v) => { setTime(v); setErrors((x) => ({ ...x, when: undefined })); }} />
+          </div>
           <label>
             Passagers
             <select value={passengers} onChange={(e) => setPassengers(Number(e.target.value))}>
