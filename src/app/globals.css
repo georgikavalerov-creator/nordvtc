@@ -2322,3 +2322,7 @@ html:not(.in-app) .btn-arrow:active::after, html:not(.in-app) .quick-btn:active:
   .grid { gap: 10px; }
   .cta-band { padding: 22px 16px; }
 }
+/* Champ heure : la zone de saisie hérite du style « pastille » du site, on l'efface à l'intérieur du sélecteur */
+.form .pk-time input:not([type="checkbox"]):not([type="radio"]), .pk-time input:not([type="checkbox"]):not([type="radio"]) { all: unset; flex: 1 1 auto; width: 100% !important; min-width: 0 !important; height: auto !important; padding: 0 !important; margin: 0 !important; border: 0 !important; background: transparent !important; box-shadow: none !important; border-radius: 0 !important; font: inherit; font-size: 16px; font-weight: 600; color: inherit; cursor: text; }
+.pk-time { cursor: text; overflow: hidden; }
+.pk, .pk-field { min-width: 0; max-width: 100%; }
