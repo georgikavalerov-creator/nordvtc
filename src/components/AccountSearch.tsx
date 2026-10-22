@@ -19,7 +19,7 @@ export default function AccountSearch({ children }: { children?: ReactNode }) {
         router.push(`/reservation${q.toString() ? `?${q}` : ""}`);
       }}
     >
-      <h2>Où allez-vous ?</h2>
+      <h2>Réserver un nouveau trajet</h2>
       <AddressField label="" value={from} onChange={setFrom} placeholder="Départ" />
       <AddressField label="" value={to} onChange={setTo} placeholder="Destination" />
       <button className="btn" type="submit">Voir le prix</button>

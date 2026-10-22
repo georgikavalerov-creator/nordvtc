@@ -1,5 +1,6 @@
 import { deleteAccount } from "../actions";
 import { requireUser } from "@/lib/account";
+import Icon from "@/components/Icon";
 import FaceIdManager from "@/components/FaceIdManager";
 import { listPasskeys } from "@/lib/passkey";
 import { clientPkDelete, clientPkRegOptions, clientPkRegVerify } from "../actions";
@@ -15,13 +16,13 @@ export default async function Securite() {
       <h1 className="acc-title">Sécurité et confidentialité</h1>
       <h2 className="acc-h">Méthodes de connexion</h2>
       <ul className="place-list">
-        {providers.map((p) => <li key={p}><span aria-hidden="true">🔐</span><span><strong>{NAMES[p] ?? p}</strong><br /><span className="muted">{user.email}</span></span><span className="pill ok">Actif</span></li>)}
+        {providers.map((p) => <li key={p}><span className="place-ico" aria-hidden="true"><Icon name={p === "email" ? "mail" : "shield"} size={20} /></span><span><strong>{NAMES[p] ?? p}</strong><br /><span className="muted">{user.email}</span></span><span className="pill ok">Actif</span></li>)}
       </ul>
       <p style={{ marginTop: 14 }}><a className="btn ghost small" href="/compte/nouveau-mot-de-passe">Définir ou changer mon mot de passe</a></p>
       <form action="/auth/signout" method="post" style={{ marginTop: 14 }}><button className="btn ghost small">Se déconnecter</button></form>
 
       <h2 className="acc-h">Face ID</h2>
-      <FaceIdManager scope={`u-${user.id.slice(0, 8)}`} list={await listPasskeys(`user:${user.id}`)} getOptions={clientPkRegOptions} save={clientPkRegVerify} remove={clientPkDelete} />
+      <FaceIdManager scope={`u-${user.id.slice(0, 8)}`} list={await listPasskeys(`user:${user.id}`).catch(() => [])} getOptions={clientPkRegOptions} save={clientPkRegVerify} remove={clientPkDelete} />
 
       <h2 className="acc-h">Mes données</h2>
       <p className="muted">Téléchargez une copie de vos informations : profil, adresses enregistrées et réservations (format JSON).</p>

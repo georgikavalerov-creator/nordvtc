@@ -2,10 +2,11 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import AddressField, { type Place } from "./AddressField";
+import IconC from "./IconC";
 import { deletePlace, savePlace } from "@/app/compte/(espace)/actions";
 import type { SavedPlace } from "@/lib/account";
 
-const KINDS = { home: ["🏠", "Domicile"], work: ["💼", "Travail"], other: ["📍", "Autre"] } as const;
+const KINDS = { home: ["house", "Domicile"], work: ["briefcase", "Travail"], other: ["pin", "Autre"] } as const;
 
 export default function PlacesManager({ places }: { places: SavedPlace[] }) {
   const router = useRouter();
@@ -31,18 +32,18 @@ export default function PlacesManager({ places }: { places: SavedPlace[] }) {
       <ul className="place-list">
         {places.map((p) => (
           <li key={p.id}>
-            <span aria-hidden="true">{KINDS[p.kind][0]}</span>
+            <span className="place-ico" aria-hidden="true"><IconC name={KINDS[p.kind][0]} size={20} /></span>
             <span><strong>{p.label}</strong><br /><span className="muted">{p.address}</span></span>
             <button type="button" className="linklike" disabled={pending} onClick={() => start(async () => { await deletePlace(p.id); router.refresh(); })}>Supprimer</button>
           </li>
         ))}
-        {!places.length && <li className="muted">Aucune adresse enregistrée.</li>}
+        {!places.length && <li className="place-empty muted">Aucune adresse enregistrée pour l&apos;instant.</li>}
       </ul>
       <div className="callgate" style={{ marginTop: 18 }}>
         <h2 style={{ fontSize: "1.1rem" }}>Ajouter une adresse</h2>
         <div className="chips" style={{ marginBottom: 12 }}>
           {(Object.keys(KINDS) as (keyof typeof KINDS)[]).map((k) => (
-            <button key={k} type="button" className={`chip${kind === k ? " on" : ""}`} aria-pressed={kind === k} onClick={() => setKind(k)}>{KINDS[k][0]} {KINDS[k][1]}</button>
+            <button key={k} type="button" className={`chip${kind === k ? " on" : ""}`} aria-pressed={kind === k} onClick={() => setKind(k)}><IconC name={KINDS[k][0]} size={16} /> {KINDS[k][1]}</button>
           ))}
         </div>
         {kind === "other" && <label className="form" style={{ display: "block", marginBottom: 12 }}>Nom<input value={label} onChange={(e) => setLabel(e.target.value)} maxLength={40} placeholder="Parents, Salle de sport…" /></label>}

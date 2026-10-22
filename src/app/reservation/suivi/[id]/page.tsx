@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Route } from "@/components/TripCard";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import AutoRefresh from "@/components/AutoRefresh";
@@ -52,7 +53,7 @@ export default async function Suivi({ params, searchParams }: Props) {
             <strong>{fmtDate(b.pickup_at)}</strong>
             <span className={`pill ${st.cls}`}>{st.label}</span>
           </header>
-          <p className="trip-route"><span>{b.origin_label}</span><span aria-hidden="true">↓</span><span>{b.dest_label}</span></p>
+          <Route from={b.origin_label} to={b.dest_label} />
           <p className="muted" style={{ margin: "0 0 8px" }}>
             {b.passengers} passager{b.passengers > 1 ? "s" : ""} · {b.luggage} bagage{b.luggage > 1 ? "s" : ""}
             {b.child_seat ? " · siège enfant" : ""}{b.flight ? ` · ${b.flight}` : ""}

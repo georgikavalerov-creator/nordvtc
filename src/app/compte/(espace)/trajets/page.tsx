@@ -21,6 +21,7 @@ export default async function Trajets({ searchParams }: Props) {
   return (
     <>
       <h1 className="acc-title">Mes trajets</h1>
+      <p className="muted acc-lead">Vos réservations, leurs documents et leur suivi.</p>
       <div className="acc-tabs" role="tablist">
         {tabs.map(([k, l]) => <Link key={k} role="tab" aria-selected={k === key} className={k === key ? "on" : ""} href={`/compte/trajets?v=${k}`}>{l} <span>{groups[k].length}</span></Link>)}
       </div>

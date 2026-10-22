@@ -6,10 +6,10 @@ import CancelTrip from "@/components/CancelTrip";
 import ClaimCancel from "@/components/ClaimCancel";
 import { claimOpen, latestClaim } from "@/lib/claim";
 import { claimMine } from "@/app/compte/(espace)/actions";
-import { rebookHref, removable } from "@/components/TripCard";
+import { rebookHref, removable, Route } from "@/components/TripCard";
 import HideTrip from "@/components/HideTrip";
 import { cancelPolicy, fmtDate, requireUser, STATUS, userBooking } from "@/lib/account";
-import { db } from "@/lib/supabase";
+import { db, dbConfigured } from "@/lib/supabase";
 import { docPath } from "@/lib/docsign";
 import { euro } from "@/lib/pricing";
 
@@ -20,12 +20,12 @@ export default async function Detail({ params }: Props) {
   const { id } = await params;
   const user = await requireUser(`/compte/trajets/${id}`);
   const b = await userBooking(user, id);
-  const claim = b ? await latestClaim(b.id) : null;
+  const claim = b ? await latestClaim(b.id).catch(() => null) : null;
   if (!b) notFound();
   const st = STATUS[b.status] ?? { label: b.status, cls: "" };
   const pol = cancelPolicy(b.pickup_at, b.paid_cents, b.price_cents);
   const rest = Math.max(0, b.price_cents - b.paid_cents);
-  const { data: rating } = await db().from("trip_ratings").select("stars,comment").eq("booking_id", b.id).maybeSingle();
+  const { data: rating } = dbConfigured() ? await db().from("trip_ratings").select("stars,comment").eq("booking_id", b.id).maybeSingle() : { data: null };
   const steps = [
     { l: "Réservation enregistrée", d: fmtDate(b.created_at), on: true },
     { l: "Paiement reçu", d: b.paid_at ? fmtDate(b.paid_at) : "", on: b.paid_cents > 0 },
@@ -41,7 +41,7 @@ export default async function Detail({ params }: Props) {
         <span className={`pill ${st.cls}`}>{st.label}</span>
       </div>
       <div className="trip-card">
-        <p className="trip-route"><span>{b.origin_label}</span><span aria-hidden="true">↓</span><span>{b.dest_label}</span></p>
+        <Route from={b.origin_label} to={b.dest_label} />
         <p className="muted trip-meta">{(b.distance_m / 1000).toFixed(0)} km · environ {Math.round(b.duration_s / 60)} min · {b.passengers} passager{b.passengers > 1 ? "s" : ""} · {b.luggage} bagage{b.luggage > 1 ? "s" : ""}{b.child_seat ? " · siège enfant" : ""}{b.flight ? ` · ${b.flight}` : ""}</p>
         {b.notes && <p className="muted trip-meta">Note : {b.notes}</p>}
       </div>
