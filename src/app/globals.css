@@ -2233,3 +2233,6 @@ html body .btn.is-pressed::before, html body .btn:active::before { transform: tr
 /* Mode nuit : la page est inversée globalement, le bleu de base y devient automatiquement clair. */
 /* Titres de section : apparition plus rapide et sans flou (lisibles dès qu'ils arrivent à l'écran) */
 .fx-on .section-head { opacity: clamp(.35, calc(var(--enter) * 1.8), 1); transform: translate3d(0, calc((1 - min(1, var(--enter) * 1.6)) * 24px), 0); filter: none; }
+.cta-actions { align-items: center; }
+.cta-actions .btn { margin: 0 !important; border: 2px solid transparent; }
+.cta-actions .btn.ghost-light { border-color: rgba(255,255,255,.55); }
