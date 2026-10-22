@@ -2414,3 +2414,15 @@ html:not(.in-app) .btn-arrow:active::after, html:not(.in-app) .quick-btn:active:
   .hero.cine > .wrap { padding-bottom: 40px; }
   .btn { padding-left: 18px; padding-right: 18px; }
 }
+
+/* Bloc 2 (trajet sur la carte) : nuage doux sous le texte pour le détacher de la carte */
+.story-copy::before {
+  content: ""; position: absolute; z-index: -1; pointer-events: none;
+  inset: -90px -120px -90px -140px;
+  background: radial-gradient(closest-side, rgba(246,248,255,.94) 0%, rgba(246,248,255,.86) 52%, rgba(246,248,255,.5) 76%, rgba(246,248,255,0) 100%);
+  -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px);
+  -webkit-mask-image: radial-gradient(closest-side, #000 62%, transparent 100%); mask-image: radial-gradient(closest-side, #000 62%, transparent 100%);
+}
+@media (max-width: 900px) {
+  .story-copy::before { inset: -70px -60px -40px -60px; }
+}
