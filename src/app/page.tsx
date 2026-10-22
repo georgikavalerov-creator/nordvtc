@@ -16,6 +16,7 @@ import Icon, { iconFor } from "@/components/Icon";
 import MapMount from "@/components/MapMount";
 import CineMount from "@/components/CineMount";
 import HeroPass from "@/components/HeroPass";
+import { RATING, RIDES } from "@/components/RatingBadge";
 import HeroBooking from "@/components/HeroBooking";
 import Reveal from "@/components/Reveal";
 import OnBoard from "@/components/OnBoard";
@@ -92,7 +93,8 @@ export default function Home() {
         <div className="cine-stats">
           <div><small>Prix</small><b>Figé</b></div>
           <div><small>Annulation</small><b>Gratuite 24 h</b></div>
-          <div><small>Chauffeur</small><b>Le même</b></div>
+          <div className="cs-rate"><small>Note passagers</small><b>{RATING}<span>/5</span> <i aria-hidden="true">★</i></b></div>
+          <div className="cs-rate"><small>Courses réalisées</small><b>{RIDES}+</b></div>
         </div>
       </section>
 

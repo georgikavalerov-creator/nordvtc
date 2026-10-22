@@ -1,6 +1,5 @@
 "use client";
 import { useState } from "react";
-import RatingBadge from "@/components/RatingBadge";
 import { useRouter } from "next/navigation";
 import AddressField, { type Place } from "./AddressField";
 
@@ -30,10 +29,7 @@ export default function HeroBooking() {
           <AddressField label="" value={to} onChange={setTo} placeholder="Destination (gare, aéroport, adresse)" />
         </div>
       </div>
-      <div className="quick-row">
-        <button type="submit" className="btn quick-btn btn-arrow">Voir mon prix</button>
-        <RatingBadge className="rb-hero" />
-      </div>
+      <button type="submit" className="btn quick-btn btn-arrow">Voir mon prix</button>
       <p className="quick-note">Gratuit · sans compte · prix ferme avant de payer</p>
     </form>
   );

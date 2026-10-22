@@ -35,7 +35,6 @@ export default async function ReservationPage({ searchParams }: Props) {
           </div>
           <aside className="reassure">
             <h2>Réservez l'esprit tranquille</h2>
-            <RatingBadge className="rb-aside" />
             <ul>
               <li><Icon name="euro" size={20} /><span><strong>Prix ferme</strong>Le montant affiché est le prix total de la course, sans supplément caché.</span></li>
               <li><Icon name="lock" size={20} /><span><strong>Acompte sécurisé</strong>Paiement par carte sur la page sécurisée de Stripe. Aucune donnée bancaire ne transite par ce site.</span></li>
@@ -43,6 +42,7 @@ export default async function ReservationPage({ searchParams }: Props) {
               <li><Icon name="mail" size={20} /><span><strong>Confirmation immédiate</strong>Récapitulatif envoyé par e-mail dès le paiement.</span></li>
               <li><Icon name="plane" size={20} /><span><strong>Vol ou train suivi</strong>L'heure de prise en charge s'adapte au retard.</span></li>
             </ul>
+            <RatingBadge className="rb-aside" />
             <PaymentBadges />
             <p className="reassure-phone">Une question ? <a href="/contact#appel">Appeler ou être rappelé</a></p>
           </aside>

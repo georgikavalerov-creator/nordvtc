@@ -5,9 +5,16 @@ export const RATING = "4,98";
 
 export default function RatingBadge({ className = "" }: { className?: string }) {
   return (
-    <p className={`rating-badge ${className}`}>
-      <span className="rb-score"><span className="rb-stars" aria-hidden="true">★★★★★</span><strong>{RATING}/5</strong></span>
-      <span className="rb-text">plus de {RIDES} courses réalisées sur les applications VTC</span>
-    </p>
+    <div className={`rating-badge ${className}`} role="note" aria-label={`Note moyenne ${RATING} sur 5, plus de ${RIDES} courses réalisées sur les applications VTC`}>
+      <div className="rb-col">
+        <span className="rb-big">{RATING}<small>/5</small></span>
+        <span className="rb-stars" aria-hidden="true">★★★★★</span>
+      </div>
+      <span className="rb-div" aria-hidden="true" />
+      <div className="rb-col">
+        <span className="rb-big">{RIDES}<small>+</small></span>
+        <span className="rb-cap">courses sur les applis VTC</span>
+      </div>
+    </div>
   );
 }
