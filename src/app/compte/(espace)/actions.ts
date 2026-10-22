@@ -8,6 +8,11 @@ import { normalizePhone } from "@/lib/callback";
 import { submitClaimCore } from "@/lib/claim";
 import { cancelBookingCore } from "@/lib/cancel";
 import { checkPhoto } from "@/lib/photo";
+import { headers } from "next/headers";
+import { deletePasskey, loginOptions, loginVerify, registrationOptions, registrationVerify } from "@/lib/passkey";
+import type { AuthenticationResponseJSON, RegistrationResponseJSON } from "@simplewebauthn/server";
+import { ipFrom } from "@/lib/ratelimit";
+import { guard } from "@/lib/security-log";
 
 async function me() {
   const u = await currentUser();
@@ -139,4 +144,43 @@ export async function hideTrips(ids: string[]): Promise<{ ok?: boolean; error?: 
   if (error) return { error: "Suppression impossible." };
   revalidatePath("/compte", "layout");
   return { ok: true, count: allowed.length };
+}
+
+// ---------- Face ID / clé d'accès (espace client) ----------
+export async function clientPkRegOptions() {
+  const u = await me();
+  return registrationOptions(`user:${u.id}`, u.email ?? u.id, u.email ?? "Client Nord VTC");
+}
+export async function clientPkRegVerify(resp: RegistrationResponseJSON, name: string) {
+  const u = await me();
+  const r = await registrationVerify(`user:${u.id}`, resp, name);
+  revalidatePath("/compte", "layout");
+  return r;
+}
+export async function clientPkDelete(id: string) {
+  const u = await me();
+  await deletePasskey(`user:${u.id}`, id);
+  revalidatePath("/compte", "layout");
+  return { ok: true };
+}
+export async function clientPkLoginOptions() {
+  const ip = ipFrom(await headers());
+  if (!(await guard(undefined, `user-pk:${ip}`, 15, 15 * 60_000))) throw new Error("Trop de tentatives. Réessayez plus tard.");
+  return loginOptions("user");
+}
+/** Connexion par Face ID : la clé est vérifiée, puis une session Supabase est ouverte pour ce compte. */
+export async function clientPkLogin(resp: AuthenticationResponseJSON): Promise<{ ok?: boolean; error?: string }> {
+  const owner = await loginVerify("user", resp).catch(() => null);
+  const uid = owner?.startsWith("user:") ? owner.slice(5) : null;
+  if (!uid) return { error: "Face ID non reconnu pour cet appareil. Connectez-vous autrement, puis activez Face ID dans Sécurité." };
+  try {
+    const { data: got } = await db().auth.admin.getUserById(uid);
+    const email = got.user?.email;
+    if (!email) return { error: "Compte introuvable." };
+    const { data: link, error } = await db().auth.admin.generateLink({ type: "magiclink", email });
+    if (error || !link.properties?.hashed_token) return { error: "Connexion impossible pour le moment." };
+    const { error: e2 } = await (await authClient()).auth.verifyOtp({ type: "magiclink", token_hash: link.properties.hashed_token });
+    if (e2) return { error: "Connexion impossible pour le moment." };
+    return { ok: true };
+  } catch { return { error: "Connexion impossible pour le moment." }; }
 }

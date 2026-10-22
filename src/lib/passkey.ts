@@ -83,7 +83,8 @@ export async function registrationVerify(owner: string, response: RegistrationRe
 }
 
 /** Étape 1 de la connexion : défi à signer (l'appareil propose la bonne clé). */
-export async function loginOptions(purpose: "admin" | "driver") {
+export type PkPurpose = "admin" | "driver" | "user";
+export async function loginOptions(purpose: PkPurpose) {
   const { rpID } = await rp();
   const opts = await generateAuthenticationOptions({ rpID, userVerification: "required" });
   await keepChallenge(`auth-${purpose}`, opts.challenge);
@@ -91,13 +92,13 @@ export async function loginOptions(purpose: "admin" | "driver") {
 }
 
 /** Étape 2 : vérifie la signature ; renvoie le propriétaire de la clé si tout est valide. */
-export async function loginVerify(purpose: "admin" | "driver", response: AuthenticationResponseJSON): Promise<string | null> {
+export async function loginVerify(purpose: PkPurpose, response: AuthenticationResponseJSON): Promise<string | null> {
   const { rpID, origin } = await rp();
   const challenge = await takeChallenge(`auth-${purpose}`);
   if (!challenge || typeof response?.id !== "string") return null;
   const { data: row } = await db().from("passkeys").select("id,owner,public_key,counter,transports").eq("id", response.id).maybeSingle();
   if (!row) return null;
-  if (purpose === "admin" ? row.owner !== "admin" : !String(row.owner).startsWith("driver:")) return null;
+  if (purpose === "admin" ? row.owner !== "admin" : !String(row.owner).startsWith(`${purpose}:`)) return null;
   try {
     const v = await verifyAuthenticationResponse({
       response, expectedChallenge: challenge, expectedOrigin: origin, expectedRPID: rpID, requireUserVerification: true,

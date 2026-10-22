@@ -1,5 +1,8 @@
 import { deleteAccount } from "../actions";
 import { requireUser } from "@/lib/account";
+import FaceIdManager from "@/components/FaceIdManager";
+import { listPasskeys } from "@/lib/passkey";
+import { clientPkDelete, clientPkRegOptions, clientPkRegVerify } from "../actions";
 
 export const metadata = { title: "Sécurité et confidentialité" };
 const NAMES: Record<string, string> = { google: "Google", apple: "Apple", email: "Lien par e-mail" };
@@ -16,6 +19,9 @@ export default async function Securite() {
       </ul>
       <p style={{ marginTop: 14 }}><a className="btn ghost small" href="/compte/nouveau-mot-de-passe">Définir ou changer mon mot de passe</a></p>
       <form action="/auth/signout" method="post" style={{ marginTop: 14 }}><button className="btn ghost small">Se déconnecter</button></form>
+
+      <h2 className="acc-h">Face ID</h2>
+      <FaceIdManager list={await listPasskeys(`user:${user.id}`)} getOptions={clientPkRegOptions} save={clientPkRegVerify} remove={clientPkDelete} />
 
       <h2 className="acc-h">Mes données</h2>
       <p className="muted">Téléchargez une copie de vos informations : profil, adresses enregistrées et réservations (format JSON).</p>

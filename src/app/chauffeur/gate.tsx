@@ -4,6 +4,9 @@ import { dbConfigured } from "@/lib/supabase";
 import { logoutDriver } from "./actions";
 import { DriverLogin } from "./Forms";
 import DriverNav from "./DriverNav";
+import FaceIdPrompt from "@/components/FaceIdPrompt";
+import { listPasskeys } from "@/lib/passkey";
+import { driverPkRegOptions, driverPkRegVerify } from "./actions";
 
 export async function DriverPage({ title, children }: { title: string; children: (d: Driver) => ReactNode }) {
   const d = await currentDriver();
@@ -27,6 +30,7 @@ export async function DriverPage({ title, children }: { title: string; children:
           </div>
           <form action={logoutDriver}><button className="btn ghost small">Se déconnecter ({d.name.split(" ")[0]})</button></form>
         </div>
+        <FaceIdPrompt count={(await listPasskeys(`driver:${d.id}`).catch(() => [])).length} getOptions={driverPkRegOptions} save={driverPkRegVerify} storeKey={`d-${d.id.slice(0, 8)}`} />
         <DriverNav />
         {children(d)}
       </div>

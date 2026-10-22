@@ -6,6 +6,9 @@ import LoginForm from "./LoginForm";
 import AdminNav from "./AdminNav";
 import AdminChatWatch from "./AdminChatWatch";
 import { adminUnread } from "@/lib/chat-unread";
+import FaceIdPrompt from "@/components/FaceIdPrompt";
+import { listPasskeys } from "@/lib/passkey";
+import { adminPkRegOptions, adminPkRegVerify } from "./actions";
 
 // Cadre commun des pages d'administration : vérifie la session, affiche le menu.
 // Usage : return <AdminPage title="…">…</AdminPage> ; si non connecté, la page de connexion s'affiche à la place.
@@ -34,6 +37,7 @@ export async function AdminPage({ title, children, actions }: { title: string; c
             <form action={logout}><button className="btn ghost small">Se déconnecter</button></form>
           </div>
         </div>
+        <FaceIdPrompt count={(await listPasskeys("admin").catch(() => [])).length} getOptions={adminPkRegOptions} save={adminPkRegVerify} storeKey="admin" />
         <AdminNav />
         <AdminChatWatch initial={await adminUnread().catch(() => ({ count: 0, messages: 0, latest: null }))} />
         {children}

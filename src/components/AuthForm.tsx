@@ -2,6 +2,8 @@
 import { useState } from "react";
 import { browserClient } from "@/lib/supabase-browser";
 import PasswordMeter from "./PasswordMeter";
+import FaceIdLogin from "./FaceIdLogin";
+import { clientPkLogin, clientPkLoginOptions } from "@/app/compte/(espace)/actions";
 
 const G = (<svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.1 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.4c-.5 2.9-2.2 5.3-4.6 6.9l7.4 5.7c4.3-4 6.9-9.9 6.9-17.1z"/><path fill="#FBBC05" d="M10.5 28.7a14.5 14.5 0 0 1 0-9.4l-7.9-6.1a24 24 0 0 0 0 21.6l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.4-5.7c-2 1.4-4.9 2.3-8.5 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg>);
 const A = (<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 12.7c0-2.5 2-3.7 2.1-3.8-1.2-1.7-3-1.9-3.6-2-1.5-.2-3 .9-3.8.9s-2-.9-3.2-.9c-1.7 0-3.2 1-4.1 2.4-1.7 3-.4 7.500 1.300 9.900.8 1.200 1.800 2.500 3.100 2.500 1.200 0 1.700-.8 3.200-.8s1.900.8 3.200.8c1.300 0 2.200-1.200 3-2.400.9-1.400 1.300-2.700 1.300-2.800-.1 0-2.500-1-2.500-3.800zM14 5.200c.7-.8 1.100-1.900 1-3-1 0-2.200.7-2.900 1.500-.6.700-1.200 1.900-1 3 1.100.1 2.200-.6 2.900-1.500z"/></svg>);
@@ -68,6 +70,7 @@ export default function AuthForm({ next = "/compte", failed = false }: { next?: 
   );
   return (
     <div className="callgate authbox">
+      <FaceIdLogin getOptions={clientPkLoginOptions} verify={clientPkLogin} next={next} />
       <div className="auth-social">
         <button type="button" className="btn auth-btn" onClick={() => oauth("google")}>{G} Continuer avec Google</button>
         <button type="button" className="btn auth-btn apple" onClick={() => oauth("apple")}>{A} Continuer avec Apple</button>

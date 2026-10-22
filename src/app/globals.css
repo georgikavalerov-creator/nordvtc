@@ -2901,3 +2901,10 @@ h2.bk-sub::before { content: ""; width: 4px; height: 1.1em; border-radius: 4px; 
 .faceid-list li { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; background: #f6f7fb; }
 .faceid-list li span { display: grid; gap: 2px; }
 .faceid-list small { font-size: .8rem; }
+.faceid-prompt { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 18px; background: linear-gradient(135deg, rgba(31,91,255,.10), rgba(124,58,237,.10)); border: 1px solid rgba(31,91,255,.25); margin-bottom: 4px; }
+.faceid-prompt-txt { flex: 1; display: grid; gap: 2px; min-width: 0; }
+.faceid-prompt-txt span { font-size: .88rem; color: #4a5370; }
+.faceid-prompt-msg { color: #1f5bff !important; font-weight: 600; }
+.faceid-prompt-act { display: grid; gap: 6px; justify-items: center; }
+.faceid-prompt .faceid-btn { width: auto; min-width: 96px; }
+@media (max-width: 520px) { .faceid-prompt { flex-wrap: wrap; } .faceid-prompt-act { width: 100%; grid-template-columns: 1fr auto; align-items: center; } .faceid-prompt .faceid-btn { width: 100%; } }
