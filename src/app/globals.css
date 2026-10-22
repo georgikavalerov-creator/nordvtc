@@ -2005,3 +2005,11 @@ html.in-app .hero.cine h1 { color: var(--app-navy); }
   .site-footer ul { gap: 2px; }
   .site-footer ul a, .footer-legal a { display: inline-flex; align-items: center; min-height: 40px; padding: 4px 0; }
 }
+
+/* Reflet des boutons animé par transform (et non left) : aucun recalcul de mise en page, pas de décalage (CLS). */
+.btn:not(.danger):not(.disabled):not([disabled])::before, .pricing .btn::before { left: 0 !important; transform: translateX(-170%) skewX(-18deg); }
+@keyframes cineShine { 0% { transform: translateX(-170%) skewX(-18deg); } 55%, 100% { transform: translateX(290%) skewX(-18deg); } }
+@media (hover: hover) {
+  .btn:not(.danger):not(.disabled):not([disabled]):hover::before, .pricing:hover .btn::before { transform: translateX(270%) skewX(-18deg); transition: transform .7s ease; }
+}
+html body .btn.is-pressed::before, html body .btn:active::before { transform: translateX(270%) skewX(-18deg); transition: transform .6s ease; }

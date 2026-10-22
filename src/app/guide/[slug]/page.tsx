@@ -19,9 +19,10 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const p = await findPost((await params).slug);
   if (!p) return {};
+  const description = p.description.length > 160 ? `${p.description.slice(0, 155).replace(/\s+\S*$/, "")}…` : p.description;
   return {
-    title: p.title,
-    description: p.description,
+    title: { absolute: p.title.length > 52 ? p.title : `${p.title} | ${SITE.name}` },
+    description,
     alternates: { canonical: `/guide/${p.slug}` },
     openGraph: { title: p.title, description: p.description, url: `${SITE.url}/guide/${p.slug}`, type: "article", locale: "fr_FR", siteName: SITE.name, publishedTime: p.date, images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: p.title }] },
     twitter: { card: "summary_large_image", title: p.title, description: p.description },

@@ -5,7 +5,7 @@ import { SITE } from "@/lib/site";
 import { VILLES } from "@/lib/villes";
 
 export const metadata: Metadata = {
-  title: "VTC dans la métropole lilloise : villes desservies et prix",
+  title: "VTC métropole lilloise : villes et prix",
   description: "Chauffeur privé à Lille, Roubaix, Tourcoing, Villeneuve-d'Ascq, Marcq-en-Barœul, Lesquin et toute la métropole : prix fixé, aéroport, gares, Paris, Bruxelles.",
   alternates: { canonical: "/vtc" },
 };

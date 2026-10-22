@@ -170,9 +170,13 @@ export function mountCine(root) {
     }
   }
 
+  let last = 0;
   function frame(now) {
     raf = 0;
     if (!visible) return;
+    // Téléphones : 30 images/s suffisent et soulagent le processeur (batterie, réactivité).
+    if (coarse && now - last < 32) { raf = requestAnimationFrame(frame); return; }
+    last = now;
     draw(now);
     if (!reduce) raf = requestAnimationFrame(frame);
   }

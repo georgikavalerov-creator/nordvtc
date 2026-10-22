@@ -19,11 +19,11 @@ import { VILLES } from "@/lib/villes";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
   title: {
-    default: "VTC Lille : chauffeur privé à prix fixé, aéroport et gares | Nord VTC",
+    default: "VTC Lille : chauffeur privé, aéroport et gares | Nord VTC",
     template: "%s | Nord VTC",
   },
   description:
-    "VTC à Lille et dans la métropole : chauffeur privé, prix fixé avant la course, suivi de vol. Aéroport de Lille-Lesquin, gares, Paris, Bruxelles. Réservation en 3 minutes.",
+    "VTC à Lille et dans la métropole : chauffeur privé à prix fixé, suivi de vol. Aéroport de Lille-Lesquin, gares, Paris, Bruxelles. Réservation en 3 minutes.",
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",

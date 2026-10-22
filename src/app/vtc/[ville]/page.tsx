@@ -18,8 +18,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const v = getVille((await params).ville);
   if (!v) return {};
   const cheapest = Math.min(...v.routes.map((r) => r.price));
-  const title = `VTC ${v.name} : chauffeur privé, aéroport et gares dès ${cheapest} €`;
-  const description = `Chauffeur privé ${v.inName} : prix fixé avant la course, aéroport de Lille-Lesquin, gares de Lille, Paris et Bruxelles. Réservation en ligne en 3 minutes, annulation gratuite 24 h avant.`;
+  const title = `VTC ${v.name} : chauffeur privé dès ${cheapest} €`;
+  const description = `Chauffeur privé ${v.inName} à prix fixé : aéroport de Lille-Lesquin, gares de Lille, Paris, Bruxelles. Réservation en 3 min, annulation gratuite.`;
   return {
     title,
     description,
