@@ -8,7 +8,7 @@ import { sendClaimDecision, sendClaimReceived } from "@/lib/mail";
 
 export type Claim = { id: string; booking_id: string; created_at: string; kind: "train" | "avion"; file_path: string; note: string | null; status: "pending" | "accepted" | "refused" };
 
-const MAX = 5 * 1024 * 1024;
+const MAX = 10 * 1024 * 1024;
 const TYPES: Record<string, string> = { "application/pdf": "pdf", "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/heic": "heic", "image/heif": "heif" };
 const BUCKET = "justificatifs";
 
@@ -33,7 +33,7 @@ export async function submitClaimCore(bookingId: string, form: FormData): Promis
   if (!(file instanceof File) || file.size === 0) return { error: "Ajoutez le justificatif d'annulation (photo ou PDF)." };
   const ext = TYPES[file.type];
   if (!ext) return { error: "Format accepté : PDF, JPG, PNG ou photo du téléphone." };
-  if (file.size > MAX) return { error: "Fichier trop lourd (5 Mo maximum)." };
+  if (file.size > MAX) return { error: "Fichier trop lourd (10 Mo maximum)." };
   const note = String(form.get("note") ?? "").trim().slice(0, 500) || null;
 
   const path = `${bookingId}/${Date.now()}.${ext}`;

@@ -33,7 +33,7 @@ export default function ClaimCancel({ action, status }: { action: (prev: R, form
         <label className="chip"><input type="radio" name="kind" value="avion" required /> ✈ Mon vol</label>
       </fieldset>
       <label>
-        Justificatif (PDF ou photo, 5 Mo max)
+        Justificatif (PDF ou photo, 10 Mo max)
         <input type="file" name="file" required accept="application/pdf,image/*" />
       </label>
       <label>

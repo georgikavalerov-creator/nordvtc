@@ -13,7 +13,7 @@ create index if not exists cancel_claims_booking_idx on public.cancel_claims(boo
 create index if not exists cancel_claims_pending_idx on public.cancel_claims(status) where status = 'pending';
 alter table public.cancel_claims enable row level security; -- accès uniquement côté serveur (service_role)
 
--- Espace de stockage privé pour les justificatifs (5 Mo max, images et PDF).
+-- Espace de stockage privé pour les justificatifs (10 Mo max, images et PDF).
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
-values ('justificatifs', 'justificatifs', false, 5242880, array['application/pdf','image/jpeg','image/png','image/webp','image/heic','image/heif'])
+values ('justificatifs', 'justificatifs', false, 10485760, array['application/pdf','image/jpeg','image/png','image/webp','image/heic','image/heif'])
 on conflict (id) do nothing;
