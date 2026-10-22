@@ -75,7 +75,7 @@ export async function adminReply(threadId: string, body: string) {
   await db().from("chat_threads").update({ last_admin_at: now, admin_seen_at: now }).eq("id", threadId);
   const away = Date.now() - new Date(t.visitor_seen_at).getTime() > 90_000;
   if (away && t.visitor_email) {
-    await sendChatReplyNotice({ email: t.visitor_email, name: t.visitor_name, body, url: `${SITE.url}/?chat=${threadId}.${resumeKey(threadId)}` }).catch((e) => console.error("chat reply mail", e));
+    await sendChatReplyNotice({ threadId, email: t.visitor_email, name: t.visitor_name, body, url: `${SITE.url}/?chat=${threadId}.${resumeKey(threadId)}` }).catch((e) => console.error("chat reply mail", e));
   }
   return { ok: true };
 }

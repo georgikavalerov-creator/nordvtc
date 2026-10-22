@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { Resend } from "resend";
+import { sendContactNotice } from "@/lib/mail";
 import { allow, clientIp } from "@/lib/ratelimit";
-import { SITE } from "@/lib/site";
 
 const schema = z.object({
   name: z.string().trim().min(2).max(100),
@@ -13,8 +12,6 @@ const schema = z.object({
   website: z.string().max(0).optional(), // champ piège anti-robots : doit rester vide
 });
 
-const esc = (s: string) =>
-  s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 
 export async function POST(req: Request) {
   if (!allow(`contact:${clientIp(req)}`, 5, 10 * 60_000)) {
@@ -30,15 +27,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Le formulaire n'est pas encore actif. Merci d'appeler ou d'écrire directement." }, { status: 503 });
   }
   try {
-    await new Resend(key).emails.send({
-      from: process.env.MAIL_FROM ?? `${SITE.name} <onboarding@resend.dev>`,
-      to,
-      replyTo: d.email,
-      subject: `Contact — ${d.subject || "demande"} (${d.name})`,
-      html: `<p><strong>${esc(d.name)}</strong> — ${esc(d.email)}${d.phone ? ` — ${esc(d.phone)}` : ""}</p>
-             <p><strong>Sujet</strong> ${esc(d.subject || "—")}</p>
-             <p>${esc(d.message).replace(/\n/g, "<br>")}</p>`,
-    });
+    await sendContactNotice(d);
     return NextResponse.json({ ok: true });
   } catch (e) {
     console.error("contact", e);

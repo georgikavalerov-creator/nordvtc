@@ -58,6 +58,8 @@ export async function POST(req: Request) {
               originLabel: b.origin_label,
               destLabel: b.dest_label,
               pickupAtLocal: when,
+              pickupIso: b.pickup_at,
+              durationS: b.duration_s,
               passengers: b.passengers,
               luggage: b.luggage,
               childSeat: b.child_seat,
