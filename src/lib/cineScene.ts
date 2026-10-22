@@ -13,7 +13,7 @@ export function mountCine(root) {
   const num = root.querySelector(".story-num");
   const xmin = parseFloat(root.dataset.xmin || "0.40");
   const MONO = "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
-  let W = 0, H = 0, dpr = 1, visible = true, raf = 0, parts = [], routes = [], mx = 0.5, my = 0.5, glow = null, GM = 0;
+  let W = 0, H = 0, dpr = 1, visible = true, raf = 0, parts = [], routes = [], mx = 0.5, my = 0.5;
   const t0 = performance.now();
   let chap = -1, chapStart = 0;
 
@@ -35,14 +35,8 @@ export function mountCine(root) {
     W = Math.max(1, Math.round(r.width * dpr));
     H = Math.max(1, Math.round(r.height * dpr));
     canvas.width = W; canvas.height = H;
-    GM = Math.round(24 * dpr);
-    glow = document.createElement("canvas");
-    const gw = Math.max(1, Math.round((W + 2 * GM) / 4)), gh = Math.max(1, Math.round((H + 2 * GM) / 4));
-    glow.width = gw; glow.height = gh;
-    const gx = glow.getContext("2d"), cxg = ((W * 0.72 + GM) / (W + 2 * GM)) * gw, cyg = ((H * 0.4 + GM) / (H + 2 * GM)) * gh;
-    const gg = gx.createRadialGradient(cxg, cyg, 0, cxg, cyg, (Math.max(W, H) * 0.6) / 4);
-    gg.addColorStop(0, "rgba(70,110,255,.20)"); gg.addColorStop(1, "rgba(70,110,255,0)");
-    gx.fillStyle = gg; gx.fillRect(0, 0, gw, gh);
+    // Lueur d'ambiance en fond CSS (peinte une seule fois par le navigateur, au lieu de chaque image)
+    canvas.style.background = "radial-gradient(circle " + Math.round(Math.max(r.width, r.height) * 0.6) + "px at 72% 40%, rgba(70,110,255,.20), rgba(70,110,255,0))";
     const portrait = r.width < r.height * 0.9;
     // coordonnées normalisées → zone utile (à droite du texte sur grand écran, en haut sur mobile)
     const map = portrait ? (p) => [0.08 + 0.84 * p[0], 0.06 + 0.46 * p[1]] : (p) => [xmin + (0.96 - xmin) * p[0], 0.10 + 0.78 * p[1]];
@@ -94,8 +88,6 @@ export function mountCine(root) {
     const main = routes[0], hi = clamp(Math.floor(clamp(p.head, 0, 1) * (main.length - 1)), 0, main.length - 1);
     const headU = clamp(p.head, 0, 1);
 
-    // lueur d'ambiance : dégradé pré-calculé en basse résolution (identique à l'œil), simplement recopié à chaque image
-    if (glow) ctx.drawImage(glow, -GM + px, -GM + py, W + 2 * GM, H + 2 * GM);
 
     // traits fins des routes
     for (let r = 0; r < routes.length; r++) {
