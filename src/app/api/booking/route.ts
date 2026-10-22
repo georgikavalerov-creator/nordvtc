@@ -4,6 +4,7 @@ import { routeSummary } from "@/lib/here";
 import { computeQuote, euro, parisToUtc } from "@/lib/pricing";
 import { db, dbConfigured, getPricing } from "@/lib/supabase";
 import { getStripe, stripeConfigured } from "@/lib/stripe";
+import { trackKey } from "@/lib/docsign";
 import { SITE } from "@/lib/site";
 import { allow, clientIp } from "@/lib/ratelimit";
 import { currentUser } from "@/lib/auth";
@@ -143,7 +144,7 @@ export async function POST(req: Request) {
       ],
       metadata: { booking_id: row.id },
       payment_intent_data: { metadata: { booking_id: row.id } },
-      success_url: `${SITE.url}/reservation/merci?ref=${row.id}`,
+      success_url: `${SITE.url}/reservation/merci?ref=${row.id}&k=${trackKey(row.id)}`,
       cancel_url: `${SITE.url}/reservation?annule=1`,
       expires_at: Math.floor(Date.now() / 1000) + 30 * 60,
     });

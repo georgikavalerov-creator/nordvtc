@@ -22,6 +22,7 @@ export type BookingMail = {
   priceCents: number;
   paidCents: number;
   orderUrl?: string;
+  trackUrl?: string;
 };
 
 async function send(to: string, subject: string, html: string) {
@@ -54,6 +55,7 @@ export async function sendBookingEmails(b: BookingMail) {
       <p>Bonjour ${esc(b.name)}, merci pour votre confiance.</p>
       ${lines}
       <p>Référence : <code>${esc(b.id.slice(0, 8))}</code>${b.orderUrl ? ` · <a href="${esc(b.orderUrl)}">Votre bon de commande</a>` : ""}</p>
+      ${b.trackUrl ? `<p><a href="${esc(b.trackUrl)}">Suivre ma réservation</a> (sans connexion : conservez ce lien)</p>` : ""}
       <p>Pour toute modification, répondez à ce message${phone ? ` ou appelez le ${esc(phone)}` : ""}.</p>
     </div>`,
   );

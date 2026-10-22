@@ -12,3 +12,12 @@ export function verifyDoc(t: string, id: string, k: unknown): boolean {
   const a = Buffer.from(sig(t, id)), b = Buffer.from(k);
   return a.length === b.length && timingSafeEqual(a, b);
 }
+
+/** Lien de suivi d'une réservation, sans compte : l'identifiant (UUID) + une signature, impossibles à deviner. */
+export const trackKey = (id: string) => sig("suivi", id);
+export const trackPath = (id: string) => `/reservation/suivi/${id}?k=${trackKey(id)}`;
+export function verifyTrack(id: string, k: unknown): boolean {
+  if (typeof k !== "string") return false;
+  const a = Buffer.from(trackKey(id)), b = Buffer.from(k);
+  return a.length === b.length && timingSafeEqual(a, b);
+}

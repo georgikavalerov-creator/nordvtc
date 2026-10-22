@@ -3,7 +3,7 @@ import type Stripe from "stripe";
 import { getStripe } from "@/lib/stripe";
 import { db } from "@/lib/supabase";
 import { sendBookingEmails } from "@/lib/mail";
-import { docPath } from "@/lib/docsign";
+import { docPath, trackPath } from "@/lib/docsign";
 import { SITE } from "@/lib/site";
 
 export const runtime = "nodejs";
@@ -48,6 +48,7 @@ export async function POST(req: Request) {
           await db().rpc("issue_order", { bid: b.id });
           await sendBookingEmails({
             orderUrl: `${SITE.url}${docPath("bon", b.id)}`,
+            trackUrl: `${SITE.url}${trackPath(b.id)}`,
             id: b.id,
             name: b.customer_name,
             email: b.customer_email,
