@@ -174,7 +174,7 @@ export function mountMap(root) {
   const kick = () => { if (!raf && vis) raf = requestAnimationFrame(draw); };
   const onMove = (e) => { const r = root.getBoundingClientRect(); px = ((e.clientX - r.left) / r.width - 0.5) * 2; py = ((e.clientY - r.top) / r.height - 0.5) * 2; kick(); };
   const ro = new ResizeObserver(() => { resize(); kick(); }); ro.observe(canvas);
-  const io = new IntersectionObserver((e) => { vis = e[0].isIntersecting; if (vis) kick(); }, { rootMargin: "100px" }); io.observe(root);
+  const io = new IntersectionObserver((e) => { vis = e[0].isIntersecting; if (vis) kick(); }, { rootMargin: "0px" }); io.observe(root);
   addEventListener("pointermove", onMove, { passive: true });
   if (reduced) addEventListener("scroll", kick, { passive: true });
   resize(); kick();

@@ -188,7 +188,7 @@ export function mountCine(root) {
   kick();
   const ro = new ResizeObserver(() => { build(); kick(); });
   ro.observe(canvas);
-  const io = new IntersectionObserver((es) => { visible = es[0].isIntersecting; if (visible) kick(); else if (raf) { cancelAnimationFrame(raf); raf = 0; } }, { rootMargin: "100px" });
+  const io = new IntersectionObserver((es) => { visible = es[0].isIntersecting; if (visible) kick(); else if (raf) { cancelAnimationFrame(raf); raf = 0; } }, { rootMargin: "0px" });
   io.observe(root);
   const onMove = (e) => { const b = root.getBoundingClientRect(); mx = clamp((e.clientX - b.left) / b.width, 0, 1); my = clamp((e.clientY - b.top) / b.height, 0, 1); };
   const onScroll = () => { if (reduce) kick(); };
