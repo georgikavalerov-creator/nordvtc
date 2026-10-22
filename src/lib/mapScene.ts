@@ -85,7 +85,7 @@ export function mountMap(root) {
     const follow = sm((s - 0.52) / 0.2) * (1 - sm((s - 0.93) / 0.07));
     const cx = lerp(metro.x, mid.x, zi) + (car.x - mid.x) * 0.5 * follow - tx * 0.004;
     const cy = lerp(metro.y, mid.y, zi) + (car.y - mid.y) * 0.5 * follow - ty * 0.004;
-    const ox = mob ? w * 0.5 : w * 0.64, oy = mob ? h * 0.26 : h * 0.5;
+    const ox = mob ? w * 0.5 : w * 0.64, oy = mob ? h * 0.35 : h * 0.5; // mobile : carte plus bas (le haut est sous l'en-tête)
     const X = (p) => (p[0] - cx) * sc + ox, Y = (p) => (p[1] - cy) * sc + oy;
     const lw = lerp(0.8, 1.5, zi), C = isDark() ? DARK : LIGHT;
 
