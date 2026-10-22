@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { trackPath, verifyTrack } from "@/lib/docsign";
+import TrackOnce from "@/components/TrackOnce";
 
 export const metadata: Metadata = {
   title: "Réservation enregistrée",
@@ -14,6 +15,7 @@ export default async function MerciPage({ searchParams }: Props) {
   return (
     <section className="section">
       <div className="wrap" style={{ maxWidth: 680, textAlign: "center" }}>
+        {track && ref && <TrackOnce event="Réservation payée" id={ref} />}
         <span className="eyebrow">Merci</span>
         <h1 style={{ fontSize: "clamp(2rem,5vw,3rem)" }}>Votre paiement est reçu</h1>
         <p className="muted">
