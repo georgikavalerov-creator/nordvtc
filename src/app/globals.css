@@ -2582,3 +2582,8 @@ ol.steps > li::before { box-shadow: 0 6px 14px -8px var(--c2) !important; }
 .sec-table tr.is-high td { background: #fdeceb; }
 .sec-table tr.is-warn td:first-child { box-shadow: inset 3px 0 0 #f59e0b; }
 .sec-table tr.is-high td:first-child { box-shadow: inset 3px 0 0 #dc2626; }
+.tfa-ways { display: grid; gap: 8px; }
+.tfa-ways .btn { justify-self: start; }
+.tfa-codes { background: #fffbea; border: 1px solid #f5d76e; border-radius: 12px; padding: 12px; }
+.tfa-codes ul { list-style: none; margin: 8px 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+.tfa-codes code { font-size: 1rem; letter-spacing: .08em; }

@@ -1,9 +1,33 @@
 "use client";
 import { useActionState, useState } from "react";
-import { confirm2fa, disable2fa, start2fa } from "./actions";
+import { confirm2fa, disable2fa, makeBackupCodes, set2faChannel, start2fa } from "./actions";
 
 type R = { error?: string; ok?: boolean | string } | undefined;
 const Msg = ({ s }: { s: R }) => (s?.error ? <p className="error">{s.error}</p> : s?.ok ? <p className="notice okmsg">{typeof s.ok === "string" ? s.ok : "Enregistré ✓"}</p> : null);
+
+export function TwoFactorChannels({ email, sms, smsAvailable, phone, backup }: { email: boolean; sms: boolean; smsAvailable: boolean; phone: string; backup: number }) {
+  const [st, setSt] = useState({ email, sms });
+  const [codes, setCodes] = useState<string[] | null>(null);
+  const [left, setLeft] = useState(backup);
+  const toggle = async (via: "email" | "sms") => { const on = !st[via]; await set2faChannel(via, on); setSt((x) => ({ ...x, [via]: on })); };
+  return (
+    <div className="adm-box" style={{ display: "grid", gap: 10, maxWidth: 640 }}>
+      <strong>Autres moyens de recevoir le code</strong>
+      <label className="inline"><input type="checkbox" checked={st.email} onChange={() => toggle("email")} /> <span>Code par e-mail (envoyé à votre adresse de notification)</span></label>
+      <label className="inline" style={{ opacity: smsAvailable ? 1 : .5 }}><input type="checkbox" checked={st.sms} disabled={!smsAvailable} onChange={() => toggle("sms")} /> <span>Code par SMS{phone ? ` au ${phone}` : ""}{smsAvailable ? "" : " (service SMS non configuré)"}</span></label>
+      <div style={{ display: "grid", gap: 6 }}>
+        <span><b>Codes de secours</b> : {left > 0 ? `${left} code(s) restant(s)` : "aucun"}. À garder en lieu sûr (papier, coffre-fort de mots de passe) : chacun permet une connexion si le téléphone est perdu.</span>
+        <button type="button" className="btn ghost small" style={{ justifySelf: "start" }} onClick={async () => { const c = await makeBackupCodes(); setCodes(c); setLeft(c.length); }}>{left > 0 ? "Générer de nouveaux codes" : "Générer 10 codes de secours"}</button>
+        {codes && (
+          <div className="tfa-codes">
+            <p className="error" style={{ margin: 0 }}>Notez-les maintenant : ils ne seront plus jamais affichés.</p>
+            <ul>{codes.map((c) => <li key={c}><code>{c}</code></li>)}</ul>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default function TwoFactor({ enabled }: { enabled: boolean }) {
   const [setup, setSetup] = useState<{ qr: string; secret: string; uri: string } | null>(null);

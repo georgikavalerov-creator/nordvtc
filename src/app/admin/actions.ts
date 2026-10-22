@@ -12,6 +12,7 @@ import { sendInvoiceEmail } from "@/lib/mail";
 import { sendInvoiceToTiime, sendPendingToTiime } from "@/lib/tiime";
 import { after } from "next/server";
 import { guard, logSecurity } from "@/lib/security-log";
+import { clearPre, markPasswordOk, methods, newBackupCodes, passwordOk, required, sendLoginCode, verifyLoginCode, type Methods } from "@/lib/twofa";
 import { get2fa, set2fa, check2faLogin, newSecret, otpauthUri, totpStep } from "@/lib/totp";
 import { docPath } from "@/lib/docsign";
 import { SITE } from "@/lib/site";
@@ -23,16 +24,20 @@ import { hashPassword, newPassword } from "@/lib/driver-auth";
 import { decideClaimCore } from "@/lib/claim";
 import { adminReply } from "@/lib/chat";
 
-export async function login(_: { error?: string; need2fa?: boolean } | undefined, form: FormData): Promise<{ error?: string; need2fa?: boolean } | undefined> {
+export type LoginState = { error?: string; need2fa?: boolean; methods?: Methods } | undefined;
+export async function login(_: LoginState, form: FormData): Promise<LoginState> {
   const ip = ipFrom(await headers());
   // Anti force brute : 5 essais / 15 min par adresse IP, et 40 / heure au total (attaques réparties).
   if (!(await guard(undefined, `admin-login:${ip}`, 5, 15 * 60_000, "admin_login_blocked")) || !(await guard(undefined, "admin-login:all", 40, 3_600_000, "admin_login_blocked"))) return { error: "Trop de tentatives. Réessayez plus tard." };
   if (!checkPassword(String(form.get("password") ?? ""))) { await logSecurity("admin_login_fail"); await new Promise((r) => setTimeout(r, 600)); return { error: "Mot de passe incorrect." }; }
-  // Double authentification (si activée) : code à 6 chiffres de l'application, à usage unique.
-  if ((await get2fa()).enabled) {
+  // Double authentification (si activée) : application, e-mail, SMS ou code de secours, à usage unique.
+  const m = await methods();
+  if (required(m)) {
+    await markPasswordOk();
     const code = String(form.get("code") ?? "").trim();
-    if (!code) return { error: "Entrez le code à 6 chiffres de votre application d'authentification.", need2fa: true };
-    if (!(await check2faLogin(code))) { await logSecurity("admin_2fa_fail"); await new Promise((r) => setTimeout(r, 600)); return { error: "Code incorrect ou déjà utilisé.", need2fa: true }; }
+    if (!code) return { error: "Entrez votre code de vérification.", need2fa: true, methods: m };
+    if (!(await verifyLoginCode(code))) { await logSecurity("admin_2fa_fail"); await new Promise((r) => setTimeout(r, 600)); return { error: "Code incorrect, expiré ou déjà utilisé.", need2fa: true, methods: m }; }
+    await clearPre();
   }
   await logSecurity("admin_login_ok");
   await startSession();
@@ -355,7 +360,7 @@ export async function confirm2fa(_: { error?: string; ok?: boolean | string } | 
   if (!t.pending) return { error: "Recommencez l'activation." };
   const step = totpStep(t.pending, String(form.get("code") ?? ""));
   if (step < 0) return { error: "Code incorrect : vérifiez l'heure de votre téléphone et réessayez." };
-  await set2fa({ secret: t.pending, enabled: true, lastStep: step });
+  await set2fa({ ...t, secret: t.pending, pending: undefined, enabled: true, lastStep: step });
   revalidatePath("/admin/reglages");
   return { ok: "Double authentification activée ✓ Le code sera demandé à chaque connexion." };
 }
@@ -364,7 +369,26 @@ export async function disable2fa(_: { error?: string; ok?: boolean | string } | 
   const t = await get2fa();
   if (!t.enabled || !t.secret) return { ok: true };
   if (totpStep(t.secret, String(form.get("code") ?? "")) < 0) return { error: "Code incorrect." };
-  await set2fa({});
+  await set2fa({ ...t, secret: undefined, enabled: false, pending: undefined, lastStep: undefined });
   revalidatePath("/admin/reglages");
   return { ok: "Double authentification désactivée." };
+}
+
+/** Envoi d'un code de connexion (e-mail ou SMS) : seulement après un mot de passe correct. */
+export async function sendCode(via: "email" | "sms"): Promise<{ ok?: string; error?: string }> {
+  if (!(await passwordOk())) return { error: "Saisissez d'abord votre mot de passe." };
+  if (!(await guard(undefined, `2fa-send:${via}`, 4, 10 * 60_000))) return { error: "Trop d'envois, patientez quelques minutes." };
+  const err = await sendLoginCode(via);
+  return err ? { error: err } : { ok: via === "email" ? "Code envoyé par e-mail." : "Code envoyé par SMS." };
+}
+export async function set2faChannel(via: "email" | "sms", on: boolean): Promise<{ ok?: string; error?: string }> {
+  if (!(await isAdmin())) redirect("/admin");
+  const t = await get2fa();
+  await set2fa({ ...t, [via]: on });
+  revalidatePath("/admin/reglages");
+  return { ok: on ? "Activé ✓" : "Désactivé" };
+}
+export async function makeBackupCodes(): Promise<string[]> {
+  if (!(await isAdmin())) redirect("/admin");
+  return newBackupCodes();
 }

@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { getSiteSettings } from "@/lib/content";
 import { AdminPage } from "../gate";
 import { SettingsForm, TiimeCatchUp } from "../Forms";
-import TwoFactor from "../TwoFactor";
+import TwoFactor, { TwoFactorChannels } from "../TwoFactor";
+import { otpConfigured } from "@/lib/callback";
 import { get2fa } from "@/lib/totp";
 import LogoUploader from "@/components/LogoUploader";
 import { getLogo } from "@/lib/logo";
@@ -13,6 +14,7 @@ export const dynamic = "force-dynamic";
 
 export default async function Page() {
   const v = await getSiteSettings();
+  const tfa = await get2fa();
   const logo = await getLogo();
   return (
     <AdminPage title="Réglages du site">
@@ -20,7 +22,8 @@ export default async function Page() {
       <LogoUploader current={logo} save={saveLogo} remove={removeLogo} />
       <SettingsForm v={v} envPhone={Boolean(process.env.DRIVER_PHONE)} />
       <TiimeCatchUp />
-      <TwoFactor enabled={!!(await get2fa()).enabled} />
+      <TwoFactor enabled={!!tfa.enabled} />
+      <TwoFactorChannels email={!!tfa.email} sms={!!tfa.sms} smsAvailable={otpConfigured()} phone={(v.driverPhone || process.env.DRIVER_PHONE || "").trim()} backup={(tfa.backup ?? []).length} />
       <div className="adm-box">
         <strong>Sécurité</strong>
         <p className="muted" style={{ marginBottom: 0 }}>Le mot de passe de l'administration se change dans les variables d'environnement (ADMIN_PASSWORD) de votre hébergeur. Changer ADMIN_SESSION_SECRET déconnecte toutes les sessions.</p>

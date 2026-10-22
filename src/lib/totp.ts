@@ -33,7 +33,7 @@ export function totpStep(secret: string, code: string, at = Date.now()) {
 export const newSecret = () => b32encode(randomBytes(20));
 export const otpauthUri = (secret: string) => `otpauth://totp/Nord%20VTC:Administration?secret=${secret}&issuer=Nord%20VTC&algorithm=SHA1&digits=6&period=30`;
 
-type TwoFA = { secret?: string; pending?: string; enabled?: boolean; lastStep?: number };
+export type TwoFA = { secret?: string; pending?: string; enabled?: boolean; lastStep?: number; email?: boolean; sms?: boolean; backup?: string[]; emailCode?: { h: string; exp: number; tries: number }; smsAt?: number };
 export async function get2fa(): Promise<TwoFA> {
   if (!dbConfigured()) return {};
   const { data } = await db().from("settings").select("value").eq("key", "admin_2fa").maybeSingle();
