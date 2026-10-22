@@ -35,7 +35,7 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
   const [luggage, setLuggage] = useState(0);
   const [childSeat, setChildSeat] = useState(defaultChildSeat);
   const [flight, setFlight] = useState("");
-  const [transport, setTransport] = useState<"" | "Avion" | "Train">("");
+  const [transport, setTransport] = useState<"" | "Avion" | "Train" | "Bus">("");
   const [name, setName] = useState(accountName);
   const [phone, setPhone] = useState(accountPhone);
   const [email, setEmail] = useState(accountEmail);
@@ -110,7 +110,7 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
         if (d.passengers) setPassengers(d.passengers);
         if (typeof d.luggage === "number") setLuggage(d.luggage);
         if (d.flight) setFlight(d.flight);
-        if (d.transport === "Avion" || d.transport === "Train") setTransport(d.transport);
+        if (d.transport === "Avion" || d.transport === "Train" || d.transport === "Bus") setTransport(d.transport);
         if (d.childSeat) setChildSeat(true);
         if (d.name) setName(d.name);
         if (d.phone) setPhone(d.phone);
@@ -250,7 +250,7 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
       else if (date && time && `${retDate}T${retTime}` <= `${date}T${time}`) e.ret = "Le retour doit être après l'aller.";
       else if (retCustom && (!retFrom || !retTo)) e.ret = "Choisissez les adresses du retour dans la liste proposée.";
     }
-    if (flight.trim() && !transport) e.flight = "Précisez s'il s'agit d'un avion ou d'un train.";
+    if (flight.trim() && !transport) e.flight = "Précisez s'il s'agit d'un avion, d'un train ou d'un bus.";
     setErrors(e);
     if (Object.keys(e).length) {
       requestAnimationFrame(() => {
@@ -328,13 +328,13 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
         {errors.when && <p className="field-error when-error" role="alert">{errors.when}</p>}
         <div className="bk-grid bk-2 bk-opts">
           <div className="tf-label">
-            N° de vol ou de train <span className="muted">(facultatif)</span>
+            N° de vol, train ou bus <span className="muted">(facultatif)</span>
             <span className="date-chips" role="radiogroup" aria-label="Type de transport">
-              {(["Avion", "Train"] as const).map((t) => (
-                <button key={t} type="button" role="radio" aria-checked={transport === t} className={`chip${transport === t ? " on" : ""}`} onClick={() => { setTransport(transport === t ? "" : t); setErrors((x) => ({ ...x, flight: undefined })); }}><IconC name={t === "Avion" ? "plane" : "train"} size={16} /> {t}</button>
+              {(["Avion", "Train", "Bus"] as const).map((t) => (
+                <button key={t} type="button" role="radio" aria-checked={transport === t} className={`chip${transport === t ? " on" : ""}`} onClick={() => { setTransport(transport === t ? "" : t); setErrors((x) => ({ ...x, flight: undefined })); }}><IconC name={t === "Avion" ? "plane" : t === "Train" ? "train" : "bus"} size={16} /> {t}</button>
               ))}
             </span>
-            <input value={flight} maxLength={20} aria-label="Numéro de vol ou de train" aria-invalid={!!errors.flight} onChange={(e) => { setFlight(e.target.value); setErrors((x) => ({ ...x, flight: undefined })); }} placeholder={transport === "Avion" ? "Ex. AF1234" : transport === "Train" ? "Ex. TGV 7123" : "Choisissez avion ou train"} />
+            <input value={flight} maxLength={20} aria-label="Numéro de vol, de train ou de bus" aria-invalid={!!errors.flight} onChange={(e) => { setFlight(e.target.value); setErrors((x) => ({ ...x, flight: undefined })); }} placeholder={transport === "Avion" ? "Ex. AF1234" : transport === "Train" ? "Ex. TGV 7123" : transport === "Bus" ? "Ex. FlixBus N802" : "Choisissez avion, train ou bus"} />
             {errors.flight && <p className="field-error flight-error" role="alert">{errors.flight}</p>}
           </div>
           <label className={`toggle${childSeat ? " on" : ""}`}>

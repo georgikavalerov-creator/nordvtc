@@ -12,7 +12,16 @@ export default function TimeField({ value, onChange, invalid, label = "Heure" }:
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<"h" | "m">("h");
   const [typed, setTyped] = useState<string | null>(null);
+  // Écran tactile (iPhone, Android, iPad) : un simple bouton, jamais de clavier ; la saisie au clavier reste sur ordinateur.
+  const [touch, setTouch] = useState(true);
   const box = useRef<HTMLDivElement>(null);
+  const pop = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    try { setTouch(!window.matchMedia("(hover: hover) and (pointer: fine)").matches); } catch { setTouch(true); }
+  }, []);
+  useEffect(() => {
+    if (open) requestAnimationFrame(() => pop.current?.scrollIntoView({ block: "nearest", behavior: "smooth" }));
+  }, [open]);
   const h = value ? Number(value.slice(0, 2)) : null;
   const m = value ? Number(value.slice(3, 5)) : null;
 
@@ -30,23 +39,31 @@ export default function TimeField({ value, onChange, invalid, label = "Heure" }:
 
   return (
     <div className="pk" ref={box}>
-      <div className={`pk-field pk-time${value ? "" : " empty"}`} aria-invalid={invalid || undefined}>
+      {touch ? (
+        <button type="button" className={`pk-field${value ? "" : " empty"}`} aria-haspopup="dialog" aria-expanded={open} aria-invalid={invalid || undefined} aria-label={value ? `${label} : ${show(value)}` : label} onClick={() => { setOpen((o) => !o); setStep(value ? "m" : "h"); }}>
+          <IconC name="clock" size={20} />
+          <span>{value ? show(value) : "Choisir…"}</span>
+        </button>
+      ) : (
+        <div className={`pk-field pk-time${value ? "" : " empty"}`} aria-invalid={invalid || undefined}>
         <IconC name="clock" size={20} />
         <input
           inputMode="numeric" aria-label={label} placeholder="Choisir…" autoComplete="off"
           value={typed ?? show(value)}
-          onFocus={() => { setOpen(true); setStep(value ? "m" : "h"); }}
+          onFocus={(e) => { e.currentTarget.select(); setOpen(true); setStep(value ? "m" : "h"); }}
           onClick={() => setOpen(true)}
           onChange={(e) => {
-            const d = e.target.value.replace(/\D/g, "").slice(0, 4);
+            const raw = e.target.value.replace(/\D/g, "");
+            const d = (typed === null && value && raw.length > 4 ? raw.slice(4) : raw).slice(0, 4);
             setTyped(d.length > 2 ? `${d.slice(0, 2)} h ${d.slice(2)}` : d);
             if (d.length === 4 && Number(d.slice(0, 2)) < 24 && Number(d.slice(2)) < 60) { set(Number(d.slice(0, 2)), Number(d.slice(2))); setTyped(null); setOpen(false); }
           }}
           onBlur={() => setTyped(null)}
         />
       </div>
+      )}
       {open && (
-        <div className="pk-pop pk-clock" role="dialog" aria-label="Choisir l'heure">
+        <div ref={pop} className="pk-pop pk-clock" role="dialog" aria-label="Choisir l'heure">
           <div className="pk-tabs">
             <button type="button" className={step === "h" ? "on" : ""} onClick={() => setStep("h")}>Heure{h !== null ? ` · ${pad(h)} h` : ""}</button>
             <button type="button" className={step === "m" ? "on" : ""} onClick={() => setStep("m")} disabled={h === null}>Minutes{m !== null ? ` · ${pad(m)}` : ""}</button>

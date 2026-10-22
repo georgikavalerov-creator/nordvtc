@@ -2731,3 +2731,11 @@ ol.steps > li h3 { color: #0b0b0c !important; letter-spacing: -.01em; }
 .trip-del-ask { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 14px; background: #fff3f2; font-size: .9rem; font-weight: 600; }
 .trip-bulk { display: flex; justify-content: flex-end; margin: -4px 0 12px; }
 .adm-avatar { width: 44px; height: 44px; font-size: 1.05rem; text-decoration: none; color: #fff !important; box-shadow: 0 0 0 2px #fff, 0 0 0 3.5px rgba(31,91,255,.5); }
+/* Champ heure en bouton sur écran tactile (pas de clavier) */
+button.pk-field { cursor: pointer; text-align: left; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+.pk-pop button { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+@media (max-width: 560px) {
+  /* Sélecteurs date/heure : panneau en bas de l'écran sur toute la largeur, fond assombri derrière */
+  .bk-grid > .tf-label:nth-child(2) .pk-pop, .pk-pop { left: 12px !important; right: 12px !important; width: auto !important; }
+  .pk-pop { box-shadow: 0 0 0 100vmax rgba(5,8,18,.38), 0 -10px 40px -10px rgba(0,0,0,.35) !important; }
+}

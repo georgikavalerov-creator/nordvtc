@@ -16,6 +16,10 @@ export default function DateField({ value, onChange, min, invalid, ariaLabel = "
   const base = value ? parse(value) : min ? parse(min) : new Date();
   const [view, setView] = useState(new Date(base.getFullYear(), base.getMonth(), 1));
   const box = useRef<HTMLDivElement>(null);
+  const pop = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (open) requestAnimationFrame(() => pop.current?.scrollIntoView({ block: "nearest", behavior: "smooth" }));
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -43,7 +47,7 @@ export default function DateField({ value, onChange, min, invalid, ariaLabel = "
         <span>{value ? label(value) : "Choisir…"}</span>
       </button>
       {open && (
-        <div className="pk-pop pk-cal" role="dialog" aria-label="Choisir une date">
+        <div ref={pop} className="pk-pop pk-cal" role="dialog" aria-label="Choisir une date">
           <div className="pk-head">
             <button type="button" onClick={() => setView(new Date(view.getFullYear(), view.getMonth() - 1, 1))} disabled={!canPrev} aria-label="Mois précédent">‹</button>
             <strong>{MOIS[view.getMonth()]} {view.getFullYear()}</strong>
