@@ -69,7 +69,7 @@ export function mountMap(root) {
   function progress() { const b = root.getBoundingClientRect(), lead = innerWidth < 900 ? innerHeight * 0.5 : 0; return clamp((lead - b.top) / Math.max(b.height - innerHeight + lead, 1), 0, 1); }
 
   const coarse = matchMedia("(pointer: coarse)").matches;
-  let lastT = 0;
+  let lastT = 0, lastFit = 0, fitY = 0, fitT = 0;
   function draw(now) {
     raf = 0; if (!vis) return;
     // Téléphones : 30 images/s suffisent (fluide, moins de batterie).
@@ -85,7 +85,19 @@ export function mountMap(root) {
     const follow = sm((s - 0.52) / 0.2) * (1 - sm((s - 0.93) / 0.07));
     const cx = lerp(metro.x, mid.x, zi) + (car.x - mid.x) * 0.5 * follow - tx * 0.004;
     const cy = lerp(metro.y, mid.y, zi) + (car.y - mid.y) * 0.5 * follow - ty * 0.004;
-    const ox = mob ? w * 0.5 : w * 0.64, oy = mob ? h * 0.35 : h * 0.5; // mobile : carte plus bas (le haut est sous l'en-tête)
+    // Mobile : la carte se centre dans l'espace libre entre l'en-tête et le texte du chapitre (quel que soit l'écran).
+    if (mob && (now - lastFit > 250 || fitY === 0)) {
+      lastFit = now;
+      const cr = canvas.getBoundingClientRect();
+      const hb = Math.max(0, (document.querySelector(".site-header")?.getBoundingClientRect().bottom ?? 0) - cr.top);
+      const chap = root.querySelector(".chap.on") || root.querySelector(".chap");
+      const ct = chap ? (chap.firstElementChild || chap).getBoundingClientRect().top - cr.top : h * 0.6;
+      const target = clamp((hb + ct) / 2, h * 0.2, h * 0.45);
+      fitY = fitY === 0 ? target : fitY;
+      fitT = target;
+    }
+    if (mob) fitY += (fitT - fitY) * 0.08;
+    const ox = mob ? w * 0.5 : w * 0.64, oy = mob ? fitY : h * 0.5;
     const X = (p) => (p[0] - cx) * sc + ox, Y = (p) => (p[1] - cy) * sc + oy;
     const lw = lerp(0.8, 1.5, zi), C = isDark() ? DARK : LIGHT;
 
