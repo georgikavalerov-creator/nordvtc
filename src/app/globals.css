@@ -2226,3 +2226,11 @@ html body .btn.is-pressed::before, html body .btn:active::before { transform: tr
 .cta-actions .btn { height: 60px; min-height: 60px; box-sizing: border-box; padding-top: 0; padding-bottom: 0; display: inline-flex; align-items: center; border-width: 2px; line-height: 1.2; }
 @media (max-width: 640px) { .cta-actions .btn { height: auto; min-height: 56px; padding-top: 12px; padding-bottom: 12px; } }
 @media (max-width: 640px) { .perks { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; } .perks li { padding: 7px 10px; font-size: .8rem; border-radius: 12px; gap: 6px; } .perks li span { font-size: 1rem; } }
+
+/* Surtitres (« Tarifs indicatifs », « Nos trajets »…) : lisibles, en bleu de la marque */
+.eyebrow { color: #1f5bff; font-size: .82rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 8px; }
+.section.ink .eyebrow, .site-footer .eyebrow, .statement .eyebrow, .cityband .eyebrow, .showcase .eyebrow { color: #8fb0ff; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .eyebrow { color: #8fb0ff; } }
+:root[data-theme="dark"] .eyebrow { color: #8fb0ff; }
+/* Titres de section : apparition plus rapide et sans flou (lisibles dès qu'ils arrivent à l'écran) */
+.fx-on .section-head { opacity: clamp(.35, calc(var(--enter) * 1.8), 1); transform: translate3d(0, calc((1 - min(1, var(--enter) * 1.6)) * 24px), 0); filter: none; }
