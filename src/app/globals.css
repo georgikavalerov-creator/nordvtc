@@ -2048,8 +2048,8 @@ html body .btn.is-pressed::before, html body .btn:active::before { transform: tr
 @media (prefers-reduced-motion: reduce) { .nf-wheel, .nf-digits > span, .nf-car, .nf-car svg, .nf-excuse { animation: none !important; } .nf-car { left: 50%; transform: translateX(-50%); } }
 
 /* Bloc « Un prix fixé… » : moins de vide autour et sous le texte (révélation au défilement conservée) */
-.statement { height: 125vh; }
+.statement { height: 135vh; }
 .statement-inner { top: 8svh; height: 84svh; padding-top: 0; padding-bottom: 0; }
-@media (max-width: 900px) { .statement { height: 118vh; } }
-@media (max-width: 560px) { .statement { height: 112vh; } .statement-inner { top: 12svh; height: 76svh; } }
+@media (max-width: 900px) { .statement { height: 130vh; } }
+@media (max-width: 560px) { .statement { height: 125vh; } .statement-inner { top: 14svh; height: 72svh; } }
 @media (prefers-reduced-motion: reduce) { .statement { height: auto; } .statement-inner { position: static; height: auto; padding: 56px 24px; } }
