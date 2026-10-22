@@ -1119,6 +1119,9 @@ p.field-error { margin: -4px 0 0; }
 .acc-nav::-webkit-scrollbar { display: none; }
 .acc-nav a { padding: 12px 14px; font-weight: 700; color: #6b6b6b; text-decoration: none; border-bottom: 3px solid transparent; white-space: nowrap; }
 .acc-nav a.on { color: #000; border-bottom-color: #000; }
+.acc-nav .acc-out { margin: 0 0 0 auto; display: flex; }
+.acc-nav .acc-out button { padding: 12px 14px; font: inherit; font-weight: 700; color: #b42318; background: none; border: 0; border-bottom: 3px solid transparent; white-space: nowrap; cursor: pointer; }
+@media (hover: hover) { .acc-nav .acc-out button:hover { text-decoration: underline; } }
 @media (hover: hover) { .acc-nav a:hover { color: #000; } }
 .acc-title { font-size: clamp(1.5rem, 4vw, 2rem); margin: 0 0 8px; }
 .acc-h { font-size: 1.2rem; margin: 30px 0 10px; }

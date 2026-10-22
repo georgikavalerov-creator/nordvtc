@@ -18,6 +18,9 @@ export default function AccountNav() {
         const on = i.exact ? path === i.href : path.startsWith(i.href);
         return <Link key={i.href} href={i.href} aria-current={on ? "page" : undefined} className={on ? "on" : ""}>{i.label}</Link>;
       })}
+      <form action="/auth/signout" method="post" className="acc-out">
+        <button type="submit">Se déconnecter</button>
+      </form>
     </nav>
   );
 }
