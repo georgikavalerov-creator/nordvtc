@@ -4,7 +4,7 @@ import { SITE } from "@/lib/site";
 import PhoneShield from "@/components/PhoneShield";
 import { getSiteSettings } from "@/lib/content";
 
-export const revalidate = 300;
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Mentions légales",

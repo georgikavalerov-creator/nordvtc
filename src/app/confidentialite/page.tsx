@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/confidentialite" },
 };
 
-export const revalidate = 300;
+export const dynamic = "force-dynamic";
 
 export default async function Confidentialite() {
   const email = (await getSiteSettings()).email || SITE.email;

@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/guide" },
 };
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 export default async function GuidePage() {
   const posts = await getAllPosts();

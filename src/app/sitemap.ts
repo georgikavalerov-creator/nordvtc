@@ -5,7 +5,7 @@ import { SITE } from "@/lib/site";
 import { VILLES } from "@/lib/villes";
 
 // Généré automatiquement à chaque build : nouvelle page de trajet = nouvelle entrée.
-export const revalidate = 600;
+export const dynamic = "force-dynamic";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const POSTS = await getAllPosts();
   const now = new Date();

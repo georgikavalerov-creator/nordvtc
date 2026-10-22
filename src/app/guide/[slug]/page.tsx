@@ -8,7 +8,7 @@ import { POSTS, fmtDate } from "@/lib/blog";
 import { findPost, getAllPosts } from "@/lib/content";
 import { SITE } from "@/lib/site";
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 type Props = { params: Promise<{ slug: string }> };
 
