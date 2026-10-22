@@ -9,14 +9,15 @@ export default function CtaBand({ title = "Votre prix en 30 secondes, sans compt
         <div className="cta-band" data-fx="" suppressHydrationWarning>
           <h2>{title}</h2>
           <p>{text}</p>
-          <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap", marginTop: 10 }}>
+          <div className="cta-actions">
             <Link href={`/reservation${q}`} className="btn btn-arrow">Voir mon prix maintenant</Link>
             <Link href="/contact#appel" className="btn ghost-light">Être rappelé gratuitement</Link>
           </div>
           <ul className="cta-points" aria-label="Nos engagements">
             <li>Prix ferme affiché d'avance</li>
             <li>Annulation gratuite 24 h avant</li>
-            <li>Eau, chargeur et Wi-Fi à bord</li>
+            <li>Eau offerte, chargeurs et Wi-Fi à bord</li>
+            <li>Chauffeur à l'heure, vol suivi</li>
           </ul>
         </div>
       </div>

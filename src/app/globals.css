@@ -2196,3 +2196,30 @@ html body .btn.is-pressed::before, html body .btn:active::before { transform: tr
 @media (max-width: 560px) { .section { padding: 22px 0; } .section-head { margin-bottom: 12px; } }
 .chat-fab { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 .chat-fab.is-placed { transition: opacity .2s, background .2s; }
+
+/* Bandeau final : deux boutons de même taille */
+.cta-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 320px)); justify-content: center; gap: 12px; margin-top: 10px; }
+.cta-actions .btn { width: 100%; justify-content: center; min-height: 56px; padding-left: 20px; padding-right: 20px; white-space: nowrap; }
+@media (max-width: 640px) { .cta-actions { grid-template-columns: 1fr; } .cta-actions .btn { white-space: normal; } }
+
+/* Comparatif avec les applications */
+.perks { list-style: none; padding: 0; margin: 0 0 18px; display: flex; flex-wrap: wrap; gap: 8px; }
+.perks li { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; background: var(--bg-2, #f3f3f3); font-weight: 600; font-size: .92rem; }
+.perks li span { font-size: 1.1rem; }
+.cmp { border: 1px solid var(--line, #e2e2e2); border-radius: 18px; overflow: hidden; }
+.cmp-row { display: grid; grid-template-columns: 170px 1fr 1fr; gap: 0; border-top: 1px solid var(--line, #e2e2e2); }
+.cmp-row:first-child { border-top: 0; }
+.cmp-row > span { padding: 12px 16px; font-size: .94rem; }
+.cmp-head > span { font-weight: 800; font-size: .85rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted, #5e5e5e); }
+.cmp-head .cmp-us { color: #1f5bff; }
+.cmp-k { font-weight: 700; }
+.cmp-row .cmp-us { background: rgba(31,91,255,.06); font-weight: 600; }
+.cmp-row .cmp-us b { color: #1f5bff; margin-right: 8px; }
+.cmp-them { color: var(--muted, #5e5e5e); }
+@media (max-width: 760px) {
+  .cmp-row { grid-template-columns: 1fr 1fr; }
+  .cmp-row .cmp-k { grid-column: 1 / -1; padding-bottom: 0; font-size: .82rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted, #5e5e5e); }
+  .cmp-head > span:first-child { display: none; }
+  .cmp-row > span { padding: 8px 12px; font-size: .88rem; }
+}
+.chat-resume { margin: 0 0 4px; font-size: .74rem; opacity: .7; text-align: center; }

@@ -111,6 +111,12 @@ export default function ChatPanel({ open, onClose, raised, anchor }: { open: boo
             <p className="chat-small">Réponses immédiates : <Link href="/faq" onClick={onClose}>questions fréquentes</Link>.</p>
           </div>
         )}
+        {started && (
+          <p className="chat-resume">
+            Votre conversation est gardée sur cet appareil : vous la retrouvez ici même après avoir fermé la fenêtre ou quitté le site.{" "}
+            <button type="button" className="chat-link" onClick={() => { if (confirm("Commencer une nouvelle conversation ? L'actuelle restera visible pour le chauffeur.")) { forgetChat(); setMsgs([]); setAskEmail(false); setHasEmail(false); } }}>Nouvelle conversation</button>
+          </p>
+        )}
         {msgs.map((m) => (
           <div key={m.id} className={`chat-msg ${m.sender === "admin" ? "from-them" : "from-me"}`}>
             <p>{m.body}</p>

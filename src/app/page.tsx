@@ -10,6 +10,7 @@ import { CAR_PICS, SERVICE_PIC, imgThumb, srcSetOf } from "@/lib/images";
 import { VILLES } from "@/lib/villes";
 import { FAQ_GROUPS, ALL_FAQ } from "@/lib/faq";
 import FaqList from "@/components/FaqList";
+import AppCompare from "@/components/AppCompare";
 import Icon, { iconFor } from "@/components/Icon";
 import MapMount from "@/components/MapMount";
 import CineMount from "@/components/CineMount";
@@ -177,6 +178,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <AppCompare />
 
       <section className="section alt">
         <div className="wrap">
