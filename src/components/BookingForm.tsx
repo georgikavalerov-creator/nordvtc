@@ -37,7 +37,6 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
   const [email, setEmail] = useState(accountEmail);
   const [notes, setNotes] = useState("");
   const [payMode, setPayMode] = useState<"deposit" | "full">("deposit");
-  const [accept, setAccept] = useState(false);
 
   const [quote, setQuote] = useState<Quote | null>(null);
   const [returnQuote, setReturnQuote] = useState<Quote | null>(null);
@@ -49,7 +48,6 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [minLead, setMinLead] = useState(2);
-  const [step, setStep] = useState<1 | 2>(1);
   const [showNotes, setShowNotes] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const [errors, setErrors] = useState<{ origin?: string; dest?: string; when?: string; ret?: string }>({});
@@ -154,9 +152,7 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    setError("");
-    if (!origin || !dest) return setError("Choisissez les adresses dans les listes proposées.");
-    if (!quote) return setError("Le prix n'est pas encore calculé.");
+    if (!checkTrip()) return;
     track("Clic paiement");
     setSubmitting(true);
     try {
@@ -182,7 +178,7 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
           billingCompany: showPro ? company || undefined : undefined,
           billingAddress: showPro ? billAddr || undefined : undefined,
           billingSiren: showPro ? siren.replace(/\s/g, "") || undefined : undefined,
-          accept,
+          accept: true,
         }),
       });
       const data = await res.json();
@@ -210,66 +206,46 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
     setErrors({});
   }
 
-  function goStep(n: 1 | 2) {
+  // Valide le trajet (adresses, date, heure, retour). Renvoie true si tout est bon, sinon affiche les erreurs et remonte au champ concerné.
+  function checkTrip(): boolean {
     setError("");
-    if (n === 2) {
-      const e: typeof errors = {};
-      if (!origin) e.origin = "Choisissez l'adresse de départ dans la liste.";
-      if (!dest) e.dest = "Choisissez l'adresse d'arrivée dans la liste.";
-      if (!date || !time) e.when = !date && !time ? "Indiquez la date et l'heure de prise en charge." : !date ? "Indiquez la date." : "Indiquez l'heure.";
-      if (wantReturn) {
-        if (!retDate || !retTime) e.ret = "Indiquez la date et l'heure du retour.";
-        else if (date && time && `${retDate}T${retTime}` <= `${date}T${time}`) e.ret = "Le retour doit être après l'aller.";
-      }
-      setErrors(e);
-      if (Object.keys(e).length) {
-        requestAnimationFrame(() => {
-          const el = formRef.current?.querySelector<HTMLElement>(e.origin || e.dest ? ".field-error" : ".when-error");
-          el?.scrollIntoView({ behavior: "smooth", block: "center" });
-          if (!e.origin && !e.dest) formRef.current?.querySelector<HTMLInputElement>(date ? '.tf input' : 'input[type="date"]')?.focus();
-          else formRef.current?.querySelector<HTMLInputElement>('input[aria-invalid="true"]')?.focus();
-        });
-        if (e.ret && !e.origin && !e.dest && !e.when) requestAnimationFrame(() => formRef.current?.querySelector<HTMLElement>(".ret-error")?.scrollIntoView({ behavior: "smooth", block: "center" }));
-        return;
-      }
-      if (!quote) return setError(loadingQuote ? "Un instant : le prix est en cours de calcul." : quoteErr || "Le prix n'est pas encore calculé.");
+    const e: typeof errors = {};
+    if (!origin) e.origin = "Choisissez l'adresse de départ dans la liste.";
+    if (!dest) e.dest = "Choisissez l'adresse d'arrivée dans la liste.";
+    if (!date || !time) e.when = !date && !time ? "Indiquez la date et l'heure de prise en charge." : !date ? "Indiquez la date." : "Indiquez l'heure.";
+    if (wantReturn) {
+      if (!retDate || !retTime) e.ret = "Indiquez la date et l'heure du retour.";
+      else if (date && time && `${retDate}T${retTime}` <= `${date}T${time}`) e.ret = "Le retour doit être après l'aller.";
     }
-    setErrors({});
-    track(n === 2 ? "Étape 2" : "Étape 1");
-    setStep(n);
-    requestAnimationFrame(() => {
-      const el = formRef.current;
-      if (el && el.getBoundingClientRect().top < 0) el.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
+    setErrors(e);
+    if (Object.keys(e).length) {
+      requestAnimationFrame(() => {
+        const sel = e.origin || e.dest ? ".field-error" : e.when ? ".when-error" : ".ret-error";
+        formRef.current?.querySelector<HTMLElement>(sel)?.scrollIntoView({ behavior: "smooth", block: "center" });
+        if (!e.origin && !e.dest && e.when) formRef.current?.querySelector<HTMLInputElement>(date ? ".tf input" : 'input[type="date"]')?.focus();
+        else formRef.current?.querySelector<HTMLInputElement>('input[aria-invalid="true"]')?.focus();
+      });
+      return false;
+    }
+    if (!quote) { setError(loadingQuote ? "Un instant : le prix est en cours de calcul." : quoteErr || "Le prix n'est pas encore calculé."); return false; }
+    return true;
   }
 
-  const shortDate = date ? new Date(date + "T12:00:00").toLocaleDateString("fr-FR", { weekday: "short", day: "numeric", month: "short" }) : "";
+  const dayChip = (offset: number) => {
+    const d = new Date(Date.now() + offset * 86_400_000);
+    const p = (n: number) => String(n).padStart(2, "0");
+    return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+  };
 
   return (
     <form ref={formRef} className="form ticket bk" onSubmit={submit} aria-label="Réservation d'un trajet">
       <header className="bk-head">
-        <div className="bk-prog" aria-hidden="true">
-          <i className="on" />
-          <i className={step === 2 ? "on" : ""} />
-        </div>
-        <p className="bk-kicker">
-          Étape {step} sur 2
-          {step === 2 && (
-            <button type="button" className="linklike" onClick={() => goStep(1)}>
-              ← Modifier le trajet
-            </button>
-          )}
-        </p>
-        <h2 className="bk-title">{step === 1 ? "Votre trajet" : "Vos coordonnées"}</h2>
-        <p className="bk-help">
-          {step === 1
-            ? "Indiquez où et quand : le prix s'affiche tout de suite, sans engagement."
-            : "Dernière étape : où vous joindre, puis le paiement sécurisé de l'acompte."}
-        </p>
+        <h2 className="bk-title">Réservez votre trajet</h2>
+        <p className="bk-help">Le prix s'affiche tout de suite. Une seule page, puis le paiement sécurisé.</p>
       </header>
       {cancelled && <p className="notice">Paiement annulé : votre réservation n'est pas confirmée. Vous pouvez recommencer.</p>}
 
-      <div className="bk-pane" hidden={step !== 1}>
+      <div className="bk-pane">
         <div className="bk-route">
           <AddressField key={`o${swapKey}`} label="Départ" value={origin} onChange={(p) => { setOrigin(p); setErrors((x) => ({ ...x, origin: undefined })); }} initialText={initialFrom} placeholder="Adresse, gare, aéroport…" error={errors.origin} />
           <button type="button" className="bk-swap" onClick={swap} aria-label="Inverser le départ et l'arrivée" title="Inverser">
@@ -291,6 +267,11 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
         <div className="bk-grid bk-4">
           <label>
             Date
+            <span className="date-chips">
+              {[["Aujourd'hui", 0], ["Demain", 1], ["Après-demain", 2]].map(([l, o]) => (
+                <button key={String(l)} type="button" className={`chip${date === dayChip(Number(o)) ? " on" : ""}`} onClick={() => { setDate(dayChip(Number(o))); setErrors((x) => ({ ...x, when: undefined })); }}>{l}</button>
+              ))}
+            </span>
             <input type="date" required min={today()} value={date} onChange={(e) => { setDate(e.target.value); setErrors((x) => ({ ...x, when: undefined })); }} aria-invalid={!!errors.when && !date} />
           </label>
           <div className="tf-label">
@@ -345,17 +326,8 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
         {wantReturn && origin && dest && <p className="muted" style={{ margin: "6px 0 0", fontSize: ".85rem" }}>Retour : {dest.label} → {origin.label}</p>}
       </div>
 
-      <div className="bk-pane" hidden={step !== 2}>
-        <div className="bk-recap">
-          <div>
-            <strong>{origin?.label ?? initialFrom} → {dest?.label ?? initialTo}</strong>
-            <span className="muted">{shortDate} à {time} · {passengers} pers. · {luggage} bag.</span>
-            {wantReturn && retDate && retTime && (
-              <span className="muted">Retour : {new Date(retDate + "T12:00:00").toLocaleDateString("fr-FR", { weekday: "short", day: "numeric", month: "short" })} à {retTime}</span>
-            )}
-          </div>
-          <button type="button" className="linklike" onClick={() => goStep(1)}>Modifier</button>
-        </div>
+      <div className="bk-pane">
+        <h3 className="bk-sub">Vos coordonnées</h3>
         <div className="bk-grid bk-2">
           <label>
             Nom et prénom
@@ -426,12 +398,7 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
             <label style={{ gridColumn: "1 / -1" }}>Adresse de facturation<input value={billAddr} onChange={(e) => setBillAddr(e.target.value)} maxLength={300} required={showPro} autoComplete="street-address" /></label>
           </div>
         )}
-        <label className="inline">
-          <input type="checkbox" required checked={accept} onChange={(e) => setAccept(e.target.checked)} />
-          <span>
-            J'accepte les <a href="/cgv" target="_blank" rel="noopener">conditions générales de vente</a>.
-          </span>
-        </label>
+
       </div>
 
       {error && (
@@ -456,20 +423,17 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
           {!loadingQuote && !quote && !quoteErr && <span className="muted">Saisissez départ et arrivée pour voir le prix</span>}
           {quoteErr && <span className="error">{quoteErr}</span>}
         </div>
-        {step === 1 ? (
-          <button key="next" className="btn" type="button" onClick={() => goStep(2)}>
-            Continuer
-          </button>
-        ) : (
-          <button key="pay" className="btn" type="submit" disabled={submitting || !quote}>
-            {submitting ? "Redirection…" : quote ? `Payer ${eur(payMode === "full" ? quote.fullCents : quote.depositCents)}` : "Payer"}
-          </button>
-        )}
+        <button key="pay" className="btn" type="submit" disabled={submitting}>
+          {submitting ? "Redirection…" : quote ? `Payer ${eur(payMode === "full" ? totalFull : totalDeposit)}` : "Voir le prix et payer"}
+        </button>
       </div>
+      <p className="muted bk-foot" style={{ marginBottom: 4 }}>
+        En cliquant sur « Payer », j'accepte les <a href="/cgv" target="_blank" rel="noopener">conditions générales de vente</a>.
+      </p>
       <ul className="trust-line"><li>Prix ferme</li><li>Annulation gratuite 24 h avant</li><li>Facture et bon de commande fournis</li></ul>
       <p className="muted bk-foot">
         Paiement sécurisé par Stripe · réservation au moins {minLead} h à l'avance
-        {step === 2 && quote && rest > 0 ? ` · reste à bord : ${eur(rest)}` : ""}.
+        {quote && rest > 0 ? ` · reste à bord : ${eur(rest)}` : ""}.
       </p>
     </form>
   );

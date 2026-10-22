@@ -1992,3 +1992,10 @@ html.in-app .hero.cine h1 { color: var(--app-navy); }
   .hero-dests .hd-go { display: none; }
   .hero.cine > .wrap { padding-bottom: 150px; }
 }
+
+/* Réservation en une page */
+.bk-sub { margin: 18px 0 2px; font-size: 1.05rem; }
+.bk-pane + .bk-pane { margin-top: 4px; }
+.date-chips { display: flex; gap: 6px; flex-wrap: wrap; margin: 2px 0 4px; }
+.date-chips .chip { font-size: .78rem; padding: 5px 10px; font-weight: 600; cursor: pointer; }
+.date-chips .chip.on { background: #000; color: #fff; border-color: #000; }
