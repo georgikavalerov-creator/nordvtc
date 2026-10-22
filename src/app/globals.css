@@ -2426,3 +2426,17 @@ html:not(.in-app) .btn-arrow:active::after, html:not(.in-app) .quick-btn:active:
 @media (max-width: 900px) {
   .story-copy::before { inset: -70px -60px -40px -60px; }
 }
+
+/* Comparatif : icône et texte côte à côte (plus de texte qui passe sous l'icône), cellules alignées */
+.cmp-row > .cmp-us, .cmp-row > .cmp-them { display: flex; align-items: flex-start; gap: 10px; }
+.cmp-row .cmp-us .ico-d { margin: 2px 0 0 !important; vertical-align: 0; }
+.cmp-row .cmp-them .ico-d { flex: none; margin-top: 3px; color: #a3abbb; }
+.cmp-row > .cmp-k { display: flex; align-items: center; }
+@media (max-width: 760px) {
+  /* Mobile : chaque critère est centré, les deux réponses côte à côte, icône au-dessus du texte */
+  .cmp-head > span { text-align: center; font-size: .74rem; letter-spacing: .03em; padding: 12px 8px; }
+  .cmp-row > .cmp-k { justify-content: center; text-align: center; padding: 12px 12px 2px; }
+  .cmp-row > .cmp-us, .cmp-row > .cmp-them { flex-direction: column; align-items: center; text-align: center; gap: 6px; padding: 10px 12px 14px; line-height: 1.4; text-wrap: balance; }
+  .cmp-row .cmp-us .ico-d, .cmp-row .cmp-them .ico-d { margin: 0 !important; }
+  .cmp-row:not(.cmp-head) > .cmp-us { border-radius: 0; }
+}
