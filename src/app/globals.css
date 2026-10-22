@@ -2078,3 +2078,23 @@ html body .btn.is-pressed::before, html body .btn:active::before { transform: tr
 .tf-label { display: grid; gap: 6px; }
 @media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) .form .toggle.on { border-color: #1f5bff; background: #f3f6ff; } }
 :root[data-theme="light"] .form .toggle.on { border-color: #1f5bff; background: #f3f6ff; }
+
+/* ---------- Bloc « Un prix fixé… » : mots qui s'allument au défilement (sans section collante, sans flou) ---------- */
+/* Uniquement opacité + transform (composités par le GPU) : effet visible, coût quasi nul. */
+.statement { height: auto !important; }
+.statement-inner { position: relative !important; top: auto !important; height: auto !important; padding: clamp(56px, 11vh, 120px) 24px !important; }
+.fx-on .statement .big-words .w {
+  --k: clamp(0, calc((var(--p, 1) * 2.3 - var(--i) / var(--n)) * 4.5), 1);
+  display: inline-block; opacity: calc(.13 + var(--k) * .87); filter: none !important;
+  transform: translate3d(0, calc((1 - var(--k)) * .32em), 0) scale(calc(.96 + var(--k) * .04));
+  transition: opacity .25s linear, transform .35s cubic-bezier(.2,.8,.2,1); will-change: transform, opacity;
+}
+/* Dernière phrase (bleue) : un trait lumineux se dessine sous les mots */
+.big-words .w:nth-last-child(-n+8) { position: relative; }
+.fx-on .statement .big-words .w:nth-last-child(-n+8)::after {
+  content: ""; position: absolute; left: 0; right: -.28em; bottom: .02em; height: .08em; border-radius: 1em;
+  background: linear-gradient(90deg, #6f97ff, #b9ccff); transform-origin: left center;
+  transform: scaleX(clamp(0, calc((var(--k) - .55) * 2.2), 1)); transition: transform .4s cubic-bezier(.2,.8,.2,1);
+}
+.fx-on .statement .big-words .w:last-child::after { right: 0; }
+@media (prefers-reduced-motion: reduce) { .fx-on .statement .big-words .w { opacity: 1; transform: none; transition: none; } }
