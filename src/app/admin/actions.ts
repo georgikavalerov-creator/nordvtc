@@ -468,3 +468,55 @@ export async function syncIcloudNow() {
   const r = await syncAllToIcloud();
   redirect(`/admin/calendrier?ical=ok&n=${r.ok}${r.failed ? `&e=${r.failed}` : ""}#agenda`);
 }
+
+// ---------- Agenda iCloud : agenda lu + bon de commande en un clic ----------
+export async function saveIcloudSource(form: FormData) {
+  if (!(await isAdmin())) redirect("/admin");
+  const { listIcloudCalendars, setIcloudSource } = await import("@/lib/icloud-push");
+  const url = String(form.get("cal") ?? "");
+  const cal = url ? (await listIcloudCalendars().catch(() => [])).find((c) => c.url === url) ?? null : null;
+  await setIcloudSource(cal);
+  revalidatePath("/admin/calendrier");
+  redirect(`/admin/calendrier${form.get("m") ? `?m=${String(form.get("m")).slice(0, 7)}` : ""}#agenda-courses`);
+}
+
+/** Lit une course notée dans l'agenda (IA) et crée directement le bon de commande. */
+export async function quickBon(ref: string, date: string): Promise<{ url?: string; id?: string; error?: string }> {
+  if (!(await isAdmin())) return { error: "Non autorisé." };
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !ref.startsWith("ical:")) return { error: "Événement invalide." };
+  const [{ icloudEventsBetween }, { getIcloudSource }, { pairUp, courseText }, { coursesFromText, withPlaces }, { createManual }] = await Promise.all([
+    import("@/lib/icloud"), import("@/lib/icloud-push"), import("@/lib/pair-events"), import("@/lib/ai-extract"), import("@/lib/manual"),
+  ]);
+  const day = new Date(`${date}T12:00:00Z`);
+  const events = (await icloudEventsBetween(new Date(day.getTime() - 36 * 3600_000), new Date(day.getTime() + 36 * 3600_000), (await getIcloudSource())?.url)).filter((e) => e.date === date);
+  const course = pairUp(events).find((c) => c.ref === ref);
+  if (!course) return { error: "Événement introuvable dans l'agenda." };
+  const e = course.dep;
+  let c;
+  try {
+    const list = (await coursesFromText(courseText(course))).slice(0, 1);
+    const base = list[0] ?? { name: "", phone: "", email: "", date: "", time: "", from: "", to: "", passengers: 1, luggage: 0, price: null, flight: "", notes: "", company: "" };
+    base.date = e.date; if (!e.allDay) base.time = e.time;
+    if (e.location) base.from = e.location.slice(0, 250);
+    if (course.arr?.location) base.to = course.arr.location.slice(0, 250);
+    [c] = await withPlaces([base]);
+  } catch (err) { console.error("quick bon ia", err); return { error: "Lecture de l'événement impossible : utilisez « Importer des courses »." }; }
+  if (!c.origin || !c.dest) return { error: "Adresses non trouvées dans l'événement : complétez-le dans « Importer des courses »." };
+  if (!c.time) return { error: "Heure manquante : complétez-la dans « Importer des courses »." };
+  const f = new FormData();
+  f.set("origin", JSON.stringify(c.origin)); f.set("dest", JSON.stringify(c.dest));
+  f.set("name", (c.name || e.title || "Client").slice(0, 100).padEnd(2, "."));
+  f.set("phone", c.phone && c.phone.replace(/\D/g, "").length >= 6 ? c.phone : "Non communiqué");
+  f.set("email", c.email && /@/.test(c.email) ? c.email : "");
+  f.set("date", c.date); f.set("time", c.time);
+  f.set("passengers", String(Math.min(8, Math.max(1, c.passengers || 1)))); f.set("luggage", String(Math.min(20, Math.max(0, c.luggage || 0))));
+  if (c.flight) f.set("flight", c.flight.slice(0, 30));
+  if (c.notes) f.set("notes", c.notes.slice(0, 500));
+  if (c.price) f.set("price", String(c.price));
+  if (c.company) f.set("company", c.company.slice(0, 120));
+  f.set("source_ref", ref); f.set("goto", "stay");
+  const r = await createManual(f, null);
+  if ("error" in r) return { error: r.error };
+  wipe();
+  return { url: docPath("bon", r.id), id: r.id };
+}

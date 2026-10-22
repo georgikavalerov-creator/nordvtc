@@ -19,6 +19,17 @@ export async function setIcloudTarget(t: IcloudTarget) {
   await db().from("settings").upsert({ key: "icloud_target", value: t ?? {}, updated_at: new Date().toISOString() });
 }
 
+/** Agenda où le chauffeur note ses courses (lu pour le calendrier et les bons en un clic). */
+export async function getIcloudSource(): Promise<IcloudTarget> {
+  if (!dbConfigured()) return null;
+  const { data } = await db().from("settings").select("value").eq("key", "icloud_source").maybeSingle();
+  const v = data?.value as IcloudTarget;
+  return v?.url ? v : null;
+}
+export async function setIcloudSource(t: IcloudTarget) {
+  await db().from("settings").upsert({ key: "icloud_source", value: t ?? {}, updated_at: new Date().toISOString() });
+}
+
 export async function listIcloudCalendars(): Promise<{ url: string; name: string }[]> {
   if (!icloudConfigured()) return [];
   return calendars();
@@ -43,6 +54,7 @@ export async function pushBookingToIcloud(id: string): Promise<void> {
     if (!target) return;
     const { data: b } = await db().from("bookings").select("*").eq("id", id).maybeSingle();
     if (!b) return;
+    if (String(b.source_ref ?? "").startsWith("ical:")) return; // course déjà notée dans l'agenda du chauffeur : pas de doublon
     if (b.status === "confirmed" || b.status === "completed") await put(target.url, b as CalBooking);
     else await del(target.url, id);
   } catch (e) { console.error("icloud push", id, e); }
@@ -55,7 +67,7 @@ export async function syncAllToIcloud(): Promise<{ ok: number; failed: number }>
   const since = new Date(Date.now() - 2 * 86_400_000).toISOString();
   const { data } = await db().from("bookings").select("*").in("status", ["confirmed", "completed"]).gte("pickup_at", since).order("pickup_at").limit(150);
   let ok = 0, failed = 0;
-  for (const b of (data ?? []) as CalBooking[]) {
+  for (const b of ((data ?? []) as (CalBooking & { source_ref?: string | null })[]).filter((x) => !String(x.source_ref ?? "").startsWith("ical:"))) {
     try { await put(target.url, b); ok++; } catch (e) { failed++; console.error("icloud sync", b.id, e); }
   }
   return { ok, failed };

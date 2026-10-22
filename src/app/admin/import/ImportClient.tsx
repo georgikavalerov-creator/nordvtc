@@ -2,6 +2,7 @@
 import { useRef, useState } from "react";
 import ManualForm, { type ManualInitial } from "../ManualForm";
 import type { CalEvent } from "@/lib/icloud";
+import { pairUp, courseText, type AgendaCourse } from "@/lib/pair-events";
 
 type Found = ManualInitial & { key: string };
 
@@ -23,22 +24,7 @@ async function analyse(payload: object): Promise<{ courses?: (ManualInitial & { 
   return r.json().catch(() => ({ error: "Réponse illisible." }));
 }
 
-type Course = { ref: string; dep: CalEvent; arr: CalEvent | null };
-const words = (s: string) => new Set(s.toLowerCase().normalize("NFD").replace(/[^a-z0-9 ]/g, " ").split(/\s+/).filter((w) => w.length >= 3 && !["arrivee", "depart", "course", "dépose", "depose", "prise", "charge", "pour"].includes(w)));
-const mins = (e: CalEvent) => Number(e.time.slice(0, 2)) * 60 + Number(e.time.slice(3, 5));
-/** Une course = un événement « départ » suivi, le même jour, de l'événement « arrivée » (même client ou dans les 4 h). */
-function pairUp(events: CalEvent[]): Course[] {
-  const out: Course[] = [];
-  for (let k = 0; k < events.length; k++) {
-    const a = events[k], b = events[k + 1];
-    const arrWord = (e: CalEvent) => /arriv|dépos|depos|destination|→/i.test(e.title);
-    const sameClient = b ? [...words(a.title)].some((w) => words(b.title).has(w)) : false;
-    const close = b && !a.allDay && !b.allDay && b.date === a.date && mins(b) >= mins(a) && mins(b) - mins(a) <= 240;
-    if (b && close && (sameClient || arrWord(b) || (!arrWord(a) && !!b.location))) { out.push({ ref: a.ref, dep: a, arr: b }); k++; }
-    else out.push({ ref: a.ref, dep: a, arr: null });
-  }
-  return out;
-}
+type Course = AgendaCourse;
 
 export default function ImportClient({ connected, calError, events, done }: { connected: boolean; calError: string; events: CalEvent[]; done: string[] }) {
   const [prepared, setPrepared] = useState<Record<string, Found | "loading" | { error: string }>>({});
@@ -49,14 +35,11 @@ export default function ImportClient({ connected, calError, events, done }: { co
   const doneSet = new Set(done);
 
   const courses = pairUp(events);
-  const describe = (e: CalEvent, role: string) => [`${role} — ${e.title}`, e.location && `Lieu : ${e.location}`, e.notes && `Notes : ${e.notes}`, `Heure : ${e.allDay ? "journée entière" : e.time}`].filter(Boolean).join("\n");
 
   async function prepare(c: Course) {
     const e = c.dep;
     setPrepared((p) => ({ ...p, [c.ref]: "loading" }));
-    const text = c.arr
-      ? `Course notée en deux événements le ${e.date}.\n${describe(e, "Événement 1 (départ)")}\n${describe(c.arr, "Événement 2 (arrivée)")}`
-      : `${describe(e, "Événement")}\nDate : ${e.date}`;
+    const text = courseText(c);
     const r = await analyse({ text, date: e.date, time: e.allDay ? undefined : e.time, ref: c.ref, from: e.location || undefined, to: c.arr?.location || undefined });
     const f = r.courses?.[0];
     setPrepared((p) => ({ ...p, [c.ref]: f ? { ...f, ref: c.ref, key: c.ref } : { error: r.error || "Aucune course reconnue." } }));

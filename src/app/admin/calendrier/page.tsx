@@ -2,8 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { db, dbConfigured } from "@/lib/supabase";
 import { AdminPage } from "../gate";
-import { addBlock, removeBlock, saveIcloudTarget, syncIcloudNow } from "../actions";
-import { getIcloudTarget, listIcloudCalendars } from "@/lib/icloud-push";
+import { addBlock, removeBlock, saveIcloudSource, saveIcloudTarget, syncIcloudNow } from "../actions";
+import AgendaCourses, { type AgendaItem } from "../AgendaCourses";
+import { icloudEventsBetween, type CalEvent } from "@/lib/icloud";
+import { pairUp } from "@/lib/pair-events";
+import { docPath } from "@/lib/docsign";
+import { getIcloudSource, getIcloudTarget, listIcloudCalendars } from "@/lib/icloud-push";
 import { icloudConfigured } from "@/lib/icloud";
 import { fmtDT, ymd, type Booking } from "../lib";
 import { agendaToken } from "@/lib/ics";
@@ -39,10 +43,28 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ m
   const blockedOn = (day: string) => blocks.some((b) => ymd(b.start_at) <= day && ymd(b.end_at) >= day);
 
   const icloudOn = icloudConfigured();
-  const [target, cals] = await Promise.all([
+  const [target, source, cals] = await Promise.all([
     getIcloudTarget().catch(() => null),
+    getIcloudSource().catch(() => null),
     icloudOn ? listIcloudCalendars().catch(() => null) : Promise.resolve([]),
   ]);
+  // Courses notées dans l'agenda iPhone pour le mois affiché (+ bons déjà créés à partir de ces événements).
+  let agenda: { ref: string; dep: CalEvent; arr: CalEvent | null }[] = [];
+  let agendaError = "";
+  if (icloudOn && source) {
+    try { agenda = pairUp(await icloudEventsBetween(new Date(from), new Date(to), source.url)).filter((c) => c.dep.date.startsWith(base)); }
+    catch { agendaError = "Agenda iCloud injoignable pour le moment."; }
+  }
+  const madeFrom = new Map<string, string>();
+  if (agenda.length && dbConfigured()) {
+    const { data } = await db().from("bookings").select("id,source_ref").in("source_ref", agenda.map((c) => c.ref)).neq("status", "cancelled");
+    for (const r of data ?? []) madeFrom.set(r.source_ref as string, r.id as string);
+  }
+  const agendaItems: AgendaItem[] = agenda.map((c) => ({
+    ref: c.ref, date: c.dep.date, time: c.dep.allDay ? "" : c.dep.time, title: c.dep.title,
+    route: [c.dep.location, c.arr?.location || c.arr?.title].filter(Boolean).join(" → "),
+    done: madeFrom.has(c.ref) ? { url: docPath("bon", madeFrom.get(c.ref)!) } : undefined,
+  }));
   const tok = agendaToken();
   const host = SITE.url.replace(/^https?:\/\//, "");
   const feed = `${host}/api/agenda/${tok}`;
@@ -105,11 +127,34 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ m
                 </i>
               ))}
               {list.length > 3 && <i>+{list.length - 3}</i>}
+              {agenda.filter((c) => c.dep.date === day && !madeFrom.has(c.ref)).slice(0, 3).map((c) => (
+                <i key={c.ref} className="ag" title={`Agenda : ${c.dep.title}`}>{c.dep.allDay ? "" : c.dep.time} {c.dep.title.split(" ").slice(0, 2).join(" ")}</i>
+              ))}
             </div>
           );
         })}
       </div>
-      <small className="muted">Vert = confirmée · gris = terminée · hachuré = indisponible (aucune réservation en ligne possible).</small>
+      <small className="muted">Vert = confirmée · gris = terminée · violet = notée dans votre agenda, sans bon · hachuré = indisponible.</small>
+
+      <div className="adm-box" id="agenda-courses">
+        <div className="ag-head">
+          <strong>Courses de mon agenda iPhone · {MONTHS[M - 1]}</strong>
+          {icloudOn && cals && (
+            <form action={saveIcloudSource} className="adm-ical-form ag-src">
+              <input type="hidden" name="m" value={base} />
+              <select name="cal" defaultValue={source?.url ?? ""} aria-label="Agenda où vous notez vos courses">
+                <option value="">Choisir l&apos;agenda de mes courses…</option>
+                {cals.map((c) => <option key={c.url} value={c.url}>{c.name}</option>)}
+              </select>
+              <button className="btn small ghost">Afficher</button>
+            </form>
+          )}
+        </div>
+        {!icloudOn ? <p className="muted" style={{ margin: 0 }}>Connexion iCloud non configurée.</p>
+          : !source ? <p className="muted" style={{ margin: 0 }}>Choisissez l&apos;agenda où vous notez vos courses (par exemple « Planning Travail ») : elles s&apos;affichent ici et dans le calendrier, avec un bouton pour créer le bon de commande en un clic.</p>
+          : agendaError ? <p className="error" style={{ margin: 0 }}>{agendaError}</p>
+          : <AgendaCourses items={agendaItems} />}
+      </div>
 
       <div className="adm-box">
         <strong>Bloquer des dates (congés, maintenance, jours complets)</strong>

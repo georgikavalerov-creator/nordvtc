@@ -71,10 +71,15 @@ function parseEvents(ics: string, calendar: string): CalEvent[] {
 const icalStamp = (d: Date) => d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
 
 /** Événements entre maintenant - `pastDays` et maintenant + `days`, triés par date. */
-export async function icloudEvents(days = 30, pastDays = 2): Promise<CalEvent[]> {
-  const from = new Date(Date.now() - pastDays * 86_400_000), to = new Date(Date.now() + days * 86_400_000);
+export async function icloudEvents(days = 30, pastDays = 2, only?: string | null): Promise<CalEvent[]> {
+  return icloudEventsBetween(new Date(Date.now() - pastDays * 86_400_000), new Date(Date.now() + days * 86_400_000), only);
+}
+
+/** Événements d'une période. `only` : URL de l'agenda choisi dans l'administration (sinon ICLOUD_CALENDARS, sinon tous). */
+export async function icloudEventsBetween(from: Date, to: Date, only?: string | null): Promise<CalEvent[]> {
   const wanted = (process.env.ICLOUD_CALENDARS ?? "").split(",").map((s) => s.trim().toLowerCase()).filter(Boolean);
-  const cals = (await calendars()).filter((c) => !wanted.length || wanted.includes(c.name.toLowerCase()));
+  const all = await calendars();
+  const cals = only ? all.filter((c) => c.url === only) : all.filter((c) => !wanted.length || wanted.includes(c.name.toLowerCase()));
   const body = `<?xml version="1.0"?><c:calendar-query xmlns:d="DAV:" xmlns:c="urn:ietf:params:xml:ns:caldav"><d:prop><c:calendar-data><c:expand start="${icalStamp(from)}" end="${icalStamp(to)}"/></c:calendar-data></d:prop><c:filter><c:comp-filter name="VCALENDAR"><c:comp-filter name="VEVENT"><c:time-range start="${icalStamp(from)}" end="${icalStamp(to)}"/></c:comp-filter></c:comp-filter></c:filter></c:calendar-query>`;
   const lists = await Promise.all(cals.map(async (c) => {
     try { const r = await dav(c.url, "REPORT", body, "1"); return tags(r.text, "calendar-data").flatMap((d) => parseEvents(xmlText(d), c.name)); }

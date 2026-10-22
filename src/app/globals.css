@@ -3745,3 +3745,19 @@ input[type="file"]:focus-visible { outline: none; border-color: #1f5bff !importa
 :root[data-theme="dark"] .adm-table th { border-bottom-color: #d9d9dc; } 
 :root[data-theme="dark"] .adm-table td { border-bottom-color: #e2e2e4; }
 input[type="file"][hidden] { display: none !important; }
+
+/* Calendrier admin : courses notées dans l'agenda iPhone */
+.adm-cal .d i.ag { background: rgba(124,58,237,.14); color: #5b21b6; }
+.ag-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+.ag-src { flex: 0 1 420px; }
+.ag-list { display: grid; gap: 10px; }
+.ag-list > .btn { justify-self: start; }
+.ag-list ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.ag-list li { display: grid; grid-template-columns: 96px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 10px 12px; border: 1px solid #e4e4e7; border-radius: 14px; background: #fff; }
+.ag-list li.is-done { opacity: .7; }
+.ag-when { display: grid; } .ag-when b { font-size: .88rem; text-transform: capitalize; } .ag-when small { color: #5e5e5e; font-variant-numeric: tabular-nums; }
+.ag-txt { display: grid; min-width: 0; } .ag-txt strong { font-size: .93rem; } .ag-txt small { color: #5e5e5e; font-size: .82rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ag-err { grid-column: 1 / -1; margin: 0; font-size: .85rem; }
+@media (max-width: 640px) { .ag-list li { grid-template-columns: 1fr auto; } .ag-when { grid-column: 1 / -1; display: flex; gap: 8px; } }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .ag-list li { background: #f3f3f3; border-color: #d9d9dc; } }
+:root[data-theme="dark"] .ag-list li { background: #f3f3f3; border-color: #d9d9dc; }
