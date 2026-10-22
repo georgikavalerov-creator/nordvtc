@@ -23,7 +23,12 @@ export default async function ReservationPage({ searchParams }: Props) {
   const resolve = async (q: string) => {
     const t = q.trim().slice(0, 120);
     if (t.length < 3) return null;
-    try { const r = (await suggestPlaces(t))[0]; return r ? signPlace(r) : null; } catch { return null; }
+    try {
+      const list = await suggestPlaces(t);
+      // On évite les parkings (« P4 », « parking ») quand un résultat plus juste existe.
+      const r = list.find((x) => !/\bP\d+\b|parking/i.test(x.label)) ?? list[0];
+      return r ? signPlace(r) : null;
+    } catch { return null; }
   };
   const [initialOrigin, initialDest] = await Promise.all([resolve(from), resolve(to)]);
   const user = await currentUser();
