@@ -1,4 +1,5 @@
 import Link from "next/link";
+import AccountSearch from "@/components/AccountSearch";
 import TripCard, { rebookHref } from "@/components/TripCard";
 import { getPlaces, requireUser, userBookings } from "@/lib/account";
 import { euro } from "@/lib/pricing";
@@ -15,11 +16,7 @@ export default async function Accueil() {
   const recent = done.slice(0, 3);
   return (
     <>
-      <form action="/reservation" className="acc-search">
-        <h2>Où allez-vous ?</h2>
-        <input name="from" placeholder="Départ" aria-label="Départ" maxLength={120} />
-        <input name="to" placeholder="Destination" aria-label="Destination" maxLength={120} />
-        <button className="btn" type="submit">Voir le prix</button>
+      <AccountSearch>
         {places.length > 0 && (
           <div className="chips">
             {places.map((p) => (
@@ -29,7 +26,7 @@ export default async function Accueil() {
             ))}
           </div>
         )}
-      </form>
+      </AccountSearch>
 
       <div className="acc-stats">
         <div><strong>{done.length}</strong><span>trajet{done.length > 1 ? "s" : ""} effectué{done.length > 1 ? "s" : ""}</span></div>
