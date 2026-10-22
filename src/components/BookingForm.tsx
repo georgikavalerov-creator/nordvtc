@@ -239,10 +239,6 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
 
   return (
     <form ref={formRef} className="form ticket bk" onSubmit={submit} aria-label="Réservation d'un trajet">
-      <header className="bk-head">
-        <h2 className="bk-title">Réservez votre trajet</h2>
-        <p className="bk-help">Le prix s'affiche tout de suite. Une seule page, puis le paiement sécurisé.</p>
-      </header>
       {cancelled && <p className="notice">Paiement annulé : votre réservation n'est pas confirmée. Vous pouvez recommencer.</p>}
 
       <div className="bk-pane">
@@ -264,14 +260,14 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
             ))}
           </div>
         )}
+    <div className="date-chips" aria-label="Choix rapide de la date">
+          {[["Aujourd'hui", 0], ["Demain", 1], ["Après-demain", 2]].map(([l, o]) => (
+            <button key={String(l)} type="button" className={`chip${date === dayChip(Number(o)) ? " on" : ""}`} onClick={() => { setDate(dayChip(Number(o))); setErrors((x) => ({ ...x, when: undefined })); }}>{l}</button>
+          ))}
+        </div>
         <div className="bk-grid bk-4">
           <label>
             Date
-            <span className="date-chips">
-              {[["Aujourd'hui", 0], ["Demain", 1], ["Après-demain", 2]].map(([l, o]) => (
-                <button key={String(l)} type="button" className={`chip${date === dayChip(Number(o)) ? " on" : ""}`} onClick={() => { setDate(dayChip(Number(o))); setErrors((x) => ({ ...x, when: undefined })); }}>{l}</button>
-              ))}
-            </span>
             <input type="date" required min={today()} value={date} onChange={(e) => { setDate(e.target.value); setErrors((x) => ({ ...x, when: undefined })); }} aria-invalid={!!errors.when && !date} />
           </label>
           <div className="tf-label">
