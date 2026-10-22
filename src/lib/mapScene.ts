@@ -68,8 +68,13 @@ export function mountMap(root) {
   }
   function progress() { const b = root.getBoundingClientRect(); return clamp(-b.top / Math.max(b.height - innerHeight, 1), 0, 1); }
 
+  const coarse = matchMedia("(pointer: coarse)").matches;
+  let lastT = 0;
   function draw(now) {
     raf = 0; if (!vis) return;
+    // Téléphones : 30 images/s suffisent (fluide, moins de batterie).
+    if (coarse && now - lastT < 32) { raf = requestAnimationFrame(draw); return; }
+    lastT = now;
     const time = (now - t0) / 1000, s = progress(); root.classList.toggle("is-started", s > 0.03);
     tx += (px - tx) * 0.06; ty += (py - ty) * 0.06;
     const zi = sm(s / 0.42);
@@ -87,7 +92,7 @@ export function mountMap(root) {
     ctx.clearRect(0, 0, w, h);
     // Halo de la ville.
     const lc = W(3.0573, 50.6292), g = ctx.createRadialGradient(X(lc), Y(lc), 0, X(lc), Y(lc), 0.16 * sc);
-    g.addColorStop(0, C.halo); g.addColorStop(1, "rgba(70,110,255,0)"); ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+    g.addColorStop(0, C.halo); g.addColorStop(1, "rgba(70,110,255,0)"); ctx.fillStyle = g; { const hr = 0.16 * sc, hx = X(lc), hy = Y(lc); ctx.fillRect(hx - hr, hy - hr, hr * 2, hr * 2); } // seule la zone du halo est peinte (rendu identique)
     if (loaded) {
       const fade = clamp((now - loaded) / 900, 0, 1);
       ctx.save(); ctx.globalAlpha = fade;
