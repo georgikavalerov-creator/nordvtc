@@ -17,6 +17,7 @@ import { createManual } from "@/lib/manual";
 import { processLogo } from "@/lib/logo";
 import { hashPassword, newPassword } from "@/lib/driver-auth";
 import { decideClaimCore } from "@/lib/claim";
+import { adminReply } from "@/lib/chat";
 
 export async function login(_: { error?: string } | undefined, form: FormData) {
   const ip = (await headers()).get("x-forwarded-for")?.split(",")[0]?.trim() || "inconnu";
@@ -293,4 +294,21 @@ export async function decideClaim(_: { error?: string; ok?: string } | undefined
   const r = await decideClaimCore(id.data, form.get("decision") === "accept");
   wipe();
   return r;
+}
+
+// ---------- Discussion en direct ----------
+export async function replyChat(_: { error?: string; ok?: boolean } | undefined, form: FormData) {
+  if (!(await isAdmin())) redirect("/admin");
+  const id = z.string().uuid().safeParse(form.get("thread"));
+  const body = String(form.get("body") ?? "").trim().slice(0, 1500);
+  if (!id.success || !body) return { error: "Message vide." };
+  const r = await adminReply(id.data, body);
+  revalidatePath("/admin/messages");
+  return r;
+}
+export async function closeChat(form: FormData) {
+  if (!(await isAdmin())) redirect("/admin");
+  const id = z.string().uuid().safeParse(form.get("thread"));
+  if (id.success) await db().from("chat_threads").update({ closed: form.get("reopen") ? false : true }).eq("id", id.data);
+  revalidatePath("/admin/messages");
 }

@@ -15,6 +15,7 @@ import PricingFx from "@/components/PricingFx";
 import { THEME_INIT } from "@/components/ThemeToggle";
 import { SITE } from "@/lib/site";
 import { VILLES } from "@/lib/villes";
+import ChatButton from "@/components/ChatButton";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
@@ -89,6 +90,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Interact />
         <Footer />
         <MobileBar />
+        <ChatButton />
         <Analytics />
         <CtaTracker />
         <AppBridge />

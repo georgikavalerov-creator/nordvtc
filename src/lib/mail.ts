@@ -126,3 +126,16 @@ export async function sendClaimDecision(b: { id: string; name: string; email: st
   await send(b.email, `${b.accepted ? "Annulation acceptée" : "Justificatif non validé"} — ${SITE.name}`,
     `<div style="font-family:system-ui;max-width:560px"><h2>${b.accepted ? "Annulation sans frais acceptée" : "Justificatif non validé"}</h2><p>Bonjour ${esc(b.name)},</p><p>${esc(b.trip)}</p>${body}<p>Référence : <code>${esc(b.id.slice(0, 8))}</code></p></div>`);
 }
+
+// ---------- Discussion en direct ----------
+export async function sendChatNotice(m: { threadId: string; name: string | null; email: string | null; page: string | null; body: string; url: string }) {
+  const notify = process.env.MAIL_NOTIFY_TO;
+  if (!notify) return;
+  await send(notify, `💬 Nouveau message${m.name ? ` de ${m.name}` : ""} sur le site`,
+    `<div style="font-family:system-ui;max-width:560px"><h3>Nouveau message dans la discussion</h3><p style="white-space:pre-wrap;background:#f3f5fa;padding:12px;border-radius:10px">${esc(m.body)}</p><p>${m.name ? esc(m.name) : "Visiteur anonyme"}${m.email ? ` — ${esc(m.email)}` : ""}${m.page ? `<br><span style="color:#667">Page : ${esc(m.page)}</span>` : ""}</p><p><a href="${esc(m.url)}" style="display:inline-block;background:#1f5bff;color:#fff;padding:10px 16px;border-radius:10px;text-decoration:none">Répondre</a></p></div>`);
+}
+
+export async function sendChatReplyNotice(m: { email: string; name: string | null; body: string; url: string }) {
+  await send(m.email, `Réponse de votre chauffeur — ${SITE.name}`,
+    `<div style="font-family:system-ui;max-width:560px"><h2>Vous avez une réponse</h2><p>Bonjour${m.name ? ` ${esc(m.name)}` : ""},</p><p style="white-space:pre-wrap;background:#f3f5fa;padding:12px;border-radius:10px">${esc(m.body)}</p><p><a href="${esc(m.url)}" style="display:inline-block;background:#1f5bff;color:#fff;padding:10px 16px;border-radius:10px;text-decoration:none">Reprendre la discussion</a></p><p style="color:#667;font-size:13px">Vous recevez cet e-mail car vous avez laissé votre adresse dans la discussion du site ${SITE.name}.</p></div>`);
+}

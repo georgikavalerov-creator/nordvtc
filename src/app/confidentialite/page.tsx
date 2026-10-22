@@ -28,6 +28,7 @@ export default async function Confidentialite() {
         <li><strong>Réservation :</strong> nom, téléphone, e-mail, adresses de départ et d'arrivée, date et heure (aller et éventuel retour), nombre de passagers et de bagages, type et numéro de vol ou de train, précisions (siège enfant, bagage volumineux, animal), informations de facturation si vous demandez une facture d'entreprise.</li>
         <li><strong>Paiement :</strong> montant, statut et référence du paiement ou du remboursement. Les données de carte bancaire sont saisies directement chez Stripe et ne sont jamais reçues ni enregistrées par ce site.</li>
         <li><strong>Annulation sur justificatif :</strong> le document que vous déposez pour prouver l'annulation de votre train ou de votre vol (e-mail, SMS ou capture de la compagnie) et votre message éventuel. Nous vous conseillons de masquer les informations sans rapport avec le trajet.</li>
+        <li><strong>Discussion en direct :</strong> vos messages et, si vous les indiquez, votre prénom et votre e-mail (pour être prévenu de la réponse). Aucun compte n&apos;est nécessaire : un identifiant aléatoire est gardé dans votre navigateur pour retrouver la conversation.</li>
         <li><strong>Contact :</strong> nom, e-mail, téléphone (facultatif) et contenu du message, via le formulaire ou l'adresse e-mail du site.</li>
         <li><strong>Demande d'appel ou de rappel :</strong> nom, numéro de mobile, besoin éventuel ; le numéro est vérifié par un code envoyé par SMS.</li>
         <li><strong>Espace personnel (facultatif) :</strong> adresse e-mail, nom, identifiant fourni par Google ou Apple si vous choisissez ce mode de connexion, adresses enregistrées, préférences de trajet, avis laissés et historique de réservations.</li>
@@ -59,6 +60,7 @@ export default async function Confidentialite() {
         <li>Pièces comptables (paiements, notes, factures) : 10 ans, comme l'exige la loi.</li>
         <li>Justificatifs d'annulation : supprimés automatiquement 1 an après leur dépôt.</li>
         <li>Messages de contact et demandes de rappel : 3 ans maximum.</li>
+        <li>Discussions en direct : supprimées automatiquement 1 an après le dernier message.</li>
         <li>Espace personnel : tant que le compte existe. Vous pouvez le supprimer à tout moment depuis « Sécurité et confidentialité » ; vos réservations passées sont alors conservées sans lien avec le compte, pour les obligations comptables.</li>
       </ul>
 
@@ -74,7 +76,7 @@ export default async function Confidentialite() {
 
       <h2>Cookies et stockage local</h2>
       <p>
-        Ce site n'utilise aucun cookie publicitaire ni de suivi. Seuls des cookies strictement nécessaires sont déposés : session de connexion à l'espace personnel, accès à l'espace d'administration et, le cas échéant, contrôle anti-robots. Ils ne nécessitent pas de consentement. Si la mesure d'audience est activée, elle repose sur Plausible Analytics, sans cookie ni donnée personnelle (statistiques agrégées). Le navigateur conserve aussi temporairement (stockage de session) le brouillon de votre réservation et votre demande d'appel ; ils disparaissent à la fermeture de l'onglet. Votre choix d'affichage (jour ou nuit) est mémorisé sur votre appareil.
+        Ce site n'utilise aucun cookie publicitaire ni de suivi. Seuls des cookies strictement nécessaires sont déposés : session de connexion à l'espace personnel, accès à l'espace d'administration et, le cas échéant, contrôle anti-robots. Ils ne nécessitent pas de consentement. Si la mesure d'audience est activée, elle repose sur Plausible Analytics, sans cookie ni donnée personnelle (statistiques agrégées). Le navigateur conserve aussi temporairement (stockage de session) le brouillon de votre réservation et votre demande d'appel ; ils disparaissent à la fermeture de l'onglet. Si vous utilisez la discussion, son identifiant est gardé sur votre appareil (stockage local) pour la retrouver. Votre choix d'affichage (jour ou nuit) est mémorisé sur votre appareil.
       </p>
     </LegalShell>
   );
