@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { allow, clientIp } from "@/lib/ratelimit";
+import { allowDurable, clientIp } from "@/lib/ratelimit";
 import { checkOtp, dailyCapOk, normalizePhone, otpConfigured } from "@/lib/callback";
 import { saveLeadAndReveal } from "@/lib/lead";
 
@@ -18,7 +18,7 @@ export async function POST(req: Request) {
   const p = schema.safeParse(await req.json().catch(() => null));
   const phone = p.success ? normalizePhone(p.data.phone) : null;
   if (!p.success || !phone) return fail("Code invalide.");
-  if (!allow(`cbv:${ip}`, 8, 10 * 60_000) || !allow(`cbv:${phone}`, 5, 10 * 60_000)) {
+  if (!(await allowDurable(`cbv:${ip}`, 8, 10 * 60_000)) || !(await allowDurable(`cbv:${phone}`, 5, 10 * 60_000))) {
     return fail("Trop d'essais. Réessayez dans quelques minutes.", 429);
   }
   if (!(await checkOtp(phone, p.data.code))) return fail("Code incorrect ou expiré.", 422);

@@ -3,7 +3,7 @@ import { z } from "zod";
 import { routeSummary } from "@/lib/here";
 import { computeQuote } from "@/lib/pricing";
 import { getPricing } from "@/lib/supabase";
-import { allow, clientIp } from "@/lib/ratelimit";
+import { allow, clientIp, allowDurable } from "@/lib/ratelimit";
 import { applyDiscount, validatePromo } from "@/lib/promo";
 import { currentUser } from "@/lib/auth";
 
@@ -38,7 +38,7 @@ export async function POST(req: Request) {
     let quote = computeQuote(route.distanceM, route.durationS, hour, pricing);
     let promoOut: { code: string; discountCents: number; label: string } | { error: string } | undefined;
     if (promo?.trim()) {
-      if (!allow(`promo:${clientIp(req)}`, 15, 10 * 60_000)) return NextResponse.json({ error: "Trop d'essais de code, réessayez plus tard." }, { status: 429 });
+      if (!(await allowDurable(`promo:${clientIp(req)}`, 15, 10 * 60_000))) return NextResponse.json({ error: "Trop d'essais de code, réessayez plus tard." }, { status: 429 });
       const user = await currentUser();
       const r = await validatePromo(promo, quote.priceCents, { userId: user?.id, email: email ?? user?.email });
       if (r.ok) { promoOut = { code: r.code, discountCents: r.discountCents, label: r.label }; quote = { ...applyDiscount(quote, r.discountCents, pricing) }; }

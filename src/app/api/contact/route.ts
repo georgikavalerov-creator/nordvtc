@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { sendContactNotice } from "@/lib/mail";
-import { allow, clientIp } from "@/lib/ratelimit";
+import { allow, clientIp, allowDurable } from "@/lib/ratelimit";
 
 const schema = z.object({
   name: z.string().trim().min(2).max(100),
@@ -14,7 +14,7 @@ const schema = z.object({
 
 
 export async function POST(req: Request) {
-  if (!allow(`contact:${clientIp(req)}`, 5, 10 * 60_000)) {
+  if (!(await allowDurable(`contact:${clientIp(req)}`, 5, 10 * 60_000))) {
     return NextResponse.json({ error: "Trop de messages, réessayez plus tard." }, { status: 429 });
   }
   const parsed = schema.safeParse(await req.json().catch(() => null));

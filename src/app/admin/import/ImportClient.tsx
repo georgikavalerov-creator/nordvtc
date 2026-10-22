@@ -19,7 +19,7 @@ async function shrink(file: File): Promise<string> {
 }
 
 async function analyse(payload: object): Promise<{ courses?: (ManualInitial & { from: string; to: string })[]; error?: string }> {
-  const r = await fetch("/api/admin/import", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+  const r = await fetch("/admin/api/import", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
   return r.json().catch(() => ({ error: "Réponse illisible." }));
 }
 

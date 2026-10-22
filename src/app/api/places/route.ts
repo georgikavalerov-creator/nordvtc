@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { suggestPlaces } from "@/lib/here";
+import { signPlace } from "@/lib/place-sign";
 import { allow, clientIp } from "@/lib/ratelimit";
 
 export async function GET(req: Request) {
@@ -9,7 +10,7 @@ export async function GET(req: Request) {
   const q = new URL(req.url).searchParams.get("q")?.trim() ?? "";
   if (q.length < 3 || q.length > 120) return NextResponse.json({ items: [] });
   try {
-    return NextResponse.json({ items: await suggestPlaces(q) });
+    return NextResponse.json({ items: (await suggestPlaces(q)).map(signPlace) });
   } catch (e) {
     console.error("places", e);
     return NextResponse.json({ error: "Recherche d'adresse indisponible" }, { status: 503 });

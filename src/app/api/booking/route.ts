@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { routeSummary } from "@/lib/here";
+import { trustPlace } from "@/lib/place-sign";
 import { computeQuote, euro, parisToUtc } from "@/lib/pricing";
 import { db, dbConfigured, getPricing } from "@/lib/supabase";
 import { getStripe, stripeConfigured } from "@/lib/stripe";
 import { trackKey } from "@/lib/docsign";
 import { SITE } from "@/lib/site";
-import { allow, clientIp } from "@/lib/ratelimit";
+import { allow, clientIp, allowDurable } from "@/lib/ratelimit";
 import { currentUser } from "@/lib/auth";
 import { applyDiscount, validatePromo } from "@/lib/promo";
 
@@ -14,6 +15,7 @@ const place = z.object({
   label: z.string().min(3).max(300),
   lat: z.number().min(-90).max(90),
   lng: z.number().min(-180).max(180),
+  sig: z.string().max(40).optional(),
 });
 
 const schema = z.object({
@@ -39,7 +41,7 @@ const schema = z.object({
 });
 
 export async function POST(req: Request) {
-  if (!allow(`booking:${clientIp(req)}`, 8, 10 * 60_000)) {
+  if (!(await allowDurable(`booking:${clientIp(req)}`, 8, 10 * 60_000))) {
     return NextResponse.json({ error: "Trop de tentatives, réessayez dans quelques minutes." }, { status: 429 });
   }
   if (!dbConfigured() || !stripeConfigured()) {
@@ -53,6 +55,14 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Merci de vérifier les champs du formulaire." }, { status: 400 });
   }
   const d = parsed.data;
+  // Coordonnées vérifiées (signature du site) ou recalculées depuis l'adresse : le prix ne peut pas être faussé.
+  {
+    const o = await trustPlace(d.origin), t = await trustPlace(d.dest);
+    if (!o || !t) return NextResponse.json({ error: "Adresse non reconnue : choisissez-la dans la liste proposée." }, { status: 422 });
+    d.origin = o; d.dest = t;
+    if (d.returnTrip?.origin) { const x = await trustPlace(d.returnTrip.origin); if (!x) return NextResponse.json({ error: "Adresse du retour non reconnue." }, { status: 422 }); d.returnTrip.origin = x; }
+    if (d.returnTrip?.dest) { const x = await trustPlace(d.returnTrip.dest); if (!x) return NextResponse.json({ error: "Adresse du retour non reconnue." }, { status: 422 }); d.returnTrip.dest = x; }
+  }
 
   try {
     const pricing = await getPricing();

@@ -1,4 +1,9 @@
-// Limiteur très simple en mémoire (suffisant pour freiner les abus sur un petit site).
+import { db, dbConfigured } from "./supabase";
+
+// Deux niveaux de limitation :
+// - allow() : en mémoire, instantané, pour les requêtes fréquentes (suggestions d'adresses, devis, actualisation du chat) ;
+// - allowDurable() : en base, partagé entre toutes les instances du site, pour les actions sensibles
+//   (connexions, SMS, formulaires, réservations) : impossible à contourner en multipliant les requêtes.
 const hits = new Map<string, number[]>();
 
 export function allow(key: string, max: number, windowMs: number): boolean {
@@ -16,6 +21,21 @@ export function allow(key: string, max: number, windowMs: number): boolean {
   return true;
 }
 
+export async function allowDurable(key: string, max: number, windowMs: number): Promise<boolean> {
+  if (!allow(`m:${key}`, max, windowMs)) return false; // premier filtre local, gratuit
+  if (!dbConfigured()) return true;
+  try {
+    const { data, error } = await db().rpc("rate_hit", { p_key: key.slice(0, 200), p_max: max, p_window_s: Math.round(windowMs / 1000) });
+    if (error) { console.error("rate_hit", error.message); return true; } // en cas de panne, on ne bloque pas les clients
+    return data !== false;
+  } catch { return true; }
+}
+
+/** Adresse IP réelle du visiteur : fournie par Cloudflare (non falsifiable), sinon repli. */
+export function ipFrom(h: Headers): string {
+  return h.get("cf-connecting-ip")?.trim() || h.get("x-real-ip")?.trim() || h.get("x-forwarded-for")?.split(",").pop()?.trim() || "inconnu";
+}
+
 export function clientIp(req: Request): string {
-  return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "inconnu";
+  return ipFrom(req.headers);
 }

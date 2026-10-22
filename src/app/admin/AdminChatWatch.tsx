@@ -17,7 +17,7 @@ export default function AdminChatWatch({ initial }: { initial: U }) {
     let stop = false;
     const tick = async () => {
       if (document.hidden || stop) return;
-      try { const r = await fetch("/api/admin/chat-unread", { cache: "no-store" }); if (r.ok) setU(await r.json()); } catch { /* hors ligne */ }
+      try { const r = await fetch("/admin/api/chat-unread", { cache: "no-store" }); if (r.ok) setU(await r.json()); } catch { /* hors ligne */ }
     };
     const t = window.setInterval(tick, 15_000);
     const onVis = () => { if (!document.hidden) tick(); };

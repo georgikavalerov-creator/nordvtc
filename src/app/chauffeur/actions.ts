@@ -8,15 +8,16 @@ import { currentDriver, endDriverSession, hashPassword, startDriverSession, veri
 import { createManual } from "@/lib/manual";
 import { processLogo } from "@/lib/logo";
 import { docPath } from "@/lib/docsign";
-import { allow } from "@/lib/ratelimit";
+import { allow, allowDurable, ipFrom } from "@/lib/ratelimit";
 import { db } from "@/lib/supabase";
 
 type R = { error?: string; ok?: boolean } | undefined;
 
 export async function loginDriver(_: R, form: FormData): Promise<R> {
-  const ip = (await headers()).get("x-forwarded-for")?.split(",")[0]?.trim() || "inconnu";
-  if (!allow(`driver-login:${ip}`, 8, 15 * 60_000)) return { error: "Trop de tentatives. Réessayez plus tard." };
+  const ip = ipFrom(await headers());
   const email = String(form.get("email") ?? "").trim().toLowerCase();
+  // Anti force brute : par adresse IP et par compte visé.
+  if (!(await allowDurable(`driver-login:${ip}`, 8, 15 * 60_000)) || !(await allowDurable(`driver-login:${email}`, 10, 3_600_000))) return { error: "Trop de tentatives. Réessayez plus tard." };
   let data: { id: string; password_hash: string; active: boolean } | null = null;
   try { data = (await db().from("drivers").select("id,password_hash,active").eq("email", email).maybeSingle()).data; }
   catch { return { error: "Service momentanément indisponible." }; }

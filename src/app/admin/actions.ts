@@ -5,7 +5,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { checkPassword, endSession, isAdmin, startSession } from "@/lib/admin-auth";
-import { allow } from "@/lib/ratelimit";
+import { allow, allowDurable, ipFrom } from "@/lib/ratelimit";
 import { db } from "@/lib/supabase";
 import { DEFAULT_PRICING } from "@/lib/pricing";
 import { sendInvoiceEmail } from "@/lib/mail";
@@ -22,9 +22,10 @@ import { decideClaimCore } from "@/lib/claim";
 import { adminReply } from "@/lib/chat";
 
 export async function login(_: { error?: string } | undefined, form: FormData) {
-  const ip = (await headers()).get("x-forwarded-for")?.split(",")[0]?.trim() || "inconnu";
-  if (!allow(`admin-login:${ip}`, 6, 15 * 60_000)) return { error: "Trop de tentatives. Réessayez plus tard." };
-  if (!checkPassword(String(form.get("password") ?? ""))) return { error: "Mot de passe incorrect." };
+  const ip = ipFrom(await headers());
+  // Anti force brute : 5 essais / 15 min par adresse IP, et 40 / heure au total (attaques réparties).
+  if (!(await allowDurable(`admin-login:${ip}`, 5, 15 * 60_000)) || !(await allowDurable("admin-login:all", 40, 3_600_000))) return { error: "Trop de tentatives. Réessayez plus tard." };
+  if (!checkPassword(String(form.get("password") ?? ""))) { await new Promise((r) => setTimeout(r, 600)); return { error: "Mot de passe incorrect." }; }
   await startSession();
   redirect("/admin");
 }
