@@ -53,7 +53,7 @@ export default async function Messages({ searchParams }: { searchParams: Promise
         </aside>
         <div className="adm-conv">
           {!cur ? (
-            <p className="muted">Choisissez une conversation. Vous recevez un e-mail à chaque nouveau message (au plus un toutes les 10 minutes par conversation).</p>
+            <p className="muted">Choisissez une conversation. Vous recevez un e-mail à chaque message d'un client : répondez directement à l'e-mail ou ici.</p>
           ) : (
             <>
               <div className="adm-conv-head">
