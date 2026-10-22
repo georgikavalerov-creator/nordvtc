@@ -84,6 +84,7 @@ export default function CallGate() {
         ) : (
           <p className="muted">Votre demande est bien enregistrée : je vous rappelle rapidement.</p>
         )}
+        <button type="button" className="linklike" onClick={() => { try { sessionStorage.removeItem("nvtc-num"); } catch {} setNumber(""); setCode(""); setStep("form"); }}>Nouvelle demande</button>
       </div>
     );
   }
