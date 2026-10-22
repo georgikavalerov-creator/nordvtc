@@ -1,5 +1,6 @@
 import Link from "next/link";
-import TripCard from "@/components/TripCard";
+import TripCard, { removable } from "@/components/TripCard";
+import HideTrip from "@/components/HideTrip";
 import { requireUser, userBookings } from "@/lib/account";
 
 export const metadata = { title: "Mes trajets" };
@@ -23,6 +24,9 @@ export default async function Trajets({ searchParams }: Props) {
       <div className="acc-tabs" role="tablist">
         {tabs.map(([k, l]) => <Link key={k} role="tab" aria-selected={k === key} className={k === key ? "on" : ""} href={`/compte/trajets?v=${k}`}>{l} <span>{groups[k].length}</span></Link>)}
       </div>
+      {key !== "avenir" && groups[key].length > 1 && (
+        <div className="trip-bulk"><HideTrip ids={groups[key].filter(removable).map((b) => b.id)} label={`Tout supprimer (${groups[key].filter(removable).length})`} confirmText={`Retirer ces ${groups[key].filter(removable).length} trajets de votre espace ?`} /></div>
+      )}
       {groups[key].length ? groups[key].map((b) => <TripCard key={b.id} b={b} rebook={key !== "avenir"} />) : <p className="muted">Rien à afficher ici pour le moment.</p>}
     </>
   );

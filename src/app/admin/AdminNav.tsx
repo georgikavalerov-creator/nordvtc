@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 
 const ITEMS = [
   ["/admin", "Tableau de bord"],
+  ["/admin/reservations/nouvelle", "+ Bon de commande"],
   ["/admin/reservations", "Réservations"],
   ["/admin/messages", "Messages"],
   ["/admin/calendrier", "Calendrier"],
@@ -22,7 +23,7 @@ export default function AdminNav() {
   return (
     <nav className="adm-nav" aria-label="Administration">
       {ITEMS.map(([href, label]) => {
-        const on = href === "/admin" ? path === href : path.startsWith(href);
+        const on = href === "/admin" ? path === href : href === "/admin/reservations" ? path.startsWith(href) && !path.startsWith("/admin/reservations/nouvelle") : path.startsWith(href);
         return <Link key={href} href={href} className={on ? "on" : ""} aria-current={on ? "page" : undefined}>{label}</Link>;
       })}
     </nav>

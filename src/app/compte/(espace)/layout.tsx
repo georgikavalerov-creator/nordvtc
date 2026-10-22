@@ -13,7 +13,7 @@ export default async function EspaceLayout({ children }: { children: React.React
     <section className="section acc">
       <div className="wrap" style={{ maxWidth: 900 }}>
         <div className="acc-head">
-          <span className="acc-avatar" aria-hidden="true">{name.slice(0, 1).toUpperCase()}</span>
+          <span className="acc-avatar" aria-hidden="true">{profile.avatar ? <img src={profile.avatar} alt="" width={52} height={52} /> : name.slice(0, 1).toUpperCase()}</span>
           <div><strong style={{ fontSize: "1.3rem" }}>{name}</strong><br /><span className="muted">{user.email}</span></div>
         </div>
         <AccountNav />

@@ -105,3 +105,42 @@ export async function claimMine(bookingId: string, _: { ok?: boolean; error?: st
   if (r.ok) revalidatePath("/compte", "layout");
   return r;
 }
+
+/** Photo de profil : petite image JPEG/PNG/WebP déjà recadrée par le navigateur (null = retirer la photo). */
+export async function saveAvatar(dataUrl: string | null): Promise<{ ok?: boolean; error?: string }> {
+  const u = await me();
+  let avatar: string | null = null;
+  if (dataUrl) {
+    const m = /^data:image\/(jpeg|png|webp);base64,([A-Za-z0-9+/]+={0,2})$/.exec(dataUrl);
+    if (!m || dataUrl.length > 200_000) return { error: "Image non prise en charge ou trop lourde." };
+    // Vérifie la signature réelle du fichier (pas seulement l'en-tête annoncé).
+    const head = Buffer.from(m[2].slice(0, 24), "base64");
+    const ok = (m[1] === "jpeg" && head[0] === 0xff && head[1] === 0xd8) || (m[1] === "png" && head[0] === 0x89 && head[1] === 0x50) || (m[1] === "webp" && head.toString("latin1", 8, 12) === "WEBP");
+    if (!ok) return { error: "Image non prise en charge." };
+    avatar = dataUrl;
+  }
+  const { error } = await db().from("profiles").upsert({ user_id: u.id, avatar, updated_at: new Date().toISOString() });
+  if (error) return { error: "Enregistrement impossible." };
+  revalidatePath("/compte", "layout");
+  return { ok: true };
+}
+
+/** Retire des trajets de l'espace client (passés, annulés ou non payés). Ils restent conservés pour la comptabilité. */
+export async function hideTrips(ids: string[]): Promise<{ ok?: boolean; error?: string; count?: number }> {
+  const u = await me();
+  const list = ids.filter((id) => /^[0-9a-f-]{36}$/.test(id)).slice(0, 500);
+  if (!list.length) return { error: "Aucun trajet sélectionné." };
+  const email = (u.email ?? "").toLowerCase();
+  const { data } = await db().from("bookings").select("id,user_id,customer_email,status,pickup_at").in("id", list);
+  const now = Date.now();
+  const allowed = (data ?? []).filter((b) => {
+    const mine = b.user_id === u.id || (u.email_confirmed_at && b.customer_email?.toLowerCase() === email);
+    const removable = b.status === "cancelled" || b.status === "completed" || b.status === "pending_payment" || new Date(b.pickup_at).getTime() < now;
+    return mine && removable;
+  }).map((b) => b.id);
+  if (!allowed.length) return { error: "Un trajet à venir doit d'abord être annulé." };
+  const { error } = await db().from("bookings").update({ user_hidden_at: new Date().toISOString() }).in("id", allowed);
+  if (error) return { error: "Suppression impossible." };
+  revalidatePath("/compte", "layout");
+  return { ok: true, count: allowed.length };
+}

@@ -6,7 +6,8 @@ import CancelTrip from "@/components/CancelTrip";
 import ClaimCancel from "@/components/ClaimCancel";
 import { claimOpen, latestClaim } from "@/lib/claim";
 import { claimMine } from "@/app/compte/(espace)/actions";
-import { rebookHref } from "@/components/TripCard";
+import { rebookHref, removable } from "@/components/TripCard";
+import HideTrip from "@/components/HideTrip";
 import { cancelPolicy, fmtDate, requireUser, STATUS, userBooking } from "@/lib/account";
 import { db } from "@/lib/supabase";
 import { docPath } from "@/lib/docsign";
@@ -68,6 +69,7 @@ export default async function Detail({ params }: Props) {
         {b.status === "confirmed" && pol.canCancel && <CancelTrip id={b.id} refundLabel={pol.refundCents > 0 ? euro(pol.refundCents) : null} keptLabel={pol.keptCents > 0 ? euro(pol.keptCents) : null} />}
         {b.status === "confirmed" && <Link className="btn small ghost" href={help("Modification")}>Modifier</Link>}
         <Link className="btn small ghost" href={help("Aide")}>Besoin d'aide</Link>
+        {removable(b) && <HideTrip ids={[b.id]} label="Supprimer de mon espace" after="/compte/trajets" />}
       </div>
       {(claimOpen(b.status, b.pickup_at) || claim?.status === "pending") && <ClaimCancel action={claimMine.bind(null, b.id)} status={claim?.status ?? null} />}
 

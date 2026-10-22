@@ -26,7 +26,7 @@ export async function userBookings(user: User): Promise<Booking[]> {
   const filters = [`user_id.eq.${user.id}`];
   const email = (user.email ?? "").toLowerCase();
   if (email && user.email_confirmed_at) filters.push(`customer_email.ilike.${clean(email)}`);
-  const { data } = await db().from("bookings").select(COLS).or(filters.join(",")).neq("status", "expired").order("pickup_at", { ascending: false });
+  const { data } = await db().from("bookings").select(COLS).or(filters.join(",")).neq("status", "expired").is("user_hidden_at", null).order("pickup_at", { ascending: false });
   const list = (data as Booking[]) ?? [];
   if (list.length && email && user.email_confirmed_at) {
     await db().from("bookings").update({ user_id: user.id }).is("user_id", null).ilike("customer_email", clean(email));
@@ -39,11 +39,11 @@ export async function userBooking(user: User, id: string): Promise<Booking | nul
   return (await userBookings(user)).find((b) => b.id === id) ?? null;
 }
 
-export type Profile = { full_name: string | null; phone: string | null; default_passengers: number; default_child_seat: boolean; marketing_opt_in: boolean };
+export type Profile = { full_name: string | null; phone: string | null; default_passengers: number; default_child_seat: boolean; marketing_opt_in: boolean; avatar?: string | null };
 export async function getProfile(userId: string): Promise<Profile> {
-  const empty = { full_name: null, phone: null, default_passengers: 1, default_child_seat: false, marketing_opt_in: false };
+  const empty = { full_name: null, phone: null, default_passengers: 1, default_child_seat: false, marketing_opt_in: false, avatar: null };
   if (!dbConfigured()) return empty;
-  const { data } = await db().from("profiles").select("full_name,phone,default_passengers,default_child_seat,marketing_opt_in").eq("user_id", userId).maybeSingle();
+  const { data } = await db().from("profiles").select("full_name,phone,default_passengers,default_child_seat,marketing_opt_in,avatar").eq("user_id", userId).maybeSingle();
   return (data as Profile) ?? empty;
 }
 
