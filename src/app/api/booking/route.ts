@@ -24,7 +24,7 @@ const schema = z.object({
   passengers: z.number().int().min(1).max(4),
   luggage: z.number().int().min(0).max(12),
   childSeat: z.boolean(),
-  flight: z.string().trim().max(20).optional(),
+  flight: z.string().trim().max(30).optional(),
   name: z.string().trim().min(2).max(100),
   phone: z.string().trim().min(6).max(30),
   email: z.string().trim().email().max(200),

@@ -8,7 +8,9 @@ import { docPath, trackPath, verifyTrack } from "@/lib/docsign";
 import { euro } from "@/lib/pricing";
 import { db, dbConfigured } from "@/lib/supabase";
 import { getSiteSettings } from "@/lib/content";
-import { cancelByLink } from "./actions";
+import { cancelByLink, claimByLink } from "./actions";
+import ClaimCancel from "@/components/ClaimCancel";
+import { claimOpen, latestClaim } from "@/lib/claim";
 
 export const metadata: Metadata = { title: "Suivi de ma réservation", robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
@@ -32,6 +34,7 @@ export default async function Suivi({ params, searchParams }: Props) {
   const rest = Math.max(0, b.price_cents - b.paid_cents);
   const pending = b.status === "pending_payment";
   const pol = cancelPolicy(b.pickup_at, b.paid_cents, b.price_cents);
+  const claim = await latestClaim(b.id);
   const phone = (await getSiteSettings()).driverPhone || process.env.DRIVER_PHONE || "";
   return (
     <section className="section">
@@ -52,7 +55,7 @@ export default async function Suivi({ params, searchParams }: Props) {
           <p className="trip-route"><span>{b.origin_label}</span><span aria-hidden="true">↓</span><span>{b.dest_label}</span></p>
           <p className="muted" style={{ margin: "0 0 8px" }}>
             {b.passengers} passager{b.passengers > 1 ? "s" : ""} · {b.luggage} bagage{b.luggage > 1 ? "s" : ""}
-            {b.child_seat ? " · siège enfant" : ""}{b.flight ? ` · vol/train ${b.flight}` : ""}
+            {b.child_seat ? " · siège enfant" : ""}{b.flight ? ` · ${b.flight}` : ""}
           </p>
           <p className="trip-price">
             <strong>{euro(b.price_cents)}</strong> <span className="muted">· Réf. {b.id.slice(0, 8).toUpperCase()}</span>
@@ -81,6 +84,9 @@ export default async function Suivi({ params, searchParams }: Props) {
             />
           )}
         </div>
+        {(claimOpen(b.status, b.pickup_at) || claim?.status === "pending") && (
+          <ClaimCancel action={claimByLink.bind(null, b.id, k as string)} status={claim?.status ?? null} />
+        )}
         {b.status === "cancelled" && <p className="notice" role="status" style={{ marginTop: 14 }}>Cette réservation est annulée. Un e-mail de confirmation vous a été envoyé.</p>}
         <p className="muted" style={{ marginTop: 18, fontSize: ".9rem" }}>
           Conservez ce lien : il vous permet de retrouver votre réservation sans compte.

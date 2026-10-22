@@ -5,6 +5,7 @@ import { z } from "zod";
 import { currentUser, authClient } from "@/lib/auth";
 import { db, dbConfigured } from "@/lib/supabase";
 import { normalizePhone } from "@/lib/callback";
+import { submitClaimCore } from "@/lib/claim";
 import { cancelBookingCore } from "@/lib/cancel";
 
 async function me() {
@@ -89,6 +90,18 @@ export async function cancelBooking(bookingId: string): Promise<{ ok?: boolean; 
   const mine = b && (b.user_id === u.id || (u.email_confirmed_at && b.customer_email?.toLowerCase() === (u.email ?? "").toLowerCase()));
   if (!b || !mine) return { error: "Réservation introuvable." };
   const r = await cancelBookingCore(bookingId, u.id);
+  if (r.ok) revalidatePath("/compte", "layout");
+  return r;
+}
+
+/** Demande d'annulation sans frais sur justificatif depuis l'espace client. */
+export async function claimMine(bookingId: string, _: { ok?: boolean; error?: string } | undefined, form: FormData): Promise<{ ok?: boolean; error?: string }> {
+  const u = await me();
+  if (!/^[0-9a-f-]{36}$/.test(bookingId)) return { error: "Réservation introuvable." };
+  const { data: b } = await db().from("bookings").select("id,user_id,customer_email").eq("id", bookingId).maybeSingle();
+  const mine = b && (b.user_id === u.id || (u.email_confirmed_at && b.customer_email?.toLowerCase() === (u.email ?? "").toLowerCase()));
+  if (!b || !mine) return { error: "Réservation introuvable." };
+  const r = await submitClaimCore(bookingId, form);
   if (r.ok) revalidatePath("/compte", "layout");
   return r;
 }

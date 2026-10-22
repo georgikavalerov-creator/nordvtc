@@ -1,6 +1,6 @@
 "use client";
 import { useActionState } from "react";
-import { refundBooking, savePost, saveSettings } from "./actions";
+import { decideClaim, refundBooking, savePost, saveSettings } from "./actions";
 import type { SiteSettings } from "@/lib/content";
 
 type R = { error?: string; ok?: boolean | string } | undefined;
@@ -58,6 +58,19 @@ export function RefundForm({ id, max }: { id: string; max: number }) {
       <label className="inline"><input type="checkbox" name="cancel" /> <span>Annuler aussi la course</span></label>
       <Msg s={s} />
       <button className="btn ghost small" disabled={pending}>{pending ? "…" : "Rembourser via Stripe"}</button>
+    </form>
+  );
+}
+
+export function ClaimDecision({ id }: { id: string }) {
+  const [s, act, pending] = useActionState(decideClaim, undefined);
+  if (s?.ok) return <Msg s={s} />;
+  return (
+    <form action={act} className="trip-actions" style={{ marginTop: 6 }}>
+      <input type="hidden" name="claim" value={id} />
+      <button className="btn small" name="decision" value="accept" disabled={pending}>{pending ? "…" : "Accepter : annuler et tout rembourser"}</button>
+      <button className="btn small ghost" name="decision" value="refuse" disabled={pending}>Refuser</button>
+      <Msg s={s} />
     </form>
   );
 }

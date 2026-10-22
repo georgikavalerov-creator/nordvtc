@@ -3,6 +3,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import RateTrip from "@/components/RateTrip";
 import CancelTrip from "@/components/CancelTrip";
+import ClaimCancel from "@/components/ClaimCancel";
+import { claimOpen, latestClaim } from "@/lib/claim";
+import { claimMine } from "@/app/compte/(espace)/actions";
 import { rebookHref } from "@/components/TripCard";
 import { cancelPolicy, fmtDate, requireUser, STATUS, userBooking } from "@/lib/account";
 import { db } from "@/lib/supabase";
@@ -16,6 +19,7 @@ export default async function Detail({ params }: Props) {
   const { id } = await params;
   const user = await requireUser(`/compte/trajets/${id}`);
   const b = await userBooking(user, id);
+  const claim = b ? await latestClaim(b.id) : null;
   if (!b) notFound();
   const st = STATUS[b.status] ?? { label: b.status, cls: "" };
   const pol = cancelPolicy(b.pickup_at, b.paid_cents, b.price_cents);
@@ -65,6 +69,7 @@ export default async function Detail({ params }: Props) {
         {b.status === "confirmed" && <Link className="btn small ghost" href={help("Modification")}>Modifier</Link>}
         <Link className="btn small ghost" href={help("Aide")}>Besoin d'aide</Link>
       </div>
+      {(claimOpen(b.status, b.pickup_at) || claim?.status === "pending") && <ClaimCancel action={claimMine.bind(null, b.id)} status={claim?.status ?? null} />}
 
       {b.status === "completed" && (
         <>

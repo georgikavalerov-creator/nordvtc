@@ -109,3 +109,20 @@ export async function sendInvoiceEmail(b: { name: string; email: string; number:
   await send(b.email, `Votre facture ${b.number} — ${SITE.name}`,
     `<div style="font-family:system-ui;max-width:560px"><h2>Merci pour votre trajet</h2><p>Bonjour ${esc(b.name)}, votre facture n° ${esc(b.number)} est disponible : <a href="${esc(b.url)}">ouvrir la facture</a> (imprimable / PDF).</p></div>`);
 }
+
+// ---------- Annulation sur justificatif (train ou vol annulé) ----------
+export async function sendClaimReceived(b: { id: string; name: string; email: string; trip: string; kind: string; fileUrl: string; note: string | null }) {
+  await send(b.email, `Demande d'annulation reçue — ${SITE.name}`,
+    `<div style="font-family:system-ui;max-width:560px"><h2>Nous avons bien reçu votre justificatif</h2><p>Bonjour ${esc(b.name)},</p><p>${esc(b.trip)}</p><p>Votre demande d'annulation sans frais (${esc(b.kind)} annulé) est en cours de vérification. Vous recevrez un e-mail dès qu'elle sera traitée ; en cas d'accord, la totalité de la somme payée vous sera remboursée.</p><p>Référence : <code>${esc(b.id.slice(0, 8))}</code></p></div>`);
+  const notify = process.env.MAIL_NOTIFY_TO;
+  if (notify) await send(notify, `Justificatif à vérifier — ${b.kind} annulé`,
+    `<div style="font-family:system-ui"><h3>Demande d'annulation sans frais</h3><p>${esc(b.name)} — ${esc(b.email)}</p><p>${esc(b.trip)}</p>${b.note ? `<p>Message : « ${esc(b.note)} »</p>` : ""}<p><a href="${esc(b.fileUrl)}">Voir le justificatif</a> (lien valable 7 jours)</p><p><a href="${SITE.url}/admin/reservations">Accepter ou refuser dans l'administration</a></p><p>Réf. ${esc(b.id)}</p></div>`);
+}
+
+export async function sendClaimDecision(b: { id: string; name: string; email: string; trip: string; accepted: boolean; refundedCents: number }) {
+  const body = b.accepted
+    ? `<p>Votre justificatif a été accepté : la réservation est annulée sans frais.</p>${b.refundedCents > 0 ? `<p>Un remboursement de <strong>${euro(b.refundedCents)}</strong> a été émis sur votre moyen de paiement (délai bancaire : quelques jours ouvrés).</p>` : ""}`
+    : `<p>Nous n'avons pas pu valider le justificatif envoyé (document illisible ou ne correspondant pas au trajet). Votre réservation reste confirmée. Répondez à cet e-mail ou contactez-nous pour en envoyer un autre.</p>`;
+  await send(b.email, `${b.accepted ? "Annulation acceptée" : "Justificatif non validé"} — ${SITE.name}`,
+    `<div style="font-family:system-ui;max-width:560px"><h2>${b.accepted ? "Annulation sans frais acceptée" : "Justificatif non validé"}</h2><p>Bonjour ${esc(b.name)},</p><p>${esc(b.trip)}</p>${body}<p>Référence : <code>${esc(b.id.slice(0, 8))}</code></p></div>`);
+}

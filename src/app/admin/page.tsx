@@ -65,7 +65,7 @@ export default async function Dashboard() {
               {upcoming.slice(0, 8).map((b) => (
                 <li key={b.id} style={{ marginBottom: 6 }}>
                   <strong>{fmtDT(b.pickup_at)}</strong> · {b.customer_name} · <a href={`tel:${b.customer_phone}`}>{b.customer_phone}</a>
-                  <br /><span className="muted">{b.origin_label} → {b.dest_label} · {euro(b.price_cents)}{b.flight ? ` · vol ${b.flight}` : ""}</span>
+                  <br /><span className="muted">{b.origin_label} → {b.dest_label} · {euro(b.price_cents)}{b.flight ? ` · ${b.flight}` : ""}</span>
                 </li>
               ))}
             </ul>

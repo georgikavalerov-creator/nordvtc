@@ -32,6 +32,7 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
   const [luggage, setLuggage] = useState(0);
   const [childSeat, setChildSeat] = useState(defaultChildSeat);
   const [flight, setFlight] = useState("");
+  const [transport, setTransport] = useState<"" | "Avion" | "Train">("");
   const [name, setName] = useState(accountName);
   const [phone, setPhone] = useState(accountPhone);
   const [email, setEmail] = useState(accountEmail);
@@ -50,7 +51,7 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
   const [minLead, setMinLead] = useState(2);
   const [showNotes, setShowNotes] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
-  const [errors, setErrors] = useState<{ origin?: string; dest?: string; when?: string; ret?: string }>({});
+  const [errors, setErrors] = useState<{ origin?: string; dest?: string; when?: string; ret?: string; flight?: string }>({});
   const [swapKey, setSwapKey] = useState(0);
   const [showPromo, setShowPromo] = useState(false);
   const [showPro, setShowPro] = useState(false);
@@ -84,6 +85,7 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
         if (d.passengers) setPassengers(d.passengers);
         if (typeof d.luggage === "number") setLuggage(d.luggage);
         if (d.flight) setFlight(d.flight);
+        if (d.transport === "Avion" || d.transport === "Train") setTransport(d.transport);
         if (d.childSeat) setChildSeat(true);
         if (d.name) setName(d.name);
         if (d.phone) setPhone(d.phone);
@@ -100,10 +102,10 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
     try {
       sessionStorage.setItem(
         "nvtc-booking",
-        JSON.stringify({ origin, dest, date, time, wantReturn, retDate, retTime, passengers, luggage, flight, childSeat, name, phone, email }),
+        JSON.stringify({ origin, dest, date, time, wantReturn, retDate, retTime, passengers, luggage, flight, transport, childSeat, name, phone, email }),
       );
     } catch {}
-  }, [origin, dest, date, time, wantReturn, retDate, retTime, passengers, luggage, flight, childSeat, name, phone, email]);
+  }, [origin, dest, date, time, wantReturn, retDate, retTime, passengers, luggage, flight, transport, childSeat, name, phone, email]);
 
   useEffect(() => {
     if (!origin || !dest) {
@@ -167,7 +169,7 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
           passengers,
           luggage,
           childSeat,
-          flight: flight || undefined,
+          flight: flight.trim() ? `${transport} ${flight.trim()}` : undefined,
           name,
           phone,
           email,
@@ -217,10 +219,11 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
       if (!retDate || !retTime) e.ret = "Indiquez la date et l'heure du retour.";
       else if (date && time && `${retDate}T${retTime}` <= `${date}T${time}`) e.ret = "Le retour doit être après l'aller.";
     }
+    if (flight.trim() && !transport) e.flight = "Précisez s'il s'agit d'un avion ou d'un train.";
     setErrors(e);
     if (Object.keys(e).length) {
       requestAnimationFrame(() => {
-        const sel = e.origin || e.dest ? ".field-error" : e.when ? ".when-error" : ".ret-error";
+        const sel = e.origin || e.dest ? ".field-error" : e.when ? ".when-error" : e.ret ? ".ret-error" : ".flight-error";
         formRef.current?.querySelector<HTMLElement>(sel)?.scrollIntoView({ behavior: "smooth", block: "center" });
         if (!e.origin && !e.dest && e.when) formRef.current?.querySelector<HTMLInputElement>(date ? ".tf input" : 'input[type="date"]')?.focus();
         else formRef.current?.querySelector<HTMLInputElement>('input[aria-invalid="true"]')?.focus();
@@ -293,10 +296,16 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
         </div>
         {errors.when && <p className="field-error when-error" role="alert">{errors.when}</p>}
         <div className="bk-grid bk-2 bk-opts">
-          <label>
-            N° de vol ou de train
-            <input value={flight} maxLength={20} onChange={(e) => setFlight(e.target.value)} placeholder="Facultatif" />
-          </label>
+          <div className="tf-label">
+            N° de vol ou de train <span className="muted">(facultatif)</span>
+            <span className="date-chips" role="radiogroup" aria-label="Type de transport">
+              {(["Avion", "Train"] as const).map((t) => (
+                <button key={t} type="button" role="radio" aria-checked={transport === t} className={`chip${transport === t ? " on" : ""}`} onClick={() => { setTransport(transport === t ? "" : t); setErrors((x) => ({ ...x, flight: undefined })); }}>{t === "Avion" ? "✈ Avion" : "🚆 Train"}</button>
+              ))}
+            </span>
+            <input value={flight} maxLength={20} aria-label="Numéro de vol ou de train" aria-invalid={!!errors.flight} onChange={(e) => { setFlight(e.target.value); setErrors((x) => ({ ...x, flight: undefined })); }} placeholder={transport === "Avion" ? "Ex. AF1234" : transport === "Train" ? "Ex. TGV 7123" : "Choisissez avion ou train"} />
+            {errors.flight && <p className="field-error flight-error" role="alert">{errors.flight}</p>}
+          </div>
           <label className={`toggle${childSeat ? " on" : ""}`}>
             <input type="checkbox" checked={childSeat} onChange={(e) => setChildSeat(e.target.checked)} />
             <span>Siège enfant ou rehausseur</span>

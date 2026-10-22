@@ -62,7 +62,7 @@ export default function CGV() {
         <strong>Par le prestataire :</strong> en cas d'empêchement, le prestataire prévient le client au plus tôt et le rembourse intégralement, ou lui propose un autre chauffeur avec son accord.
       </p>
       <p>
-        <strong>Vol ou train annulé :</strong> sur justificatif, la course est reportée ou annulée sans frais, quel que soit le délai.
+        <strong>Train ou vol annulé :</strong> la course est annulée sans frais, quel que soit le délai, et la totalité de la somme payée est remboursée. Le client, avec ou sans compte, dépose le justificatif de l'annulation (e-mail, SMS ou capture de la compagnie) depuis le lien de suivi de sa réservation ou son espace personnel, au plus tard 24 heures après l'heure de prise en charge prévue. Le remboursement est émis après vérification du justificatif ; le client peut aussi demander un report de la course.
       </p>
 
       <h2>6. Attente, retards et absence</h2>

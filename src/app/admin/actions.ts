@@ -16,6 +16,7 @@ import { parseBody } from "@/lib/content";
 import { createManual } from "@/lib/manual";
 import { processLogo } from "@/lib/logo";
 import { hashPassword, newPassword } from "@/lib/driver-auth";
+import { decideClaimCore } from "@/lib/claim";
 
 export async function login(_: { error?: string } | undefined, form: FormData) {
   const ip = (await headers()).get("x-forwarded-for")?.split(",")[0]?.trim() || "inconnu";
@@ -282,4 +283,14 @@ export async function removeLogo(_: LogoR): Promise<LogoR> {
   await db().from("settings").delete().eq("key", "logo");
   wipe();
   return { ok: true };
+}
+
+// ---------- Annulation sur justificatif ----------
+export async function decideClaim(_: { error?: string; ok?: string } | undefined, form: FormData) {
+  if (!(await isAdmin())) redirect("/admin");
+  const id = z.string().uuid().safeParse(form.get("claim"));
+  if (!id.success) return { error: "Demande introuvable." };
+  const r = await decideClaimCore(id.data, form.get("decision") === "accept");
+  wipe();
+  return r;
 }

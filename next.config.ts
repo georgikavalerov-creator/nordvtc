@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
-  experimental: { serverActions: { bodySizeLimit: "4mb" } }, // envoi du logo
+  experimental: { serverActions: { bodySizeLimit: "6mb" } }, // envoi du logo et des justificatifs (5 Mo max)
   async redirects() {
     const host = process.env.SITE_HOST; // ex. nordvtc.fr
     return host ? [{ source: "/:path*", has: [{ type: "host" as const, value: `www.${host}` }], destination: `https://${host}/:path*`, permanent: true }] : [];

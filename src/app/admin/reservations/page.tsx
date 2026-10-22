@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { db, dbConfigured } from "@/lib/supabase";
 import { docPath } from "@/lib/docsign";
 import { AdminPage } from "../gate";
-import { RefundForm } from "../Forms";
+import { ClaimDecision, RefundForm } from "../Forms";
+import { claimFileUrl, type Claim } from "@/lib/claim";
 import CalButtons from "../CalButtons";
 import { saveBookingMeta, setStatus } from "../actions";
 import { STATUS, euro, fmtDT, type Booking } from "../lib";
@@ -30,6 +31,13 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ q
     rows = (data as Booking[]) ?? [];
   } else err = "Supabase n'est pas configuré.";
   if (q) rows = rows.filter((b) => [b.customer_name, b.customer_email, b.customer_phone, b.origin_label, b.dest_label, b.id].join(" ").toLowerCase().includes(q));
+
+  // Demandes d'annulation sur justificatif en attente
+  let claims: (Claim & { url: string; b?: { customer_name: string; origin_label: string; dest_label: string; pickup_at: string; paid_cents: number; refunded_cents: number } })[] = [];
+  if (dbConfigured()) {
+    const { data } = await db().from("cancel_claims").select("*, b:bookings(customer_name,origin_label,dest_label,pickup_at,paid_cents,refunded_cents)").eq("status", "pending").order("created_at");
+    claims = await Promise.all(((data as typeof claims) ?? []).map(async (c) => ({ ...c, url: await claimFileUrl(c.file_path) })));
+  }
 
   // Frais estimés (péages + carburant) pour les trajets confirmés ou terminés (les 25 premiers affichés).
   const costs = await getCosts();
@@ -61,6 +69,19 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ q
         <button className="btn small">Filtrer</button>
       </form>
       {err && <p className="error">{err}</p>}
+      {claims.length > 0 && (
+        <div className="notice" style={{ marginBottom: 18 }}>
+          <strong>Annulations sur justificatif à vérifier ({claims.length})</strong>
+          {claims.map((c) => (
+            <div key={c.id} style={{ marginTop: 10, paddingTop: 10, borderTop: "1px solid var(--line, #ddd)" }}>
+              <div>{c.b?.customer_name} · {c.kind === "train" ? "🚆 train annulé" : "✈ vol annulé"} · {c.b ? fmtDT(c.b.pickup_at) : ""}</div>
+              <div className="muted">{c.b?.origin_label} → {c.b?.dest_label} · payé {euro((c.b?.paid_cents ?? 0) - (c.b?.refunded_cents ?? 0))}{c.note ? ` · « ${c.note} »` : ""}</div>
+              <a href={c.url} target="_blank" rel="noopener noreferrer">Ouvrir le justificatif</a>
+              <ClaimDecision id={c.id} />
+            </div>
+          ))}
+        </div>
+      )}
       <p className="muted" style={{ margin: 0 }}>{rows.length} réservation(s)</p>
       <div style={{ display: "grid", gap: 12 }}>
         {rows.length === 0 && <p className="muted">Aucune réservation.</p>}
@@ -83,7 +104,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ q
                     <a href={`tel:${b.customer_phone}`}>{b.customer_phone}</a> · <a href={`mailto:${b.customer_email}`}>{b.customer_email}</a>
                   </p>
                   <p className="muted" style={{ margin: "6px 0" }}>
-                    {b.passengers} pers. · {b.luggage} bag.{b.child_seat ? " · siège enfant" : ""}{b.flight ? ` · vol ${b.flight}` : ""}
+                    {b.passengers} pers. · {b.luggage} bag.{b.child_seat ? " · siège enfant" : ""}{b.flight ? ` · ${b.flight}` : ""}
                   </p>
                   {b.notes && <p>« {b.notes} »</p>}
                   <p className="muted" style={{ margin: "6px 0" }}>
