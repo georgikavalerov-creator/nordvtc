@@ -15,7 +15,7 @@ export default function CookieNotice() {
 
   useEffect(() => {
     setStats(read("plausible_ignore") !== "true");
-    if (location.pathname.startsWith("/admin") || location.pathname.startsWith("/chauffeur")) return;
+    if (/^\/(admin|chauffeur|reservation|doc)/.test(location.pathname)) return; // jamais pendant une réservation
     let t = 0;
     if (!read(KEY)) t = window.setTimeout(() => setShow(true), 2500);
     const open = () => { setDetails(true); setShow(true); };

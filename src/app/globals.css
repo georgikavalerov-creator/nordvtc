@@ -2615,3 +2615,6 @@ ol.steps > li::before { box-shadow: 0 6px 14px -8px var(--c2) !important; }
   .ck { left: 12px; right: 12px; width: auto; bottom: calc(146px + env(safe-area-inset-bottom, 0px)); }
 }
 @media print { .ck { display: none !important; } }
+.ck-row b { font-weight: 700; }
+.ck-row small, .ck-row span { font-weight: 400; }
+.ck-row > span:first-child > b { font-weight: 700; }
