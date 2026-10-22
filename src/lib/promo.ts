@@ -11,6 +11,14 @@ const norm = (c: string) => c.trim().toUpperCase().replace(/[^A-Z0-9_-]/g, "").s
 export async function validatePromo(raw: string, priceCents: number, who: { userId?: string | null; email?: string | null }): Promise<PromoResult> {
   const code = norm(raw);
   if (!code) return { ok: false, error: "Saisissez un code." };
+  // Code d'essai privé (paiement réel à 1 €) : actif seulement si TEST_PAY_CODE est défini, et réservé à l'e-mail du propriétaire.
+  const testCode = norm(process.env.TEST_PAY_CODE ?? "");
+  if (testCode && code === testCode) {
+    const owner = (process.env.TEST_PAY_EMAIL ?? "georgi.kavalerov@gmail.com").trim().toLowerCase();
+    if (who.email?.trim().toLowerCase() !== owner) return { ok: false, error: "Ce code n'est pas valide." };
+    if (priceCents <= 100) return { ok: false, error: "Ce code ne s'applique pas à ce trajet." };
+    return { ok: true, code, discountCents: priceCents - 100, label: "essai 1 €" };
+  }
   if (!dbConfigured()) return { ok: false, error: "Codes promo indisponibles pour le moment." };
   const { data: p } = await db().from("promo_codes").select("*").eq("code", code).maybeSingle();
   const bad = (error: string): PromoResult => ({ ok: false, error });
