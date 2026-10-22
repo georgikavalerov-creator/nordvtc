@@ -29,7 +29,7 @@ const schema = z.object({
   phone: z.string().trim().min(6).max(30),
   email: z.string().trim().email().max(200),
   notes: z.string().trim().max(500).optional(),
-  returnTrip: z.object({ date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/), time: z.string().regex(/^\d{2}:\d{2}$/) }).optional(),
+  returnTrip: z.object({ date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/), time: z.string().regex(/^\d{2}:\d{2}$/), origin: place.optional(), dest: place.optional() }).optional(),
   payMode: z.enum(["deposit", "full"]),
   promo: z.string().max(40).optional(),
   billingCompany: z.string().trim().max(120).optional(),
@@ -92,7 +92,7 @@ export async function POST(req: Request) {
     const chargeCents = d.payMode === "full" ? quote.fullCents : quote.depositCents;
 
     // Trajet retour (facultatif) : même parcours en sens inverse, à une autre date.
-    let ret: { pickup: Date; quote: ReturnType<typeof computeQuote>; charge: number; distanceM: number; durationS: number } | null = null;
+    let ret: { pickup: Date; quote: ReturnType<typeof computeQuote>; charge: number; distanceM: number; durationS: number; from: z.infer<typeof place>; to: z.infer<typeof place> } | null = null;
     if (d.returnTrip) {
       const rp = parisToUtc(d.returnTrip.date, d.returnTrip.time);
       if (Number.isNaN(rp.getTime()) || rp.getTime() < pickup.getTime() + (route.durationS + 1800) * 1000) {
@@ -101,9 +101,11 @@ export async function POST(req: Request) {
       if (rp.getTime() > now + 365 * 86_400_000) return NextResponse.json({ error: "Date de retour trop lointaine." }, { status: 422 });
       const { data: blockedR } = await db().from("blocked_periods").select("id").lte("start_at", rp.toISOString()).gt("end_at", rp.toISOString()).limit(1);
       if (blockedR?.length) return NextResponse.json({ error: "Nous ne sommes pas disponibles à la date de retour. Choisissez un autre créneau ou contactez-nous." }, { status: 422 });
-      const back = await routeSummary(d.dest, d.origin);
+      const rFrom = d.returnTrip.origin ?? d.dest, rTo = d.returnTrip.dest ?? d.origin;
+      const back = await routeSummary(rFrom, rTo);
+      if (back.distanceM / 1000 > pricing.maxDistanceKm) return NextResponse.json({ error: "Retour très long : contactez-nous pour un devis." }, { status: 422 });
       const rq = computeQuote(back.distanceM, back.durationS, Number(d.returnTrip.time.slice(0, 2)), pricing);
-      ret = { pickup: rp, quote: rq, charge: d.payMode === "full" ? rq.fullCents : rq.depositCents, distanceM: back.distanceM, durationS: back.durationS };
+      ret = { pickup: rp, quote: rq, charge: d.payMode === "full" ? rq.fullCents : rq.depositCents, distanceM: back.distanceM, durationS: back.durationS, from: rFrom, to: rTo };
     }
 
     const { data: row, error } = await db()
@@ -153,8 +155,8 @@ export async function POST(req: Request) {
           billing_company: d.billingCompany || null,
           billing_address: d.billingAddress || null,
           billing_siren: d.billingSiren || null,
-          origin_label: d.dest.label, origin_lat: d.dest.lat, origin_lng: d.dest.lng,
-          dest_label: d.origin.label, dest_lat: d.origin.lat, dest_lng: d.origin.lng,
+          origin_label: ret.from.label, origin_lat: ret.from.lat, origin_lng: ret.from.lng,
+          dest_label: ret.to.label, dest_lat: ret.to.lat, dest_lng: ret.to.lng,
           pickup_at: ret.pickup.toISOString(),
           passengers: d.passengers, luggage: d.luggage, child_seat: d.childSeat,
           customer_name: d.name, customer_phone: d.phone, customer_email: d.email,
@@ -196,7 +198,7 @@ export async function POST(req: Request) {
                 unit_amount: ret.charge,
                 product_data: {
                   name: `Retour — ${d.payMode === "full" ? "paiement total" : "acompte de réservation"}`,
-                  description: `${d.dest.label} → ${d.origin.label} (${euro(ret.quote.priceCents)} au total)`.slice(0, 300),
+                  description: `${ret.from.label} → ${ret.to.label} (${euro(ret.quote.priceCents)} au total)`.slice(0, 300),
                 },
               },
             }]

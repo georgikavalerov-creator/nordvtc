@@ -13,6 +13,8 @@ const schema = z.object({
   dest: point,
   time: z.string().regex(/^\d{2}:\d{2}$/).optional(),
   returnTime: z.string().regex(/^\d{2}:\d{2}$/).optional(),
+  returnOrigin: point.optional(),
+  returnDest: point.optional(),
   promo: z.string().max(40).optional(),
   email: z.string().max(200).optional(),
 });
@@ -23,7 +25,7 @@ export async function POST(req: Request) {
   }
   const parsed = schema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: "Données invalides" }, { status: 400 });
-  const { origin, dest, time, returnTime, promo, email } = parsed.data;
+  const { origin, dest, time, returnTime, returnOrigin, returnDest, promo, email } = parsed.data;
   try {
     const [pricing, route] = await Promise.all([getPricing(), routeSummary(origin, dest)]);
     if (route.distanceM / 1000 > pricing.maxDistanceKm) {
@@ -42,7 +44,10 @@ export async function POST(req: Request) {
       if (r.ok) { promoOut = { code: r.code, discountCents: r.discountCents, label: r.label }; quote = { ...applyDiscount(quote, r.discountCents, pricing) }; }
       else promoOut = { error: r.error };
     }
-    const returnQuote = returnTime ? computeQuote(route.distanceM, route.durationS, Number(returnTime.slice(0, 2)), pricing) : undefined;
+    // Retour : même trajet en sens inverse, ou adresses choisies par le client.
+    const back = returnTime && returnOrigin && returnDest ? await routeSummary(returnOrigin, returnDest) : route;
+    if (returnTime && back.distanceM / 1000 > pricing.maxDistanceKm) return NextResponse.json({ error: "Retour très long : contactez-nous pour un devis personnalisé." }, { status: 422 });
+    const returnQuote = returnTime ? computeQuote(back.distanceM, back.durationS, Number(returnTime.slice(0, 2)), pricing) : undefined;
     return NextResponse.json({ quote, returnQuote, promo: promoOut, depositPct: pricing.depositPct, minLeadHours: pricing.minLeadHours });
   } catch (e) {
     console.error("quote", e);

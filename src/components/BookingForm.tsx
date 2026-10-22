@@ -44,6 +44,11 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
   const [wantReturn, setWantReturn] = useState(false);
   const [retDate, setRetDate] = useState("");
   const [retTime, setRetTime] = useState("");
+  // Retour : par défaut le trajet inverse ; le client peut choisir d'autres adresses.
+  const [retCustom, setRetCustom] = useState(false);
+  const [retFrom, setRetFrom] = useState<Place | null>(null);
+  const [retTo, setRetTo] = useState<Place | null>(null);
+  const [retKey, setRetKey] = useState(0);
   const [quoteErr, setQuoteErr] = useState("");
   const [loadingQuote, setLoadingQuote] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -124,6 +129,7 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
         dest: { lat: dest.lat, lng: dest.lng },
         time: time || undefined,
         returnTime: wantReturn && retTime ? retTime : undefined,
+        ...(wantReturn && retCustom && retFrom && retTo ? { returnOrigin: { lat: retFrom.lat, lng: retFrom.lng }, returnDest: { lat: retTo.lat, lng: retTo.lng } } : {}),
         promo: promoApplied || undefined,
         email: email || undefined,
       }),
@@ -150,7 +156,7 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
     return () => {
       off = true;
     };
-  }, [origin, dest, time, retTime, wantReturn, promoApplied]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [origin, dest, time, retTime, wantReturn, promoApplied, retCustom, retFrom, retTo]); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -174,7 +180,7 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
           phone,
           email,
           notes: notes || undefined,
-          returnTrip: wantReturn ? { date: retDate, time: retTime } : undefined,
+          returnTrip: wantReturn ? { date: retDate, time: retTime, ...(retCustom && retFrom && retTo ? { origin: retFrom, dest: retTo } : {}) } : undefined,
           payMode,
           promo: promoInfo?.code,
           billingCompany: showPro ? company || undefined : undefined,
@@ -218,6 +224,7 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
     if (wantReturn) {
       if (!retDate || !retTime) e.ret = "Indiquez la date et l'heure du retour.";
       else if (date && time && `${retDate}T${retTime}` <= `${date}T${time}`) e.ret = "Le retour doit être après l'aller.";
+      else if (retCustom && (!retFrom || !retTo)) e.ret = "Choisissez les adresses du retour dans la liste proposée.";
     }
     if (flight.trim() && !transport) e.flight = "Précisez s'il s'agit d'un avion ou d'un train.";
     setErrors(e);
@@ -328,7 +335,26 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
           </div>
         )}
         {errors.ret && <p className="field-error ret-error" role="alert">{errors.ret}</p>}
-        {wantReturn && origin && dest && <p className="muted" style={{ margin: "6px 0 0", fontSize: ".85rem" }}>Retour : {dest.label} → {origin.label}</p>}
+        {wantReturn && origin && dest && !retCustom && (
+          <p className="muted" style={{ margin: "6px 0 0", fontSize: ".85rem" }}>
+            Retour : {dest.label} → {origin.label} ·{" "}
+            <button type="button" className="linklike" onClick={() => { setRetCustom(true); setRetFrom(dest); setRetTo(origin); setRetKey((k) => k + 1); }}>Modifier les adresses du retour</button>
+          </p>
+        )}
+        {wantReturn && retCustom && (
+          <div className="bk-route" style={{ marginTop: 8 }}>
+            <AddressField key={`rf${retKey}`} label="Départ du retour" value={retFrom} onChange={(p) => { setRetFrom(p); setErrors((x) => ({ ...x, ret: undefined })); }} initialText={retFrom?.label ?? ""} placeholder="Adresse, gare, aéroport…" />
+            <button type="button" className="bk-swap" onClick={() => { const a = retFrom; setRetFrom(retTo); setRetTo(a); setRetKey((k) => k + 1); }} aria-label="Inverser les adresses du retour" title="Inverser">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M7 4v16M7 20l-4-4M7 20l4-4M17 20V4M17 4l-4 4M17 4l4 4"/></svg>
+            </button>
+            <AddressField key={`rt${retKey}`} label="Arrivée du retour" value={retTo} onChange={(p) => { setRetTo(p); setErrors((x) => ({ ...x, ret: undefined })); }} initialText={retTo?.label ?? ""} placeholder="Adresse, gare, aéroport…" />
+          </div>
+        )}
+        {wantReturn && retCustom && (
+          <p className="muted" style={{ margin: "4px 0 0", fontSize: ".85rem" }}>
+            <button type="button" className="linklike" onClick={() => { setRetCustom(false); setRetFrom(null); setRetTo(null); }}>Revenir au trajet inverse</button>
+          </p>
+        )}
       </div>
 
       <div className="bk-pane">
