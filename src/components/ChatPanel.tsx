@@ -103,7 +103,7 @@ export default function ChatPanel({ open, onClose, raised, anchor }: { open: boo
     <div className={`chat-panel${open ? " is-open" : ""}${raised ? " is-raised" : ""}`} style={place} role="dialog" aria-label="Discussion avec le chauffeur" aria-hidden={!open}>
       <header className="chat-head">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/img/chauffeur-avatar.webp" alt="" width={36} height={36} />
+        <img src="/img/chauffeur-avatar-manga.webp" alt="" width={36} height={36} />
         <div>
           <strong>Georgi, votre chauffeur</strong>
           <span>Je réponds dès que possible, souvent en quelques minutes</span>

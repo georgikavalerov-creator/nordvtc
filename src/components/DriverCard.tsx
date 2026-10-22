@@ -12,7 +12,7 @@ export default function DriverCard() {
         <div className="driver-id">
           <div className="avatar">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/img/chauffeur-avatar.webp" alt="Portrait illustré, style manga, de Georgi, votre chauffeur" width={400} height={400} loading="lazy" />
+            <img src="/img/chauffeur-avatar-manga.webp" alt="Portrait illustré, style manga, de Georgi, votre chauffeur" width={400} height={400} loading="lazy" />
           </div>
           <div>
             <span className="eyebrow">Votre chauffeur</span>
