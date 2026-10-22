@@ -11,6 +11,7 @@ import { VILLES } from "@/lib/villes";
 import { FAQ_GROUPS, ALL_FAQ } from "@/lib/faq";
 import FaqList from "@/components/FaqList";
 import AppCompare from "@/components/AppCompare";
+import ColorIcon, { colorIconFor } from "@/components/ColorIcon";
 import Icon, { iconFor } from "@/components/Icon";
 import MapMount from "@/components/MapMount";
 import CineMount from "@/components/CineMount";
@@ -193,7 +194,7 @@ export default function Home() {
                 <div className="thumb">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={SERVICE_PIC[s.slug].src} srcSet={srcSetOf(SERVICE_PIC[s.slug].src)} sizes="(max-width: 760px) 130px, 420px" alt={SERVICE_PIC[s.slug].alt} loading="lazy" width={1000} height={666} style={{ objectPosition: SERVICE_PIC[s.slug].pos }} />
-                  <span className="chip"><Icon name={iconFor(s.slug, s.category)} /></span>
+                  <span className="chip chip-color no-invert"><ColorIcon name={colorIconFor(s.slug, s.category)} /></span>
                 </div>
                 <div className="body">
                   <span className="tag">{s.category}</span>

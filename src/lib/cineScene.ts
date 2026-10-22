@@ -65,7 +65,9 @@ export function mountCine(root) {
   function progress(now) {
     if (mode === "scroll") {
       const b = root.getBoundingClientRect(), vh = window.innerHeight;
-      const s = clamp(-b.top / Math.max(b.height - vh, 1), 0, 1);
+      // Mobile : l'animation démarre dès que le bloc occupe la moitié de l'écran (pas une fois tout en haut).
+      const lead = window.innerWidth < 900 ? vh * 0.5 : 0;
+      const s = clamp((lead - b.top) / Math.max(b.height - vh + lead, 1), 0, 1);
       return { s, build: ease(s / 0.28), head: inout((s - 0.18) / 0.74), arrive: clamp((s - 0.9) / 0.1, 0, 1) };
     }
     const t = (now - t0) / 1000;

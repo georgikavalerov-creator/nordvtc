@@ -2440,3 +2440,22 @@ html:not(.in-app) .btn-arrow:active::after, html:not(.in-app) .quick-btn:active:
   .cmp-row .cmp-us .ico-d, .cmp-row .cmp-them .ico-d { margin: 0 !important; }
   .cmp-row:not(.cmp-head) > .cmp-us { border-radius: 0; }
 }
+
+/* « Où voulez-vous aller ? » : icônes multicolores plus grandes */
+.svc .chip.chip-color { width: 62px; height: 62px; left: 18px; bottom: 12px; background: #fff; border-radius: 50%; box-shadow: 0 10px 24px -10px rgba(0,0,0,.55); }
+.svc .chip.chip-color .ico-color { width: 38px; height: 38px; }
+a.card.svc:hover .chip.chip-color { background: #fff; color: inherit; transform: scale(1.08) rotate(-6deg); }
+@media (max-width: 760px) {
+  .svc .chip.chip-color { width: 52px; height: 52px; left: 12px; bottom: 10px; }
+  .svc .chip.chip-color .ico-color { width: 32px; height: 32px; }
+}
+
+/* Bloc 2 : nuage agrandi */
+.story-copy::before {
+  inset: -170px -260px -170px -300px;
+  background: radial-gradient(closest-side, rgba(246,248,255,.96) 0%, rgba(246,248,255,.92) 55%, rgba(246,248,255,.62) 78%, rgba(246,248,255,0) 100%);
+  -webkit-mask-image: radial-gradient(closest-side, #000 70%, transparent 100%); mask-image: radial-gradient(closest-side, #000 70%, transparent 100%);
+}
+@media (max-width: 900px) {
+  .story-copy::before { inset: -130px -90px -70px -90px; }
+}

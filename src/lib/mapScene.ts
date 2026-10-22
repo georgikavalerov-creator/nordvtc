@@ -66,7 +66,7 @@ export function mountMap(root) {
     const r = canvas.getBoundingClientRect(); w = Math.max(r.width, 1); h = Math.max(r.height, 1); mob = w < 800;
     canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
-  function progress() { const b = root.getBoundingClientRect(); return clamp(-b.top / Math.max(b.height - innerHeight, 1), 0, 1); }
+  function progress() { const b = root.getBoundingClientRect(), lead = innerWidth < 900 ? innerHeight * 0.5 : 0; return clamp((lead - b.top) / Math.max(b.height - innerHeight + lead, 1), 0, 1); }
 
   const coarse = matchMedia("(pointer: coarse)").matches;
   let lastT = 0;
