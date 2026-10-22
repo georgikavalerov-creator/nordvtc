@@ -13,7 +13,9 @@ export default function ChatButton() {
   const path = usePathname();
   const [open, setOpen] = useState(false);
   const [loaded, setLoaded] = useState(false);
-  const [unread, setUnread] = useState(false);
+  const [unread, setUnread] = useState(0);
+  const [preview, setPreview] = useState<{ id: number; body: string } | null>(null);
+  const [dismissed, setDismissed] = useState<number>(() => { try { return Number(sessionStorage.getItem("nvtc-chat-dis") || 0); } catch { return 0; } });
   // Bulle déplaçable (doigt ou souris) ; la position est retenue sur l'appareil.
   const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
   const justDragged = useRef(false);
@@ -50,13 +52,21 @@ export default function ChatButton() {
         const r = await fetch(`/api/chat?id=${s.id}&token=${encodeURIComponent(s.token)}&after=${s.seen}`, { cache: "no-store" });
         if (!r.ok) return;
         const d = await r.json();
-        setUnread((d.messages as { sender: string }[]).some((m) => m.sender === "admin"));
+        const mine = (d.messages as { id: number; sender: string; body: string }[]).filter((m) => m.sender === "admin");
+        setUnread(mine.length);
+        setPreview(mine.length ? { id: mine[mine.length - 1].id, body: mine[mine.length - 1].body } : null);
       } catch { /* hors ligne */ }
     };
     const first = window.setTimeout(check, 2500);
-    const t = window.setInterval(check, 60_000);
+    const t = window.setInterval(check, 30_000);
     return () => { stop = true; window.clearTimeout(first); window.clearInterval(t); };
   }, [open]);
+
+  // Nombre de réponses non lues dans le titre de l'onglet
+  useEffect(() => {
+    const base = document.title.replace(/^\(\d+\)\s*/, "");
+    document.title = unread > 0 && !open ? `(${unread}) ${base}` : base;
+  }, [unread, open, path]);
 
   if (path.startsWith("/admin") || path.startsWith("/chauffeur") || path.startsWith("/doc")) return null;
   const onReservation = path.startsWith("/reservation");
@@ -64,7 +74,7 @@ export default function ChatButton() {
     <>
       <button
         type="button"
-        className={`chat-fab${onReservation && !pos ? " is-raised" : ""}${open ? " is-open" : ""}${pos ? " is-placed" : ""}`}
+        className={`chat-fab${onReservation && !pos ? " is-raised" : ""}${open ? " is-open" : ""}${pos ? " is-placed" : ""}${preview && !open && preview.id !== dismissed ? " has-pop" : ""}`}
         style={pos ? { left: pos.x, top: pos.y, right: "auto", bottom: "auto" } : undefined}
         title="Discuter — maintenir pour déplacer"
         onPointerDown={(e) => {
@@ -92,15 +102,24 @@ export default function ChatButton() {
         onPointerCancel={() => { drag.current = null; }}
         aria-label={open ? "Fermer la discussion" : unread ? "Discussion : nouvelle réponse" : "Une question ? Discuter avec le chauffeur"}
         aria-expanded={open}
-        onClick={() => { if (justDragged.current) { justDragged.current = false; return; } setLoaded(true); setOpen((o) => !o); setUnread(false); }}
+        onClick={() => { if (justDragged.current) { justDragged.current = false; return; } setLoaded(true); setOpen((o) => !o); setUnread(0); setPreview(null); }}
       >
         {open ? (
           <IconC name="x" size={22} />
         ) : (
           <IconC name="chat" size={24} />
         )}
-        {unread && !open && <span className="chat-dot" aria-hidden="true" />}
+        {unread > 0 && !open && <span className="chat-count" aria-hidden="true">{unread > 9 ? "9+" : unread}</span>}
       </button>
+      {preview && !open && preview.id !== dismissed && (
+        <div className={`chat-pop${onReservation && !pos ? " is-raised" : ""}`} style={pos ? { left: Math.max(8, Math.min(pos.x - 230, window.innerWidth - 290)), top: pos.y > window.innerHeight / 2 ? pos.y - 96 : pos.y + 58, right: "auto", bottom: "auto" } : undefined} role="status">
+          <button type="button" className="chat-pop-body" onClick={() => { setLoaded(true); setOpen(true); setUnread(0); setPreview(null); }}>
+            <strong>Georgi vous a répondu{unread > 1 ? ` · ${unread} messages` : ""}</strong>
+            <span>{preview.body.slice(0, 100)}</span>
+          </button>
+          <button type="button" className="chat-pop-x" aria-label="Masquer" onClick={() => { setDismissed(preview.id); try { sessionStorage.setItem("nvtc-chat-dis", String(preview.id)); } catch { /* ignoré */ } }}>×</button>
+        </div>
+      )}
       {loaded && <ChatPanel open={open} onClose={() => setOpen(false)} raised={onReservation} anchor={pos} />}
     </>
   );

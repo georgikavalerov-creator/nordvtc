@@ -3,6 +3,8 @@ import { adminConfigured, isAdmin } from "@/lib/admin-auth";
 import { logout } from "./actions";
 import LoginForm from "./LoginForm";
 import AdminNav from "./AdminNav";
+import AdminChatWatch from "./AdminChatWatch";
+import { adminUnread } from "@/lib/chat-unread";
 
 // Cadre commun des pages d'administration : vérifie la session, affiche le menu.
 // Usage : return <AdminPage title="…">…</AdminPage> ; si non connecté, la page de connexion s'affiche à la place.
@@ -28,6 +30,7 @@ export async function AdminPage({ title, children, actions }: { title: string; c
           </div>
         </div>
         <AdminNav />
+        <AdminChatWatch initial={await adminUnread().catch(() => ({ count: 0, messages: 0, latest: null }))} />
         {children}
       </div>
     </section>
