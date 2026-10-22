@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import RatingBadge from "@/components/RatingBadge";
 import Link from "next/link";
 import { SERVICE_PIC, srcSetOf } from "@/lib/images";
 import { notFound } from "next/navigation";
@@ -82,6 +83,7 @@ export default async function ServicePage({ params }: Props) {
             <div>
               <span className="eyebrow">{s.category}</span>
               <h1>{s.h1}</h1>
+              <RatingBadge />
             </div>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img className="split-img" src={SERVICE_PIC[s.slug].src} srcSet={srcSetOf(SERVICE_PIC[s.slug].src)} sizes="(max-width: 760px) 92vw, 50vw" fetchPriority="high" decoding="async" alt={SERVICE_PIC[s.slug].alt} width={1000} height={666} style={{ objectPosition: SERVICE_PIC[s.slug].pos }} />

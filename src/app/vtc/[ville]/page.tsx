@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import RatingBadge from "@/components/RatingBadge";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import BookingForm from "@/components/BookingForm";
@@ -89,6 +90,7 @@ export default async function VillePage({ params }: Props) {
           </p>
           <span className="eyebrow">Métropole lilloise</span>
           <h1>VTC {v.inName} : votre chauffeur privé, prix fixé d&apos;avance</h1>
+          <RatingBadge />
         </div>
       </section>
 

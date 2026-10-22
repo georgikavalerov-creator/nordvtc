@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import RatingBadge from "@/components/RatingBadge";
 import BookingForm from "@/components/BookingForm";
 import Icon from "@/components/Icon";
 import { currentUser } from "@/lib/auth";
@@ -34,6 +35,7 @@ export default async function ReservationPage({ searchParams }: Props) {
           </div>
           <aside className="reassure">
             <h2>Réservez l'esprit tranquille</h2>
+            <RatingBadge className="rb-aside" />
             <ul>
               <li><Icon name="euro" size={20} /><span><strong>Prix ferme</strong>Le montant affiché est le prix total de la course, sans supplément caché.</span></li>
               <li><Icon name="lock" size={20} /><span><strong>Acompte sécurisé</strong>Paiement par carte sur la page sécurisée de Stripe. Aucune donnée bancaire ne transite par ce site.</span></li>

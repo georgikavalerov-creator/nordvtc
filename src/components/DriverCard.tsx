@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { RATING, RIDES } from "@/components/RatingBadge";
 import Icon from "@/components/Icon";
 import { SITE } from "@/lib/site";
 
@@ -19,6 +20,10 @@ export default function DriverCard() {
             <p className="muted">
               Indépendant depuis 2021 et installé à Lesquin, à quelques minutes de l'aéroport. Pas de plateforme entre nous : vous réservez auprès de la personne qui conduit, vous pouvez lui écrire ou l'appeler, et le prix reste celui annoncé.
             </p>
+            <div className="driver-stats">
+              <div><b>{RIDES}+</b><span>courses réalisées sur les applications VTC</span></div>
+              <div><b>{RATING}<small>/5</small> <i aria-hidden="true">★</i></b><span>note moyenne des passagers</span></div>
+            </div>
             <div className="lang">
               <Icon name="globe" size={18} /> Français · English · Български
             </div>
