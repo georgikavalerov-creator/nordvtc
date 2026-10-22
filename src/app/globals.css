@@ -2495,8 +2495,8 @@ ol.steps > li:nth-child(2) { --c1: #22c55e; --c2: #15803d; --tint: #ecfbf1; --li
 ol.steps > li:nth-child(3) { --c1: #f97316; --c2: #c2410c; --tint: #fff4ea; --line: #ffdcc0; }
 ol.steps > li { background: linear-gradient(160deg, var(--tint) 0%, #fff 85%); border-color: var(--line); }
 ol.steps > li::before { background: linear-gradient(140deg, var(--c1), var(--c2)) !important; color: #fff !important; box-shadow: 0 10px 22px -10px var(--c2); }
-ol.steps > li::after { content: ""; position: absolute; left: 0; top: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--c1), var(--c2)); }
+ol.steps > li { box-shadow: inset 0 4px 0 var(--c1); }
 ol.steps > li h3 { color: var(--c2); }
 .step-ico { position: absolute; top: 18px; right: 18px; width: 48px; height: 48px; border-radius: 14px; background: #fff; display: grid; place-items: center; box-shadow: 0 6px 16px -10px rgba(15,23,42,.4), inset 0 0 0 1px var(--line); }
 @media (hover: hover) { ol.steps > li:hover::before { background: linear-gradient(140deg, var(--c2), var(--c1)) !important; } }
-@media (max-width: 560px) { .step-ico { top: 14px; right: 14px; width: 40px; height: 40px; } .step-ico .ico-c { width: 24px; height: 24px; } }
+@media (max-width: 560px) { ol.steps > li { padding-right: 62px; } .step-ico { top: 16px; right: 14px; width: 40px; height: 40px; } .step-ico .ico-c { width: 24px; height: 24px; } }
