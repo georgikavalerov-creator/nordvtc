@@ -9,6 +9,7 @@ import AppBridge from "@/components/AppBridge";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import JsonLd from "@/components/JsonLd";
+import CookieNotice from "@/components/CookieNotice";
 import Analytics from "@/components/Analytics";
 import CtaTracker from "@/components/CtaTracker";
 import PricingFx from "@/components/PricingFx";
@@ -92,6 +93,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <MobileBar />
         <ChatButton />
         <Analytics />
+        <CookieNotice />
         <CtaTracker />
         <AppBridge />
         <PricingFx />

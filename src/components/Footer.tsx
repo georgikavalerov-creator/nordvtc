@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CookieLink } from "./CookieNotice";
 import Logo from "@/components/Logo";
 import PaymentBadges from "@/components/PaymentBadges";
 import { SITE } from "@/lib/site";
@@ -53,7 +54,7 @@ export default function Footer() {
       </div>
       <div className="wrap ft-legal">
         <span>© {new Date().getFullYear()} {SITE.name} — {SITE.legal.form}, SIRET {SITE.legal.siret}</span>
-        <span className="ft-legal-links">{LEGAL.map(([h, l]) => <Link key={h} href={h}>{l}</Link>)}</span>
+        <span className="ft-legal-links">{LEGAL.map(([h, l]) => <Link key={h} href={h}>{l}</Link>)}<CookieLink /></span>
         <small>{CREDITS}</small>
       </div>
     </footer>

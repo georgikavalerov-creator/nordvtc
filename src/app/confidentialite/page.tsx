@@ -74,7 +74,12 @@ export default async function Confidentialite() {
         Vous disposez d'un droit d'accès, de rectification, d'effacement, d'opposition, de limitation et de portabilité de vos données, ainsi que du droit de retirer votre consentement à tout moment et de définir des directives sur leur sort après votre décès. Pour les exercer, écrivez{email ? <> à <a href={`mailto:${email}`}>{email}</a></> : null} ou via la <a href="/contact">page contact</a> ; nous répondons dans un délai d'un mois. Depuis votre espace personnel, vous pouvez aussi télécharger vos données et supprimer votre compte. Si vous estimez que vos droits ne sont pas respectés, vous pouvez adresser une réclamation à la CNIL (<a href="https://www.cnil.fr" rel="noopener noreferrer">cnil.fr</a>).
       </p>
 
-      <h2>Cookies et stockage local</h2>
+      <h2>Journal de sécurité</h2>
+      <p>
+        Pour protéger le site contre les attaques (tentatives de connexion frauduleuses, envois automatisés, falsification de liens ou de prix), certains événements techniques sont enregistrés : adresse IP, pays et réseau d&apos;origine, navigateur, page concernée, date et identifiant technique de la requête. Base légale : intérêt légitime (sécurité du service). Durée de conservation : 12 mois maximum, puis suppression automatique. Ces données ne sont utilisées que pour la sécurité et, en cas d&apos;attaque, peuvent être transmises aux autorités compétentes.
+      </p>
+
+      <h2 id="cookies">Cookies et stockage local</h2>
       <p>
         Ce site n'utilise aucun cookie publicitaire ni de suivi. Seuls des cookies strictement nécessaires sont déposés : session de connexion à l'espace personnel, accès à l'espace d'administration et, le cas échéant, contrôle anti-robots. Ils ne nécessitent pas de consentement. Si la mesure d'audience est activée, elle repose sur Plausible Analytics, sans cookie ni donnée personnelle (statistiques agrégées). Le navigateur conserve aussi temporairement (stockage de session) le brouillon de votre réservation et votre demande d'appel ; ils disparaissent à la fermeture de l'onglet. Si vous utilisez la discussion, son identifiant est gardé sur votre appareil (stockage local) pour la retrouver. Votre choix d'affichage (jour ou nuit) est mémorisé sur votre appareil.
       </p>
