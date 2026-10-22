@@ -3087,3 +3087,43 @@ h2.bk-sub::before { content: ""; width: 4px; height: 1.1em; border-radius: 4px; 
 /* dates : seule la première lettre en majuscule */
 .acc-next-when span { text-transform: none !important; display: inline-block; }
 .acc-next-when span::first-letter { text-transform: uppercase; }
+
+/* ===== Sobriété : moins d'effets gadgets ===== */
+/* plus de reflet qui balaie les boutons en boucle (seulement au survol, une fois) */
+.btn:not(.danger):not(.disabled):not([disabled])::before, .pricing .btn::before { animation: none !important; }
+/* tarifs : pas de pulsation continue, pas de bascule 3D ni de bordure tournante */
+.pricing .btn, .pricing.pop .btn { animation: none !important; }
+.pricing::after { display: none !important; }
+@media (hover: hover) and (min-width: 901px) {
+  .pricing:not(.pop):hover, .pricing.pop:hover { transform: translateY(-4px) !important; }
+  .pricing:hover .btn { transform: none !important; }
+  .pricing:hover .amount { transform: none !important; text-shadow: none !important; }
+}
+/* indicateur de mot de passe sobre */
+.pwm2 { display: grid; gap: 6px; margin-top: 4px; }
+.pwm2-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+.pwm2-bar span { height: 5px; border-radius: 3px; background: #e3e6ee; transition: background .25s; }
+.pwm2.lv1 .pwm2-bar .on { background: #d92d20; }
+.pwm2.lv2 .pwm2-bar .on { background: #f59e0b; }
+.pwm2.lv3 .pwm2-bar .on { background: #1f5bff; }
+.pwm2.lv4 .pwm2-bar .on { background: #12a150; }
+.pwm2-txt, .pwm2-tip { margin: 0; font-size: .84rem; color: #6b7385; line-height: 1.4; }
+.pwm2-txt strong { color: #0b1430; }
+.pwm2.lv1 .pwm2-txt strong { color: #d92d20; } .pwm2.lv4 .pwm2-txt strong { color: #12a150; }
+/* page 404 sobre */
+.nf2 { padding: 64px 0 80px; }
+.nf2-wrap { max-width: 680px; display: grid; gap: 14px; }
+.nf2 h1 { font-size: clamp(1.8rem, 4vw, 2.6rem); letter-spacing: -.02em; margin: 0; }
+.nf2 p { margin: 0; }
+.nf2-links { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
+.nf2-list { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 0; border-top: 1px solid #e3e6ee; }
+.nf2-list li { border-bottom: 1px solid #e3e6ee; }
+.nf2-list a { display: flex; justify-content: space-between; padding: 14px 2px; color: #0b1430; text-decoration: none; font-weight: 600; }
+.nf2-list a::after { content: "›"; color: #8a93ab; font-size: 1.3rem; line-height: 1; }
+@media (hover: hover) { .nf2-list a:hover { color: #1f5bff; } }
+/* Pied de page (ordinateur) : pas de chevron ni de trait hérités du style des FAQ */
+@media (min-width: 761px) {
+  .site-footer .ft-col > summary::after { display: none !important; content: none !important; }
+  .site-footer .ft-col { border: 0 !important; padding: 0 !important; margin: 0 !important; background: none !important; box-shadow: none !important; }
+  .site-footer .ft-col > summary { display: block; color: #fff !important; font-size: .82rem; letter-spacing: .08em; text-transform: uppercase; opacity: .7; margin-bottom: 10px; padding: 0; }
+}

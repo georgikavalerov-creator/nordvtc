@@ -47,7 +47,7 @@ type Thread = { id: string; notified_at: string | null; last_admin_at: string | 
 export async function addVisitorMessage(t: Thread, body: string) {
   const since = new Date(Date.now() - 60_000).toISOString();
   const { count } = await db().from("chat_messages").select("id", { count: "exact", head: true }).eq("thread_id", t.id).eq("sender", "visitor").gte("created_at", since);
-  if ((count ?? 0) >= 8) return { error: "Doucement 🙂 attendez quelques secondes avant d'envoyer un autre message." };
+  if ((count ?? 0) >= 8) return { error: "Patientez quelques secondes avant d'envoyer un autre message." };
   const { data, error } = await db().from("chat_messages").insert({ thread_id: t.id, sender: "visitor", body }).select("*").single();
   if (error || !data) return { error: "Message non envoyé, réessayez." };
   const now = new Date().toISOString();

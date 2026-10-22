@@ -83,7 +83,7 @@ export default function CallGate() {
     const tel = number.replace(/\s/g, "");
     return (
       <div className="callgate done" id="appel">
-        <p className="cg-ok">Merci {name || ""} 👋</p>
+        <p className="cg-ok">Merci{name ? ` ${name.split(" ")[0]}` : ""}, c&apos;est noté.</p>
         {tel ? (
           <>
             <p className="muted">Voici mon numéro. Vous pouvez m'appeler maintenant ; si je suis en course, je vous rappelle rapidement.</p>

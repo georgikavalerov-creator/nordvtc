@@ -63,7 +63,7 @@ export default function AuthForm({ next = "/compte", failed = false }: { next?: 
 
   if (sent) return (
     <div className="callgate" role="status">
-      <p className="cg-ok">Consultez votre boîte mail ✉️</p>
+      <p className="cg-ok">Consultez votre boîte mail</p>
       <p className="muted">Nous avons envoyé un lien de connexion à <strong>{email}</strong>. Cliquez dessus pour accéder à votre espace (pensez aux courriers indésirables).</p>
       <button type="button" className="linklike" onClick={() => setSent(false)}>Changer d'adresse</button>
     </div>

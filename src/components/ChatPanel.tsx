@@ -114,7 +114,7 @@ export default function ChatPanel({ open, onClose, raised, anchor }: { open: boo
       <div className="chat-list" ref={listRef} aria-live="polite">
         {!started && (
           <div className="chat-intro">
-            <p>Bonjour 👋 Une question sur un trajet, un prix ou votre réservation ? Écrivez-moi ici, sans compte.</p>
+            <p>Bonjour, une question sur un trajet, un prix ou votre réservation ? Écrivez-moi ici, sans compte.</p>
             <div className="chat-sugg">
               {SUGGEST.map((s) => <button key={s} type="button" onClick={() => setText(s)}>{s}</button>)}
             </div>
@@ -136,7 +136,7 @@ export default function ChatPanel({ open, onClose, raised, anchor }: { open: boo
         ))}
         {askEmail && !hasEmail && (
           <div className="chat-ask">
-            <p>Message bien reçu ✔ Pour être prévenu de ma réponse si vous quittez le site, laissez votre e-mail (facultatif) :</p>
+            <p>Message bien reçu. Pour être prévenu de ma réponse si vous quittez le site, laissez votre e-mail (facultatif) :</p>
             <div className="chat-row">
               <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="vous@exemple.fr" aria-label="Votre e-mail" />
               <button type="button" onClick={saveEmail}>OK</button>
