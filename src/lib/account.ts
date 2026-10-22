@@ -12,12 +12,12 @@ export async function requireUser(next = "/compte"): Promise<User> {
 
 export type Booking = {
   id: string; status: string; created_at: string; origin_label: string; dest_label: string; pickup_at: string;
-  passengers: number; luggage: number; flight: string | null; child_seat: boolean; notes: string | null;
+  passengers: number; luggage: number; flight: string | null; child_seat: boolean; pet?: boolean; notes: string | null;
   price_cents: number; paid_cents: number; charge_cents: number; pay_mode: string; distance_m: number; duration_s: number;
   customer_name: string; customer_email: string; customer_phone: string; paid_at: string | null;
-  promo_code: string | null; discount_cents: number; refunded_cents: number;
+  promo_code: string | null; discount_cents: number; refunded_cents: number; user_hidden_at?: string | null;
 };
-const COLS = "id,status,created_at,origin_label,dest_label,pickup_at,passengers,luggage,flight,child_seat,notes,price_cents,paid_cents,charge_cents,pay_mode,distance_m,duration_s,customer_name,customer_email,customer_phone,paid_at,promo_code,discount_cents,refunded_cents";
+const COLS = "id,status,created_at,origin_label,dest_label,pickup_at,passengers,luggage,flight,child_seat,pet,notes,price_cents,paid_cents,charge_cents,pay_mode,distance_m,duration_s,customer_name,customer_email,customer_phone,paid_at,promo_code,discount_cents,refunded_cents";
 const clean = (s: string) => s.replace(/[,()%*]/g, "");
 
 /** Réservations du compte + anciennes réservations faites avec la même adresse e-mail vérifiée. */
@@ -34,16 +34,26 @@ export async function userBookings(user: User): Promise<Booking[]> {
   return list;
 }
 
+/** Corbeille : trajets retirés de l'espace, les plus récemment supprimés d'abord. */
+export async function hiddenBookings(user: User): Promise<Booking[]> {
+  if (!dbConfigured()) return [];
+  const filters = [`user_id.eq.${user.id}`];
+  const email = (user.email ?? "").toLowerCase();
+  if (email && user.email_confirmed_at) filters.push(`customer_email.ilike.${clean(email)}`);
+  const { data } = await db().from("bookings").select(`${COLS},user_hidden_at`).or(filters.join(",")).neq("status", "expired").not("user_hidden_at", "is", null).order("user_hidden_at", { ascending: false }).limit(200);
+  return (data as Booking[]) ?? [];
+}
+
 export async function userBooking(user: User, id: string): Promise<Booking | null> {
   if (!/^[0-9a-f-]{36}$/.test(id)) return null;
   return (await userBookings(user)).find((b) => b.id === id) ?? null;
 }
 
-export type Profile = { full_name: string | null; phone: string | null; default_passengers: number; default_child_seat: boolean; marketing_opt_in: boolean; avatar?: string | null };
+export type Profile = { full_name: string | null; phone: string | null; default_passengers: number; default_child_seat: boolean; default_pet?: boolean; marketing_opt_in: boolean; avatar?: string | null };
 export async function getProfile(userId: string): Promise<Profile> {
   const empty = { full_name: null, phone: null, default_passengers: 1, default_child_seat: false, marketing_opt_in: false, avatar: null };
   if (!dbConfigured()) return empty;
-  const { data } = await db().from("profiles").select("full_name,phone,default_passengers,default_child_seat,marketing_opt_in,avatar").eq("user_id", userId).maybeSingle();
+  const { data } = await db().from("profiles").select("full_name,phone,default_passengers,default_child_seat,default_pet,marketing_opt_in,avatar").eq("user_id", userId).maybeSingle();
   return (data as Profile) ?? empty;
 }
 

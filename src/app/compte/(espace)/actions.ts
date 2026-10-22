@@ -38,6 +38,7 @@ export async function saveProfile(_: unknown, f: FormData): Promise<{ ok?: boole
     user_id: u.id, full_name: p.data.full_name || null, phone,
     default_passengers: p.data.default_passengers,
     default_child_seat: f.get("default_child_seat") === "on",
+    default_pet: f.get("default_pet") === "on",
     marketing_opt_in: f.get("marketing_opt_in") === "on",
     updated_at: new Date().toISOString(),
   });
@@ -126,22 +127,33 @@ export async function saveAvatar(dataUrl: string | null): Promise<{ ok?: boolean
   return { ok: true };
 }
 
-/** Retire des trajets de l'espace client (passés, annulés ou non payés). Ils restent conservés pour la comptabilité. */
-export async function hideTrips(ids: string[]): Promise<{ ok?: boolean; error?: string; count?: number }> {
+async function ownedIds(ids: string[]) {
   const u = await me();
   const list = ids.filter((id) => /^[0-9a-f-]{36}$/.test(id)).slice(0, 500);
-  if (!list.length) return { error: "Aucun trajet sélectionné." };
+  if (!list.length) return { u, ids: [] as string[] };
   const email = (u.email ?? "").toLowerCase();
-  const { data } = await db().from("bookings").select("id,user_id,customer_email,status,pickup_at").in("id", list);
-  const now = Date.now();
-  const allowed = (data ?? []).filter((b) => {
-    const mine = b.user_id === u.id || (u.email_confirmed_at && b.customer_email?.toLowerCase() === email);
-    const removable = b.status === "cancelled" || b.status === "completed" || b.status === "pending_payment" || new Date(b.pickup_at).getTime() < now;
-    return mine && removable;
-  }).map((b) => b.id);
-  if (!allowed.length) return { error: "Un trajet à venir doit d'abord être annulé." };
+  const { data } = await db().from("bookings").select("id,user_id,customer_email").in("id", list);
+  const mine = (data ?? []).filter((b) => b.user_id === u.id || (u.email_confirmed_at && b.customer_email?.toLowerCase() === email)).map((b) => b.id);
+  return { u, ids: mine };
+}
+
+/** Retire des trajets de l'espace client (ils vont dans la corbeille et restent conservés pour la comptabilité).
+ *  Retirer un trajet à venir ne l'annule pas : l'avertissement est affiché avant la confirmation. */
+export async function hideTrips(ids: string[]): Promise<{ ok?: boolean; error?: string; count?: number; ids?: string[] }> {
+  const { ids: allowed } = await ownedIds(ids);
+  if (!allowed.length) return { error: "Aucun trajet sélectionné." };
   const { error } = await db().from("bookings").update({ user_hidden_at: new Date().toISOString() }).in("id", allowed);
   if (error) return { error: "Suppression impossible." };
+  revalidatePath("/compte", "layout");
+  return { ok: true, count: allowed.length, ids: allowed };
+}
+
+/** Remet dans l'espace client des trajets supprimés par erreur. */
+export async function restoreTrips(ids: string[]): Promise<{ ok?: boolean; error?: string; count?: number }> {
+  const { ids: allowed } = await ownedIds(ids);
+  if (!allowed.length) return { error: "Aucun trajet à restaurer." };
+  const { error } = await db().from("bookings").update({ user_hidden_at: null }).in("id", allowed);
+  if (error) return { error: "Restauration impossible." };
   revalidatePath("/compte", "layout");
   return { ok: true, count: allowed.length };
 }

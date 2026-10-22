@@ -23,6 +23,7 @@ export default function ProfileForm({ profile, email, countries }: { profile: Pr
       <label>Nombre de passagers habituel
         <select name="default_passengers" defaultValue={profile.default_passengers}>{[1, 2, 3, 4].map((n) => <option key={n} value={n}>{n}</option>)}</select>
       </label>
+      <label className="cg-consent"><input type="checkbox" name="default_pet" defaultChecked={!!profile.default_pet} /><span>J&apos;ai un animal de compagnie</span></label>
       <label className="cg-consent"><input type="checkbox" name="default_child_seat" defaultChecked={profile.default_child_seat} /><span>Je voyage habituellement avec un siège enfant</span></label>
       <label className="cg-consent"><input type="checkbox" name="marketing_opt_in" defaultChecked={profile.marketing_opt_in} /><span>Recevoir les offres et actualités de Nord VTC</span></label>
       {state.error && <p className="error" role="alert">{state.error}</p>}

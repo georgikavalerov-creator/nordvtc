@@ -105,7 +105,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ q
                     <a href={`tel:${b.customer_phone}`}>{b.customer_phone}</a> · <a href={`mailto:${b.customer_email}`}>{b.customer_email}</a>
                   </p>
                   <p className="muted" style={{ margin: "6px 0" }}>
-                    {b.passengers} pers. · {b.luggage} bag.{b.child_seat ? " · siège enfant" : ""}{b.flight ? ` · ${b.flight}` : ""}
+                    {b.passengers} pers. · {b.luggage} bag.{b.child_seat ? " · siège enfant" : ""}{b.pet ? " · animal" : ""}{b.flight ? ` · ${b.flight}` : ""}
                   </p>
                   {b.notes && <p>« {b.notes} »</p>}
                   <p className="muted" style={{ margin: "6px 0" }}>

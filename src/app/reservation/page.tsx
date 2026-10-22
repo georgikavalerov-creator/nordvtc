@@ -31,7 +31,7 @@ export default async function ReservationPage({ searchParams }: Props) {
       <section className="section">
         <div className="wrap booking-layout">
           <div>
-            <BookingForm initialFrom={from.slice(0, 120)} initialTo={to.slice(0, 120)} accountName={prof?.full_name ?? (user?.user_metadata?.full_name as string) ?? ""} accountEmail={user?.email ?? ""} accountPhone={prof?.phone ?? ""} defaultPassengers={prof?.default_passengers ?? 1} defaultChildSeat={prof?.default_child_seat ?? false} savedPlaces={places} />
+            <BookingForm initialFrom={from.slice(0, 120)} initialTo={to.slice(0, 120)} accountName={prof?.full_name ?? (user?.user_metadata?.full_name as string) ?? ""} accountEmail={user?.email ?? ""} accountPhone={prof?.phone ?? ""} defaultPassengers={prof?.default_passengers ?? 1} defaultChildSeat={prof?.default_child_seat ?? false} defaultPet={prof?.default_pet ?? false} savedPlaces={places} />
           </div>
           <aside className="reassure">
             <h2>Réservez l'esprit tranquille</h2>

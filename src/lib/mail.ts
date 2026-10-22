@@ -18,6 +18,7 @@ export type BookingMail = {
   passengers: number;
   luggage: number;
   childSeat: boolean;
+  pet?: boolean;
   flight: string | null;
   notes: string | null;
   priceCents: number;
@@ -61,6 +62,7 @@ const tripRows = (b: BookingMail) => rows([
   ["Passagers", String(b.passengers)],
   ["Bagages", String(b.luggage)],
   b.childSeat && ["Siège enfant", "Demandé"],
+  b.pet && ["Animal de compagnie", "Oui"],
   b.flight && ["Vol / train", esc(b.flight)],
   ["Référence", ref(b.id)],
 ]);

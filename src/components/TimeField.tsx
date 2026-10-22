@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import IconC from "./IconC";
+import { useSheet } from "./useSheet";
 
 // Heure à la minute près, en deux touches : on choisit l'heure dans une grille, puis les minutes
 // (raccourcis de 5 en 5 + boutons −1 / +1 pour la minute exacte). On peut aussi taper « 1435 » directement.
@@ -19,15 +21,17 @@ export default function TimeField({ value, onChange, invalid, label = "Heure" }:
   useEffect(() => {
     try { setTouch(!window.matchMedia("(hover: hover) and (pointer: fine)").matches); } catch { setTouch(true); }
   }, []);
+  const sheet = useSheet(open);
   useEffect(() => {
-    if (open) requestAnimationFrame(() => pop.current?.scrollIntoView({ block: "nearest", behavior: "smooth" }));
-  }, [open]);
+    // Sur ordinateur, on fait apparaître le menu s'il dépasse ; sur téléphone (panneau fixe), on ne fait jamais défiler la page.
+    if (open && !sheet) requestAnimationFrame(() => pop.current?.scrollIntoView({ block: "nearest", behavior: "smooth" }));
+  }, [open, sheet]);
   const h = value ? Number(value.slice(0, 2)) : null;
   const m = value ? Number(value.slice(3, 5)) : null;
 
   useEffect(() => {
     if (!open) return;
-    const out = (e: PointerEvent) => { if (box.current && !box.current.contains(e.target as Node)) { setOpen(false); setTyped(null); } };
+    const out = (e: PointerEvent) => { if (box.current && !box.current.contains(e.target as Node) && !pop.current?.contains(e.target as Node)) { setOpen(false); setTyped(null); } };
     const esc = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
     document.addEventListener("pointerdown", out);
     document.addEventListener("keydown", esc);
@@ -37,33 +41,8 @@ export default function TimeField({ value, onChange, invalid, label = "Heure" }:
   const set = (hh: number, mm: number) => onChange(`${pad(((hh % 24) + 24) % 24)}:${pad(((mm % 60) + 60) % 60)}`);
   const nudge = (d: number) => { const t = ((h ?? 12) * 60 + (m ?? 0) + d + 1440) % 1440; set(Math.floor(t / 60), t % 60); };
 
-  return (
-    <div className="pk" ref={box}>
-      {touch ? (
-        <button type="button" className={`pk-field${value ? "" : " empty"}`} aria-haspopup="dialog" aria-expanded={open} aria-invalid={invalid || undefined} aria-label={value ? `${label} : ${show(value)}` : label} onClick={() => { setOpen((o) => !o); setStep(value ? "m" : "h"); }}>
-          <IconC name="clock" size={20} />
-          <span>{value ? show(value) : "Choisir…"}</span>
-        </button>
-      ) : (
-        <div className={`pk-field pk-time${value ? "" : " empty"}`} aria-invalid={invalid || undefined}>
-        <IconC name="clock" size={20} />
-        <input
-          inputMode="numeric" aria-label={label} placeholder="Choisir…" autoComplete="off"
-          value={typed ?? show(value)}
-          onFocus={(e) => { e.currentTarget.select(); setOpen(true); setStep(value ? "m" : "h"); }}
-          onClick={() => setOpen(true)}
-          onChange={(e) => {
-            const raw = e.target.value.replace(/\D/g, "");
-            const d = (typed === null && value && raw.length > 4 ? raw.slice(4) : raw).slice(0, 4);
-            setTyped(d.length > 2 ? `${d.slice(0, 2)} h ${d.slice(2)}` : d);
-            if (d.length === 4 && Number(d.slice(0, 2)) < 24 && Number(d.slice(2)) < 60) { set(Number(d.slice(0, 2)), Number(d.slice(2))); setTyped(null); setOpen(false); }
-          }}
-          onBlur={() => setTyped(null)}
-        />
-      </div>
-      )}
-      {open && (
-        <div ref={pop} className="pk-pop pk-clock" role="dialog" aria-label="Choisir l'heure">
+  const panel = (
+        <div ref={pop} className={`pk-pop pk-clock${sheet ? " pk-sheet" : ""}`} role="dialog" aria-label="Choisir l'heure">
           <div className="pk-tabs">
             <button type="button" className={step === "h" ? "on" : ""} onClick={() => setStep("h")}>Heure{h !== null ? ` · ${pad(h)} h` : ""}</button>
             <button type="button" className={step === "m" ? "on" : ""} onClick={() => setStep("m")} disabled={h === null}>Minutes{m !== null ? ` · ${pad(m)}` : ""}</button>
@@ -90,7 +69,34 @@ export default function TimeField({ value, onChange, invalid, label = "Heure" }:
             </>
           )}
         </div>
+  );
+
+  return (
+    <div className="pk" ref={box}>
+      {touch ? (
+        <button type="button" className={`pk-field${value ? "" : " empty"}`} aria-haspopup="dialog" aria-expanded={open} aria-invalid={invalid || undefined} aria-label={value ? `${label} : ${show(value)}` : label} onClick={() => { setOpen((o) => !o); setStep(value ? "m" : "h"); }}>
+          <IconC name="clock" size={20} />
+          <span>{value ? show(value) : "Choisir…"}</span>
+        </button>
+      ) : (
+        <div className={`pk-field pk-time${value ? "" : " empty"}`} aria-invalid={invalid || undefined}>
+        <IconC name="clock" size={20} />
+        <input
+          inputMode="numeric" aria-label={label} placeholder="Choisir…" autoComplete="off"
+          value={typed ?? show(value)}
+          onFocus={(e) => { e.currentTarget.select(); setOpen(true); setStep(value ? "m" : "h"); }}
+          onClick={() => setOpen(true)}
+          onChange={(e) => {
+            const raw = e.target.value.replace(/\D/g, "");
+            const d = (typed === null && value && raw.length > 4 ? raw.slice(4) : raw).slice(0, 4);
+            setTyped(d.length > 2 ? `${d.slice(0, 2)} h ${d.slice(2)}` : d);
+            if (d.length === 4 && Number(d.slice(0, 2)) < 24 && Number(d.slice(2)) < 60) { set(Number(d.slice(0, 2)), Number(d.slice(2))); setTyped(null); setOpen(false); }
+          }}
+          onBlur={() => setTyped(null)}
+        />
+      </div>
       )}
+      {open && (sheet ? createPortal(panel, document.body) : panel)}
     </div>
   );
 }

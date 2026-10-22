@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import AccountNav from "@/components/AccountNav";
 import FaceIdPrompt from "@/components/FaceIdPrompt";
+import UndoBar from "@/components/UndoBar";
 import { getProfile, requireUser } from "@/lib/account";
 import { listPasskeys } from "@/lib/passkey";
 import { clientPkRegOptions, clientPkRegVerify } from "./actions";
@@ -36,6 +37,7 @@ export default async function EspaceLayout({ children }: { children: React.React
           <AccountNav />
           <div className="acc-body">{children}</div>
         </div>
+        <UndoBar />
       </div>
     </section>
   );

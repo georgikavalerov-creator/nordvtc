@@ -1,10 +1,14 @@
 "use client";
 import { useState, useTransition } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { hideTrips } from "@/app/compte/(espace)/actions";
 
-/** Bouton « Supprimer » avec confirmation sur place (un trajet ou tous ceux d'un onglet). */
-export default function HideTrip({ ids, label = "Supprimer", confirmText = "Retirer ce trajet de votre espace ?", after }: { ids: string[]; label?: string; confirmText?: string; after?: string }) {
+export const UNDO_EVENT = "nvtc-trips-hidden";
+
+/** Bouton « Supprimer » avec confirmation sur place (un trajet ou tous ceux d'un onglet).
+ *  Le trajet part dans la corbeille : une barre « Annuler » permet de le récupérer aussitôt. */
+export default function HideTrip({ ids, label = "Supprimer", confirmText = "Supprimer ce trajet de votre espace ?", after, booked = false, detailHref }: { ids: string[]; label?: string; confirmText?: string; after?: string; booked?: boolean; detailHref?: string }) {
   const [ask, setAsk] = useState(false);
   const [err, setErr] = useState("");
   const [pending, start] = useTransition();
@@ -14,6 +18,7 @@ export default function HideTrip({ ids, label = "Supprimer", confirmText = "Reti
     const r = await hideTrips(ids);
     if (r.error) { setErr(r.error); return; }
     setAsk(false);
+    window.dispatchEvent(new CustomEvent(UNDO_EVENT, { detail: { ids: r.ids ?? ids } }));
     if (after) router.push(after); else router.refresh();
   });
   if (!ask) return (
@@ -23,9 +28,11 @@ export default function HideTrip({ ids, label = "Supprimer", confirmText = "Reti
     </button>
   );
   return (
-    <span className="trip-del-ask" role="group" aria-label="Confirmer la suppression">
-      <span>{confirmText}</span>
-      <button type="button" className="btn small danger" onClick={go} disabled={pending}>{pending ? "…" : "Oui, supprimer"}</button>
+    <span className={`trip-del-ask${booked ? " warn" : ""}`} role="group" aria-label="Confirmer la suppression">
+      {booked ? (
+        <span><strong>Ce trajet est toujours réservé.</strong> Le supprimer de votre espace ne l&apos;annule pas.{detailHref && <> Pour ne plus faire la course, <Link href={detailHref}>annulez-la d&apos;abord</Link>.</>}</span>
+      ) : <span>{confirmText}</span>}
+      <button type="button" className="btn small danger" onClick={go} disabled={pending}>{pending ? "…" : booked ? "Supprimer quand même" : "Oui, supprimer"}</button>
       <button type="button" className="btn small ghost" onClick={() => setAsk(false)} disabled={pending}>Non</button>
       {err && <span className="error" role="alert">{err}</span>}
     </span>

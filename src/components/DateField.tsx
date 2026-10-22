@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import IconC from "./IconC";
+import { useSheet } from "./useSheet";
 
 // Calendrier maison, aux couleurs du site (remplace le calendrier natif du navigateur).
 // Valeur au format "AAAA-MM-JJ" ; les jours avant `min` sont grisés.
@@ -17,15 +19,17 @@ export default function DateField({ value, onChange, min, invalid, ariaLabel = "
   const [view, setView] = useState(new Date(base.getFullYear(), base.getMonth(), 1));
   const box = useRef<HTMLDivElement>(null);
   const pop = useRef<HTMLDivElement>(null);
+  const sheet = useSheet(open);
   useEffect(() => {
-    if (open) requestAnimationFrame(() => pop.current?.scrollIntoView({ block: "nearest", behavior: "smooth" }));
-  }, [open]);
+    // Sur ordinateur, on fait apparaître le menu s'il dépasse ; sur téléphone (panneau fixe), on ne fait jamais défiler la page.
+    if (open && !sheet) requestAnimationFrame(() => pop.current?.scrollIntoView({ block: "nearest", behavior: "smooth" }));
+  }, [open, sheet]);
 
   useEffect(() => {
     if (!open) return;
     const b = value ? parse(value) : min ? parse(min) : new Date();
     setView(new Date(b.getFullYear(), b.getMonth(), 1));
-    const out = (e: PointerEvent) => { if (box.current && !box.current.contains(e.target as Node)) setOpen(false); };
+    const out = (e: PointerEvent) => { if (box.current && !box.current.contains(e.target as Node) && !pop.current?.contains(e.target as Node)) setOpen(false); };
     const esc = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
     document.addEventListener("pointerdown", out);
     document.addEventListener("keydown", esc);
@@ -40,14 +44,8 @@ export default function DateField({ value, onChange, min, invalid, ariaLabel = "
   const canPrev = !minDate || new Date(view.getFullYear(), view.getMonth(), 0) >= minDate;
   const cells: (string | null)[] = [...Array(lead).fill(null), ...Array.from({ length: days }, (_, i) => iso(new Date(view.getFullYear(), view.getMonth(), i + 1)))];
 
-  return (
-    <div className="pk" ref={box}>
-      <button type="button" className={`pk-field${value ? "" : " empty"}`} aria-haspopup="dialog" aria-expanded={open} aria-invalid={invalid || undefined} aria-label={value ? `${ariaLabel} : ${label(value)}` : ariaLabel} onClick={() => setOpen((o) => !o)}>
-        <IconC name="calendar" size={20} />
-        <span>{value ? label(value) : "Choisir…"}</span>
-      </button>
-      {open && (
-        <div ref={pop} className="pk-pop pk-cal" role="dialog" aria-label="Choisir une date">
+  const panel = (
+        <div ref={pop} className={`pk-pop pk-cal${sheet ? " pk-sheet" : ""}`} role="dialog" aria-label="Choisir une date">
           <div className="pk-head">
             <button type="button" onClick={() => setView(new Date(view.getFullYear(), view.getMonth() - 1, 1))} disabled={!canPrev} aria-label="Mois précédent">‹</button>
             <strong>{MOIS[view.getMonth()]} {view.getFullYear()}</strong>
@@ -66,7 +64,15 @@ export default function DateField({ value, onChange, min, invalid, ariaLabel = "
             ))}
           </div>
         </div>
-      )}
+  );
+
+  return (
+    <div className="pk" ref={box}>
+      <button type="button" className={`pk-field${value ? "" : " empty"}`} aria-haspopup="dialog" aria-expanded={open} aria-invalid={invalid || undefined} aria-label={value ? `${ariaLabel} : ${label(value)}` : ariaLabel} onClick={() => setOpen((o) => !o)}>
+        <IconC name="calendar" size={20} />
+        <span>{value ? label(value) : "Choisir…"}</span>
+      </button>
+      {open && (sheet ? createPortal(panel, document.body) : panel)}
     </div>
   );
 }

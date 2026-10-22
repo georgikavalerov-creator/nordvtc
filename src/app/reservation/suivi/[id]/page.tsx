@@ -24,7 +24,7 @@ export default async function Suivi({ params, searchParams }: Props) {
   if (!/^[0-9a-f-]{36}$/.test(id) || !verifyTrack(id, k) || !dbConfigured()) notFound();
   const { data: b } = await db()
     .from("bookings")
-    .select("id,group_id,is_return,status,origin_label,dest_label,pickup_at,passengers,luggage,flight,child_seat,price_cents,paid_cents,customer_name")
+    .select("id,group_id,is_return,status,origin_label,dest_label,pickup_at,passengers,luggage,flight,child_seat,pet,price_cents,paid_cents,customer_name")
     .eq("id", id)
     .maybeSingle();
   if (!b || b.status === "expired") notFound();
@@ -56,7 +56,7 @@ export default async function Suivi({ params, searchParams }: Props) {
           <Route from={b.origin_label} to={b.dest_label} />
           <p className="muted" style={{ margin: "0 0 8px" }}>
             {b.passengers} passager{b.passengers > 1 ? "s" : ""} · {b.luggage} bagage{b.luggage > 1 ? "s" : ""}
-            {b.child_seat ? " · siège enfant" : ""}{b.flight ? ` · ${b.flight}` : ""}
+            {b.child_seat ? " · siège enfant" : ""}{b.pet ? " · animal de compagnie" : ""}{b.flight ? ` · ${b.flight}` : ""}
           </p>
           <p className="trip-price">
             <strong>{euro(b.price_cents)}</strong> <span className="muted">· Réf. {b.id.slice(0, 8).toUpperCase()}</span>

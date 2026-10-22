@@ -63,6 +63,7 @@ export async function POST(req: Request) {
               passengers: b.passengers,
               luggage: b.luggage,
               childSeat: b.child_seat,
+              pet: !!b.pet,
               flight: b.flight,
               notes: b.notes,
               priceCents: b.price_cents,

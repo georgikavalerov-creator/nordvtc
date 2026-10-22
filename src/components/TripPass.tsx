@@ -23,7 +23,7 @@ function Stamp({ price, city }: { price: string; city: string }) {
     <div className="pass-stamp" aria-hidden="true">
       <svg viewBox="-4 -4 62 74" width="62" height="74">
         <path d={STAMP} fill="#fff" />
-        <rect x="5" y="5" width="44" height="56" rx="1.5" fill="#1f5eff" />
+        <rect x="5" y="5" width="44" height="56" rx="1.5" fill="#1f5bff" />
         <path d="M9 52 L45 52" stroke="#fff" strokeOpacity=".5" strokeWidth=".8" />
         <text x="27" y="17" textAnchor="middle" fontSize="6" fontWeight="800" letterSpacing="1.4" fill="#fff">NORD VTC</text>
         <text x="27" y="42" textAnchor="middle" fontSize="23" fontWeight="800" fill="#fff">{n}</text>

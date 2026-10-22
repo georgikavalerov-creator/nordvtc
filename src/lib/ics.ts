@@ -3,7 +3,7 @@ import { SITE } from "./site";
 
 export type CalBooking = {
   id: string; status: string; origin_label: string; dest_label: string; pickup_at: string; duration_s: number | null;
-  passengers: number; luggage: number; child_seat: boolean; flight: string | null;
+  passengers: number; luggage: number; child_seat: boolean; pet?: boolean; flight: string | null;
   customer_name: string; customer_phone: string; customer_email: string; notes: string | null;
   price_cents: number; paid_cents: number; admin_note?: string | null; driver?: string | null;
   origin_lat?: number | null; origin_lng?: number | null; dest_lat?: number | null; dest_lng?: number | null;
@@ -36,7 +36,7 @@ export function details(b: CalBooking): string {
     `Arrivée : ${b.dest_label}`,
     `Itinéraire arrivée : ${map(b.dest_label, b.dest_lat, b.dest_lng)}`,
     "",
-    `Passagers : ${b.passengers} · Bagages : ${b.luggage}${b.child_seat ? " · Siège enfant" : ""}`,
+    `Passagers : ${b.passengers} · Bagages : ${b.luggage}${b.child_seat ? " · Siège enfant" : ""}${b.pet ? " · Animal de compagnie" : ""}`,
     b.flight ? `Vol / train : ${b.flight}` : "",
     `Prix : ${eur(b.price_cents)} · Réglé : ${eur(b.paid_cents)} · Reste à encaisser : ${eur(rest)}`,
     b.driver ? `Chauffeur : ${b.driver}` : "",

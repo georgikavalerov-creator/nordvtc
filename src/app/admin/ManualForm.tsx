@@ -69,6 +69,7 @@ export default function ManualForm({ mode = "booking", action = createManualBook
       </details>
       <label>Vol / train (facultatif)<input name="flight" placeholder="AF1234" defaultValue={i.flight} /></label>
       <label className="inline"><input type="checkbox" name="child_seat" /> <span>Siège enfant</span></label>
+      <label className="inline"><input type="checkbox" name="pet" /> <span>Animal de compagnie</span></label>
       <label>Remarque du client<textarea name="notes" style={{ minHeight: 60 }} defaultValue={i.notes} /></label>
       <strong>Prix</strong>
       <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))" }}>

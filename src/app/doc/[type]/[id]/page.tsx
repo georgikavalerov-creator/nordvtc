@@ -84,6 +84,7 @@ export default async function Doc({ params, searchParams }: Props) {
               <tr><td>Lieu de prise en charge</td><td>{b.origin_label}</td></tr>
               <tr><td>Destination</td><td>{b.dest_label}</td></tr>
               <tr><td>Passagers / bagages</td><td>{b.passengers} / {b.luggage}{b.flight ? ` · ${b.flight}` : ""}</td></tr>
+              {(b.child_seat || b.pet) && <tr><td>Options</td><td>{[b.child_seat && "Siège enfant ou rehausseur", b.pet && "Animal de compagnie"].filter(Boolean).join(" · ")}</td></tr>}
               {t === "bon" && <tr><td>Distance estimée</td><td>{(b.distance_m / 1000).toFixed(0)} km · ~{Math.round(b.duration_s / 60)} min</td></tr>}
             </tbody>
           </table>

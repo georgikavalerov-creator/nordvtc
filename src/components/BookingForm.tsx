@@ -26,7 +26,7 @@ const today = () => {
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
 };
 
-export default function BookingForm({ initialFrom = "", initialTo = "", accountName = "", accountEmail = "", accountPhone = "", defaultPassengers = 1, defaultChildSeat = false, savedPlaces = [] }: { initialFrom?: string; initialTo?: string; accountName?: string; accountEmail?: string; accountPhone?: string; defaultPassengers?: number; defaultChildSeat?: boolean; savedPlaces?: { id: string; kind: string; label: string; address: string; lat: number; lng: number }[] }) {
+export default function BookingForm({ initialFrom = "", initialTo = "", accountName = "", accountEmail = "", accountPhone = "", defaultPassengers = 1, defaultChildSeat = false, defaultPet = false, savedPlaces = [] }: { initialFrom?: string; initialTo?: string; accountName?: string; accountEmail?: string; accountPhone?: string; defaultPassengers?: number; defaultChildSeat?: boolean; defaultPet?: boolean; savedPlaces?: { id: string; kind: string; label: string; address: string; lat: number; lng: number }[] }) {
   const [origin, setOrigin] = useState<Place | null>(null);
   const [dest, setDest] = useState<Place | null>(null);
   const [date, setDate] = useState("");
@@ -34,6 +34,7 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
   const [passengers, setPassengers] = useState(defaultPassengers);
   const [luggage, setLuggage] = useState(0);
   const [childSeat, setChildSeat] = useState(defaultChildSeat);
+  const [pet, setPet] = useState(defaultPet);
   const [flight, setFlight] = useState("");
   const [transport, setTransport] = useState<"" | "Avion" | "Train" | "Bus">("");
   const [name, setName] = useState(accountName);
@@ -112,6 +113,7 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
         if (d.flight) setFlight(d.flight);
         if (d.transport === "Avion" || d.transport === "Train" || d.transport === "Bus") setTransport(d.transport);
         if (d.childSeat) setChildSeat(true);
+        if (d.pet) setPet(true);
         if (d.name) setName(d.name);
         if (d.phone) setPhone(d.phone);
         if (d.email) setEmail(d.email);
@@ -127,10 +129,10 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
     try {
       sessionStorage.setItem(
         "nvtc-booking",
-        JSON.stringify({ origin, dest, date, time, wantReturn, retDate, retTime, passengers, luggage, flight, transport, childSeat, name, phone, email }),
+        JSON.stringify({ origin, dest, date, time, wantReturn, retDate, retTime, passengers, luggage, flight, transport, childSeat, pet, name, phone, email }),
       );
     } catch {}
-  }, [origin, dest, date, time, wantReturn, retDate, retTime, passengers, luggage, flight, transport, childSeat, name, phone, email]);
+  }, [origin, dest, date, time, wantReturn, retDate, retTime, passengers, luggage, flight, transport, childSeat, pet, name, phone, email]);
 
   useEffect(() => {
     if (!origin || !dest) {
@@ -195,6 +197,7 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
           passengers,
           luggage,
           childSeat,
+          pet,
           flight: flight.trim() ? `${transport} ${flight.trim()}` : undefined,
           name,
           phone,
@@ -337,10 +340,16 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
             <input value={flight} maxLength={20} aria-label="Numéro de vol, de train ou de bus" aria-invalid={!!errors.flight} onChange={(e) => { setFlight(e.target.value); setErrors((x) => ({ ...x, flight: undefined })); }} placeholder={transport === "Avion" ? "Ex. AF1234" : transport === "Train" ? "Ex. TGV 7123" : transport === "Bus" ? "Ex. FlixBus N802" : "Choisissez avion, train ou bus"} />
             {errors.flight && <p className="field-error flight-error" role="alert">{errors.flight}</p>}
           </div>
-          <label className={`toggle${childSeat ? " on" : ""}`}>
-            <input type="checkbox" checked={childSeat} onChange={(e) => setChildSeat(e.target.checked)} />
-            <span>Siège enfant ou rehausseur</span>
-          </label>
+          <div className="bk-toggles">
+            <label className={`toggle${childSeat ? " on" : ""}`}>
+              <input type="checkbox" checked={childSeat} onChange={(e) => setChildSeat(e.target.checked)} />
+              <span>Siège enfant ou rehausseur</span>
+            </label>
+            <label className={`toggle${pet ? " on" : ""}`}>
+              <input type="checkbox" checked={pet} onChange={(e) => setPet(e.target.checked)} />
+              <span>J&apos;ai un animal de compagnie</span>
+            </label>
+          </div>
         </div>
         <label className={`toggle${wantReturn ? " on" : ""}`} style={{ marginTop: 6 }}>
           <input type="checkbox" checked={wantReturn} onChange={(e) => { setWantReturn(e.target.checked); if (e.target.checked && !retDate) setRetDate(date); setErrors((x) => ({ ...x, ret: undefined })); }} />

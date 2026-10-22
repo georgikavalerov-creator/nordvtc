@@ -6,7 +6,7 @@ import CancelTrip from "@/components/CancelTrip";
 import ClaimCancel from "@/components/ClaimCancel";
 import { claimOpen, latestClaim } from "@/lib/claim";
 import { claimMine } from "@/app/compte/(espace)/actions";
-import { rebookHref, removable, Route } from "@/components/TripCard";
+import { rebookHref, stillBooked, Route } from "@/components/TripCard";
 import HideTrip from "@/components/HideTrip";
 import { cancelPolicy, fmtDate, requireUser, STATUS, userBooking } from "@/lib/account";
 import { db, dbConfigured } from "@/lib/supabase";
@@ -42,7 +42,7 @@ export default async function Detail({ params }: Props) {
       </div>
       <div className="trip-card">
         <Route from={b.origin_label} to={b.dest_label} />
-        <p className="muted trip-meta">{(b.distance_m / 1000).toFixed(0)} km · environ {Math.round(b.duration_s / 60)} min · {b.passengers} passager{b.passengers > 1 ? "s" : ""} · {b.luggage} bagage{b.luggage > 1 ? "s" : ""}{b.child_seat ? " · siège enfant" : ""}{b.flight ? ` · ${b.flight}` : ""}</p>
+        <p className="muted trip-meta">{(b.distance_m / 1000).toFixed(0)} km · environ {Math.round(b.duration_s / 60)} min · {b.passengers} passager{b.passengers > 1 ? "s" : ""} · {b.luggage} bagage{b.luggage > 1 ? "s" : ""}{b.child_seat ? " · siège enfant" : ""}{b.pet ? " · animal de compagnie" : ""}{b.flight ? ` · ${b.flight}` : ""}</p>
         {b.notes && <p className="muted trip-meta">Note : {b.notes}</p>}
       </div>
 
@@ -69,7 +69,7 @@ export default async function Detail({ params }: Props) {
         {b.status === "confirmed" && pol.canCancel && <CancelTrip id={b.id} refundLabel={pol.refundCents > 0 ? euro(pol.refundCents) : null} keptLabel={pol.keptCents > 0 ? euro(pol.keptCents) : null} />}
         {b.status === "confirmed" && <Link className="btn small ghost" href={help("Modification")}>Modifier</Link>}
         <Link className="btn small ghost" href={help("Aide")}>Besoin d'aide</Link>
-        {removable(b) && <HideTrip ids={[b.id]} label="Supprimer de mon espace" after="/compte/trajets" />}
+        <HideTrip ids={[b.id]} label="Supprimer de mon espace" after="/compte/trajets" booked={stillBooked(b)} />
       </div>
       {(claimOpen(b.status, b.pickup_at) || claim?.status === "pending") && <ClaimCancel action={claimMine.bind(null, b.id)} status={claim?.status ?? null} />}
 

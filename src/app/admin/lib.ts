@@ -2,7 +2,7 @@ import { euro } from "@/lib/pricing";
 export { euro };
 export type Booking = {
   id: string; status: string; origin_label: string; dest_label: string; pickup_at: string;
-  passengers: number; luggage: number; child_seat: boolean; flight: string | null;
+  passengers: number; luggage: number; child_seat: boolean; pet?: boolean; flight: string | null;
   customer_name: string; customer_phone: string; customer_email: string; notes: string | null;
   price_cents: number; paid_cents: number; refunded_cents: number | null;
   admin_note: string | null; driver: string | null; created_at: string; stripe_payment_intent: string | null;

@@ -30,7 +30,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ o
                   </summary>
                   <div style={{ display: "grid", gap: 10, marginTop: 12 }}>
                     <p style={{ margin: 0 }}><a href={`tel:${b.customer_phone}`}>{b.customer_phone}</a>{b.customer_email && <> · <a href={`mailto:${b.customer_email}`}>{b.customer_email}</a></>}</p>
-                    <p className="muted" style={{ margin: 0 }}>{b.origin_label} → {b.dest_label} · {b.passengers} pers. · {b.luggage} bag.{b.flight ? ` · ${b.flight}` : ""}{b.notes ? ` · « ${b.notes} »` : ""}</p>
+                    <p className="muted" style={{ margin: 0 }}>{b.origin_label} → {b.dest_label} · {b.passengers} pers. · {b.luggage} bag.{b.child_seat ? " · siège enfant" : ""}{b.pet ? " · animal" : ""}{b.flight ? ` · ${b.flight}` : ""}{b.notes ? ` · « ${b.notes} »` : ""}</p>
                     {b.status === "confirmed" && (
                       <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                         <a className="btn ghost small" href={docPath("bon", b.id)} target="_blank" rel="noopener">Bon de commande</a>

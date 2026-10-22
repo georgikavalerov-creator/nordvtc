@@ -3,10 +3,11 @@ import { euro } from "@/lib/pricing";
 import { STATUS, type Booking } from "@/lib/account";
 import { docPath } from "@/lib/docsign";
 import HideTrip from "@/components/HideTrip";
+import RestoreTrip from "@/components/RestoreTrip";
 
-/** Trajet qu'on peut retirer de son espace : terminé, annulé, non payé ou passé (un trajet à venir s'annule d'abord). */
-export const removable = (b: Pick<Booking, "status" | "pickup_at">) =>
-  b.status === "completed" || b.status === "cancelled" || b.status === "pending_payment" || new Date(b.pickup_at).getTime() < Date.now();
+/** Trajet payé et à venir : le supprimer de l'espace ne l'annule pas (avertissement avant confirmation). */
+export const stillBooked = (b: Pick<Booking, "status" | "pickup_at">) =>
+  b.status === "confirmed" && new Date(b.pickup_at).getTime() >= Date.now();
 
 export function rebookHref(b: Pick<Booking, "origin_label" | "dest_label">) {
   return `/reservation?from=${encodeURIComponent(b.origin_label.slice(0, 120))}&to=${encodeURIComponent(b.dest_label.slice(0, 120))}`;
@@ -32,14 +33,21 @@ export function Route({ from, to }: { from: string; to: string }) {
   );
 }
 
-export default function TripCard({ b, rebook = false }: { b: Booking; rebook?: boolean }) {
+export default function TripCard({ b, rebook = false, trash = false }: { b: Booking; rebook?: boolean; trash?: boolean }) {
   const st = STATUS[b.status] ?? { label: b.status, cls: "" };
   return (
-    <article className={`trip-card tc-${b.status}`}>
-      <Link href={`/compte/trajets/${b.id}`} className="tc-date" aria-label="Voir le détail du trajet">
-        <span>{part(b.pickup_at, { day: "numeric" })}</span>
-        <small>{part(b.pickup_at, { month: "short" }).replace(".", "")}</small>
-      </Link>
+    <article className={`trip-card tc-${b.status}${trash ? " tc-trash" : ""}`}>
+      {trash ? (
+        <span className="tc-date">
+          <span>{part(b.pickup_at, { day: "numeric" })}</span>
+          <small>{part(b.pickup_at, { month: "short" }).replace(".", "")}</small>
+        </span>
+      ) : (
+        <Link href={`/compte/trajets/${b.id}`} className="tc-date" aria-label="Voir le détail du trajet">
+          <span>{part(b.pickup_at, { day: "numeric" })}</span>
+          <small>{part(b.pickup_at, { month: "short" }).replace(".", "")}</small>
+        </Link>
+      )}
       <div className="tc-main">
         <div className="tc-top">
           <span className="tc-when">{part(b.pickup_at, { weekday: "long" })} · {part(b.pickup_at, { hour: "2-digit", minute: "2-digit" })}</span>
@@ -50,12 +58,19 @@ export default function TripCard({ b, rebook = false }: { b: Booking; rebook?: b
           <span className="tc-price">{euro(b.price_cents)}</span>
           <span className="tc-ref">Réf. {b.id.slice(0, 8).toUpperCase()}</span>
         </div>
-        <div className="trip-actions tc-actions">
-          <Link href={`/compte/trajets/${b.id}`} className="btn small">Détails</Link>
-          {(b.status === "confirmed" || b.status === "completed") && <Link href={docPath("bon", b.id)} className="btn small ghost">Bon de commande</Link>}
-          {rebook && <Link href={rebookHref(b)} className="btn small ghost">Réserver à nouveau</Link>}
-          {removable(b) && <HideTrip ids={[b.id]} />}
-        </div>
+        {trash ? (
+          <div className="trip-actions tc-actions">
+            <RestoreTrip ids={[b.id]} primary />
+            {b.user_hidden_at && <span className="tc-ref">Supprimé le {part(b.user_hidden_at, { day: "numeric", month: "long" })}</span>}
+          </div>
+        ) : (
+          <div className="trip-actions tc-actions">
+            <Link href={`/compte/trajets/${b.id}`} className="btn small">Détails</Link>
+            {(b.status === "confirmed" || b.status === "completed") && <Link href={docPath("bon", b.id)} className="btn small ghost">Bon de commande</Link>}
+            {rebook && <Link href={rebookHref(b)} className="btn small ghost">Réserver à nouveau</Link>}
+            <HideTrip ids={[b.id]} booked={stillBooked(b)} detailHref={`/compte/trajets/${b.id}`} />
+          </div>
+        )}
       </div>
     </article>
   );

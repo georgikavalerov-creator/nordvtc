@@ -57,7 +57,7 @@ export async function createManual(form: FormData, driver: Driver | null): Promi
   const paidCents = Math.min(eurToCents(v.paid), priceCents);
   const { data, error } = await db().from("bookings").insert({
     status: "confirmed", origin_label: o.label, origin_lat: o.lat, origin_lng: o.lng, dest_label: d.label, dest_lat: d.lat, dest_lng: d.lng,
-    pickup_at: pickup.toISOString(), passengers: v.passengers, luggage: v.luggage, child_seat: form.get("child_seat") === "on",
+    pickup_at: pickup.toISOString(), passengers: v.passengers, luggage: v.luggage, child_seat: form.get("child_seat") === "on", pet: form.get("pet") === "on",
     flight: v.flight || null, customer_name: v.name, customer_phone: v.phone, customer_email: v.email, notes: v.notes || null,
     distance_m: distanceM, duration_s: durationS, price_cents: priceCents, charge_cents: paidCents, pay_mode: paidCents >= priceCents ? "full" : "deposit",
     paid_cents: paidCents, paid_at: paidCents ? new Date().toISOString() : null, admin_note: driver ? null : "Créée à la main", driver_id: driver?.id ?? null, driver: driver?.name ?? null,
@@ -81,7 +81,7 @@ export async function createManual(form: FormData, driver: Driver | null): Promi
     const { data: r2, error: e2 } = await db().from("bookings").insert({
       status: "confirmed", group_id: data.id, is_return: true,
       origin_label: d.label, origin_lat: d.lat, origin_lng: d.lng, dest_label: o.label, dest_lat: o.lat, dest_lng: o.lng,
-      pickup_at: rp.toISOString(), passengers: v.passengers, luggage: v.luggage, child_seat: form.get("child_seat") === "on",
+      pickup_at: rp.toISOString(), passengers: v.passengers, luggage: v.luggage, child_seat: form.get("child_seat") === "on", pet: form.get("pet") === "on",
       customer_name: v.name, customer_phone: v.phone, customer_email: v.email, notes: v.notes || null,
       distance_m: rDist, duration_s: rDur, price_cents: rPrice, charge_cents: 0, pay_mode: "deposit", paid_cents: 0, paid_at: null,
       admin_note: driver ? null : "Créée à la main (retour)", driver_id: driver?.id ?? null, driver: driver?.name ?? null,
