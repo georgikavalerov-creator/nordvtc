@@ -1,12 +1,17 @@
 import { DEFAULT_PRICING } from "./pricing";
 import type { User } from "@supabase/supabase-js";
 import { redirect } from "next/navigation";
-import { currentUser } from "./auth";
+import { authClient, currentUser } from "./auth";
 import { db, dbConfigured } from "./supabase";
 
 export async function requireUser(next = "/compte"): Promise<User> {
   const u = await currentUser();
   if (!u) redirect(`/compte/connexion?next=${encodeURIComponent(next)}`);
+  // Double authentification activée par le client : le code à 6 chiffres est demandé après la connexion.
+  try {
+    const { data } = await (await authClient()).auth.mfa.getAuthenticatorAssuranceLevel();
+    if (data?.nextLevel === "aal2" && data.currentLevel !== "aal2") redirect(`/compte/verification?next=${encodeURIComponent(next)}`);
+  } catch (e) { if ((e as { digest?: string })?.digest?.startsWith("NEXT_REDIRECT")) throw e; }
   return u;
 }
 

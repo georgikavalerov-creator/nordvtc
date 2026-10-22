@@ -17,6 +17,9 @@ import { guard } from "@/lib/security-log";
 async function me() {
   const u = await currentUser();
   if (!u || !dbConfigured()) throw new Error("non autorisé");
+  // Double authentification activée : aucune action tant que le code n'a pas été saisi.
+  const { data } = await (await authClient()).auth.mfa.getAuthenticatorAssuranceLevel();
+  if (data?.nextLevel === "aal2" && data.currentLevel !== "aal2") throw new Error("non autorisé");
   return u;
 }
 

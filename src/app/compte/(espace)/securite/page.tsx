@@ -2,6 +2,7 @@ import { deleteAccount } from "../actions";
 import { requireUser } from "@/lib/account";
 import Icon from "@/components/Icon";
 import FaceIdManager from "@/components/FaceIdManager";
+import ClientTwoFactor from "@/components/ClientTwoFactor";
 import { listPasskeys } from "@/lib/passkey";
 import { clientPkDelete, clientPkRegOptions, clientPkRegVerify } from "../actions";
 
@@ -23,6 +24,9 @@ export default async function Securite() {
 
       <h2 className="acc-h">Face ID</h2>
       <FaceIdManager scope={`u-${user.id.slice(0, 8)}`} list={await listPasskeys(`user:${user.id}`).catch(() => [])} getOptions={clientPkRegOptions} save={clientPkRegVerify} remove={clientPkDelete} />
+
+      <h2 className="acc-h">Double authentification</h2>
+      <ClientTwoFactor />
 
       <h2 className="acc-h">Mes données</h2>
       <p className="muted">Téléchargez une copie de vos informations : profil, adresses enregistrées et réservations (format JSON).</p>
