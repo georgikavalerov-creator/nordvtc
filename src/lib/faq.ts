@@ -9,7 +9,7 @@ export const FAQ_GROUPS: FaqGroup[] = [
     id: "reservation",
     title: "Réserver",
     items: [
-      { q: "Comment réserver un chauffeur ?", a: "En ligne, en trois minutes : saisissez le départ, l'arrivée, la date et l'heure. Le prix s'affiche immédiatement, puis vous payez un acompte (ou la totalité) par carte, Apple Pay ou Google Pay. La réservation est confirmée par e-mail dans la foulée." },
+      { q: "Comment réserver un chauffeur ?", a: "En ligne, en une minute : saisissez le départ, l'arrivée, la date et l'heure. Le prix s'affiche immédiatement, puis vous payez un acompte (ou la totalité) par carte, Apple Pay ou Google Pay. La réservation est confirmée par e-mail dans la foulée." },
       { q: "Faut-il créer un compte ?", a: "Non. Vous pouvez réserver sans compte : l'e-mail de confirmation contient un lien personnel pour suivre, annuler ou retrouver votre réservation. Le compte est facultatif et permet d'enregistrer vos adresses et de retrouver tous vos trajets." },
       { q: "Combien de temps à l'avance dois-je réserver ?", a: "Au moins 2 heures avant la prise en charge pour une réservation en ligne, et jusqu'à un an à l'avance. Pour un départ très matinal (vol de 6 h, par exemple), réservez de préférence la veille. Pour une course dans moins de 2 heures, appelez ou demandez à être rappelé." },
       { q: "Puis-je réserver pour une autre personne ?", a: "Oui. Indiquez vos coordonnées pour la confirmation, et précisez le nom et le téléphone du passager dans la case « Ajouter une précision ». Le chauffeur contactera directement le passager si besoin." },

@@ -7,7 +7,17 @@ type Msg = { id: number; created_at: string; sender: "visitor" | "admin"; body: 
 const SUGGEST = ["Quel prix pour l'aéroport de Lesquin ?", "Puis-je réserver pour ce soir ?", "J'ai beaucoup de bagages", "Je voudrais un devis"];
 const hhmm = (iso: string) => new Intl.DateTimeFormat("fr-FR", { hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
 
-export default function ChatPanel({ open, onClose, raised }: { open: boolean; onClose: () => void; raised: boolean }) {
+export default function ChatPanel({ open, onClose, raised, anchor }: { open: boolean; onClose: () => void; raised: boolean; anchor?: { x: number; y: number } | null }) {
+  // Si la bulle a été déplacée, la fenêtre s'ouvre à côté d'elle (au-dessus ou en dessous, côté gauche ou droit).
+  const place = (() => {
+    if (!anchor || typeof window === "undefined") return undefined;
+    const w = window.innerWidth, h = window.innerHeight, mobile = w <= 900;
+    const st: React.CSSProperties = {};
+    if (anchor.y > h / 2) { st.bottom = h - anchor.y + 10; st.top = "auto"; } else { st.top = anchor.y + 60; st.bottom = "auto"; }
+    if (!mobile) { if (anchor.x < w / 2) { st.left = Math.max(12, anchor.x); st.right = "auto"; } else { st.right = Math.max(12, w - anchor.x - 50); st.left = "auto"; } }
+    st.maxHeight = Math.max(260, (anchor.y > h / 2 ? anchor.y - 20 : h - anchor.y - 80));
+    return st;
+  })();
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [text, setText] = useState("");
   const [name, setName] = useState("");
@@ -80,7 +90,7 @@ export default function ChatPanel({ open, onClose, raised }: { open: boolean; on
 
   const started = msgs.length > 0;
   return (
-    <div className={`chat-panel${open ? " is-open" : ""}${raised ? " is-raised" : ""}`} role="dialog" aria-label="Discussion avec le chauffeur" aria-hidden={!open}>
+    <div className={`chat-panel${open ? " is-open" : ""}${raised ? " is-raised" : ""}`} style={place} role="dialog" aria-label="Discussion avec le chauffeur" aria-hidden={!open}>
       <header className="chat-head">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/img/chauffeur-avatar.webp" alt="" width={36} height={36} />

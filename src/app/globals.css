@@ -2194,3 +2194,5 @@ html body .btn.is-pressed::before, html body .btn:active::before { transform: tr
 @media (min-width: 1100px) { .section .grid.cols-3.fx-stagger:has(> .card.svc) { grid-template-columns: repeat(4, 1fr); } }
 @media (max-width: 900px) { .section { padding: 26px 0; } .card { padding: 14px; } }
 @media (max-width: 560px) { .section { padding: 22px 0; } .section-head { margin-bottom: 12px; } }
+.chat-fab { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+.chat-fab.is-placed { transition: opacity .2s, background .2s; }

@@ -62,7 +62,7 @@ export const VILLES: Ville[] = [
     slug: "lambersart", name: "Lambersart", inName: "à Lambersart", fromName: "de Lambersart", query: "Lambersart",
     intro: [
       "Chauffeur privé à Lambersart pour vos départs en voyage ou vos trajets du quotidien : gares de Lille en un quart d'heure, aéroport de Lesquin, Paris et Bruxelles sans changement.",
-      "Vous réservez en ligne en trois minutes, le prix est fixé et le chauffeur est le même du début à la fin.",
+      "Vous réservez en ligne en une minute, le prix est fixé et le chauffeur est le même du début à la fin.",
     ],
     places: ["Bords de la Deûle", "Canteleu", "Centre-ville", "Proximité de la Citadelle de Lille"],
     routes: R([76, 22.1, 28], [39, 6.2, 13], [491, 203, 120], [325, 130, 106]),

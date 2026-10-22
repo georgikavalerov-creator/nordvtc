@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     template: "%s | Nord VTC",
   },
   description:
-    "VTC à Lille et dans la métropole : chauffeur privé à prix fixé, suivi de vol. Aéroport de Lille-Lesquin, gares, Paris, Bruxelles. Réservation en 3 minutes.",
+    "VTC à Lille et dans la métropole : chauffeur privé à prix fixé, suivi de vol. Aéroport de Lille-Lesquin, gares, Paris, Bruxelles. Réservation en 1 minute.",
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",

@@ -99,9 +99,9 @@ export default function Home() {
           <div className="story-copy">
             <div className="chap on">
               <span className="cine-label"><b>01</b> Réservation</span>
-              <h2>Trois minutes, un prix.</h2>
+              <h2>Une minute, un prix.</h2>
               <p>Départ, arrivée, date : le prix ferme s'affiche tout de suite, sans compte à créer.</p>
-              <div className="chap-stat"><b data-count="3">3</b><em>min</em><small>pour réserver</small></div>
+              <div className="chap-stat"><b data-count="1">1</b><em>min</em><small>pour réserver</small></div>
             </div>
             <div className="chap">
               <span className="cine-label"><b>02</b> Prix figé</span>
@@ -213,7 +213,7 @@ export default function Home() {
         <div className="wrap">
           <div className="section-head" data-fx="" suppressHydrationWarning>
             <span className="eyebrow">Simple et rapide</span>
-            <h2>Trois minutes pour être tranquille</h2>
+            <h2>Une minute pour être tranquille</h2>
           </div>
           <ol className="steps fx-stagger" data-fx="" suppressHydrationWarning style={{ marginTop: 0 }}>
             <li>
