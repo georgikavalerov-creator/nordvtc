@@ -7,16 +7,16 @@ const ICONS: Record<Name, React.ReactNode> = {
   plane: (
     <>
       <defs>
-        <linearGradient id="ci-pl-a" x1="6" y1="40" x2="42" y2="8" gradientUnits="userSpaceOnUse"><stop stopColor="#1d4ed8" /><stop offset="1" stopColor="#60a5fa" /></linearGradient>
-        <linearGradient id="ci-pl-b" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#fdba74" /><stop offset="1" stopColor="#f97316" /></linearGradient>
+        <linearGradient id="ci-pl-a" x1="0" y1="0" x2="0" y2="1"><stop stopColor="#60a5fa" /><stop offset="1" stopColor="#1d4ed8" /></linearGradient>
+        <linearGradient id="ci-pl-b" x1="0" y1="0" x2="0" y2="1"><stop stopColor="#fdba74" /><stop offset="1" stopColor="#ea580c" /></linearGradient>
       </defs>
-      <path d="M21 25 9 21.5c-1.4-.4-1.6-2.3-.3-3l1.8-.9a3 3 0 0 1 2.3-.2L25 21z" fill="url(#ci-pl-b)" />
-      <path d="m24.5 30.5-2.7 10.6c-.3 1.3 1.2 2.2 2.2 1.3l1.3-1.2a3 3 0 0 0 .8-1.4L29 29z" fill="url(#ci-pl-b)" />
-      <path d="M40.8 7.2c1.9 1.9.8 5.6-1.8 8.2L17.3 37.1l-5.9 1.7c-1.1.3-2.1-.7-1.8-1.8l1.7-5.9L32.6 9c2.6-2.6 6.3-3.7 8.2-1.8z" fill="url(#ci-pl-a)" />
-      <circle cx="33" cy="15" r="2.3" fill="#e0f2fe" />
-      <circle cx="27.4" cy="20.6" r="1.6" fill="#e0f2fe" opacity=".85" />
-      <circle cx="23" cy="25" r="1.6" fill="#e0f2fe" opacity=".7" />
-      <path d="M5 44c6-1 9-3 11-6" stroke="#93c5fd" strokeWidth="2" strokeLinecap="round" fill="none" opacity=".8" />
+      <g transform="rotate(45 24 24) translate(24 24) scale(.9) translate(-24 -24)">
+        <path d="M21 21 3.5 31v4.5L21 30zM27 21l17.5 10v4.5L27 30z" fill="url(#ci-pl-b)" />
+        <path d="M21.2 38.5 14.5 43v3l6.7-1.8zM26.8 38.5 33.5 43v3l-6.7-1.8z" fill="url(#ci-pl-b)" />
+        <path d="M24 1.5c2.6 0 4 3.2 4 7.5v31c0 3-1.6 6-4 6s-4-3-4-6V9c0-4.3 1.4-7.5 4-7.5z" fill="url(#ci-pl-a)" />
+        <path d="M21.8 8.5c.4-2.6 1.2-4 2.2-4s1.8 1.4 2.2 4z" fill="#1e3a8a" />
+        <circle cx="24" cy="15" r="1.2" fill="#e0f2fe" /><circle cx="24" cy="19.5" r="1.2" fill="#e0f2fe" /><circle cx="24" cy="34" r="1.2" fill="#e0f2fe" />
+      </g>
     </>
   ),
   train: (
@@ -58,7 +58,7 @@ const ICONS: Record<Name, React.ReactNode> = {
       <path d="M30 3v3M41 17h3M39.9 7.1l-2.1 2.1M20.1 7.1l2.1 2.1" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" />
       <path d="M3 30c4 0 4-3 8-3s4 3 8 3 4-3 8-3 4 3 8 3 4-3 8-3 4 3 2 3v15H3z" fill="url(#ci-co-b)" />
       <path d="M5 37c3.5 0 3.5-2.5 7-2.5s3.5 2.5 7 2.5 3.5-2.5 7-2.5 3.5 2.5 7 2.5 3.5-2.5 7-2.5" stroke="#e0f2fe" strokeWidth="1.8" strokeLinecap="round" fill="none" opacity=".8" />
-      <path d="M8 26 14 13l6 13z" fill="#f8fafc" /><path d="M14 13v13" stroke="#94a3b8" strokeWidth="1.2" />
+      <path d="M14 11v15" stroke="#475569" strokeWidth="1.4" /><path d="M15 12.5 22 25h-7z" fill="#f97316" /><path d="M13 15 8 25h5z" fill="#fb923c" opacity=".85" /><path d="M7 27h16l-2 3H9z" fill="#7c2d12" />
     </>
   ),
   rings: (
