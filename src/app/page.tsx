@@ -221,14 +221,17 @@ export default function Home() {
           </div>
           <ol className="steps fx-stagger" data-fx="" suppressHydrationWarning style={{ marginTop: 0 }}>
             <li>
+              <span className="step-ico" aria-hidden="true"><Icon name="pin" size={30} /></span>
               <h3>Entrez votre trajet</h3>
               <p className="muted">Départ, arrivée, date, heure : le prix ferme s'affiche tout de suite, sans créer de compte.</p>
             </li>
             <li>
+              <span className="step-ico" aria-hidden="true"><Icon name="lock" size={30} /></span>
               <h3>Confirmez avec un acompte</h3>
               <p className="muted">Paiement sécurisé par carte, confirmation immédiate par e-mail avec le nom du chauffeur et le véhicule.</p>
             </li>
             <li>
+              <span className="step-ico" aria-hidden="true"><Icon name="car" size={30} /></span>
               <h3>Votre chauffeur arrive</h3>
               <p className="muted">Je suis là à l'heure, devant chez vous ou en salle d'arrivée. Vous réglez le solde à bord, facture fournie.</p>
             </li>
