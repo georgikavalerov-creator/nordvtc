@@ -8,7 +8,7 @@ export const FORFAITS: ForfaitGroup[] = [
   {
     title: "Aéroports",
     rows: [
-      { route: "Lille centre → Aéroport de Lille-Lesquin", note: "Suivi du vol", duration: "~20 min", price: "dès 68 €" },
+      { route: "Lille centre → Aéroport de Lille-Lesquin", note: "Suivi du vol", duration: "~25 min", price: "dès 68 €" },
       { route: "Lille → Paris Charles-de-Gaulle", duration: "~2 h 15", price: "dès 481 €" },
       { route: "Lille → Bruxelles-Zaventem", duration: "~1 h 10", price: "dès 321 €" },
       { route: "Lille → Bruxelles-Sud Charleroi", duration: "~1 h 20", price: "dès 297 €" },

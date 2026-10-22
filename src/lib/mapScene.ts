@@ -156,7 +156,7 @@ export function mountMap(root) {
     pin(B, "B · AÉROPORT LESQUIN", sm((s - 0.26) / 0.1), C.pinB, s > 0.9 || s < 0.5);
     // Étiquette prix au milieu du trajet.
     { const k = sm((s - 0.34) / 0.12) * (1 - sm((s - 0.6) / 0.1) * 0.0); if (k > 0.01) {
-      const m = at(RL * 0.5), y = Y([m.x, m.y]) + (1 - k) * 8, txt = "70 € · PRIX FERME"; ctx.font = "600 11px ui-monospace, Menlo, monospace"; ctx.letterSpacing = "1.2px";
+      const m = at(RL * 0.5), y = Y([m.x, m.y]) + (1 - k) * 8, txt = "68 € · PRIX FERME"; ctx.font = "600 11px ui-monospace, Menlo, monospace"; ctx.letterSpacing = "1.2px";
       const tw = ctx.measureText(txt).width + 22; let x = X([m.x, m.y]) + 14; if (x + tw > w - 8) x = X([m.x, m.y]) - 14 - tw; ctx.globalAlpha = k; ctx.fillStyle = C.price; ctx.beginPath(); ctx.roundRect(x, y - 13, tw, 26, 13); ctx.fill();
       ctx.fillStyle = C.priceTx; ctx.textAlign = "left"; ctx.fillText(txt, x + 11, y); ctx.globalAlpha = 1; } }
     // Arrivée : durée.

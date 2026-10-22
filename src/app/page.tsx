@@ -130,7 +130,7 @@ export default function Home() {
               <span className="cine-label"><b>02</b> Prix figé</span>
               <h2>Le prix ne bouge plus.</h2>
               <p>Annoncé avant que vous confirmiez, jamais revu à la hausse : ni heure de pointe, ni détour, ni embouteillage.</p>
-              <div className="chap-stat"><em>dès</em><b data-count="70">70</b><em>€</em><small>Lille → Lesquin</small></div>
+              <div className="chap-stat"><em>dès</em><b data-count="68">68</b><em>€</em><small>Lille → Lesquin</small></div>
             </div>
             <div className="chap">
               <span className="cine-label"><b>03</b> Votre chauffeur</span>
@@ -142,7 +142,7 @@ export default function Home() {
               <span className="cine-label"><b>04</b> Arrivée</span>
               <h2>À l'heure, devant la porte.</h2>
               <p>En salle d'arrivée ou devant chez vous. Le solde se règle à bord, la facture est fournie.</p>
-              <div className="chap-stat"><b data-count="15">15</b><em>min</em><small>Lille centre → Lesquin</small></div>
+              <div className="chap-stat"><b data-count="25">25</b><em>min</em><small>Lille centre → Lesquin</small></div>
               <Link href="/reservation" className="btn btn-arrow">Voir mon prix</Link>
             </div>
           </div>
