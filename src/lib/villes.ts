@@ -1,5 +1,5 @@
 // Pages locales « VTC à <ville> » pour le référencement dans la métropole lilloise.
-// Distances et durées relevées le 23/10/2026 avec le calcul du site (départ depuis le centre de la commune) ;
+// Distances relevées le 23/10/2026 avec le calcul du site (itinéraire sans circulation, stable ; départ du centre) ;
 // les prix « à partir de » en sont déduits par la formule du site (src/lib/prix-depart.ts, tarif de jour).
 // Le prix exact dépend de l'adresse et s'affiche dans le formulaire.
 import { prixDes } from "./prix-depart";
@@ -37,7 +37,7 @@ export const VILLES: Ville[] = [
       "Depuis Roubaix, la route vers l'aéroport de Lille-Lesquin traverse la métropole par la voie rapide : comptez une petite demi-heure hors pointe, davantage le matin en semaine. Pour un vol tôt, une prise en charge à domicile évite de rejoindre Lille en métro avec ses valises.",
       "Le chauffeur connaît bien la ville, du centre et de la Grand-Place au parc Barbieux, en passant par les abords du Vélodrome les jours de course. Pour les visiteurs, La Piscine, le musée d'art et d'industrie installé dans une ancienne piscine Art déco, est une étape à ne pas manquer.",
     ],
-    routes: R([21.3, 26], [11.2, 21], [208.2, 132], [127.1, 101]),
+    routes: R([20.87, 26], [11.31, 21], [208.27, 132], [126.96, 101]),
   },
   {
     slug: "tourcoing", name: "Tourcoing", inName: "à Tourcoing", fromName: "de Tourcoing", query: "Tourcoing",
@@ -50,7 +50,7 @@ export const VILLES: Ville[] = [
       "Tourcoing est l'une des communes de la métropole les plus proches de la Belgique : Bruxelles et son aéroport de Zaventem se rejoignent directement par l'autoroute, sans passer par le centre de Lille. C'est souvent le trajet le plus simple pour un vol au départ de Bruxelles.",
       "Pour les gares de Lille, le trajet prend un peu plus de vingt minutes hors pointe. Le chauffeur vous prend en charge en centre-ville, près du Fresnoy, le studio national des arts contemporains, ou dans les quartiers résidentiels, et vous dépose devant l'entrée de la gare.",
     ],
-    routes: R([21.8, 28], [12.3, 22], [208.7, 134], [116.6, 95]),
+    routes: R([21.31, 28], [12.18, 22], [208.7, 134], [116.96, 95]),
   },
   {
     slug: "villeneuve-d-ascq", name: "Villeneuve-d'Ascq", inName: "à Villeneuve-d'Ascq", fromName: "de Villeneuve-d'Ascq", query: "Villeneuve-d'Ascq",
@@ -63,7 +63,7 @@ export const VILLES: Ville[] = [
       "Villeneuve-d'Ascq est la commune la plus proche de l'aéroport parmi les grandes villes de la métropole : une douzaine de minutes suffisent hors pointe depuis le centre. Les jours de match ou de concert au Stade Pierre-Mauroy, les abords du stade sont fermés ou très chargés : convenez d'un point de prise en charge un peu à l'écart.",
       "Étudiants et enseignants de la Cité scientifique, visiteurs du LaM ou du lac du Héron, familles du quartier de l'Hôtel de ville ou de Pont-de-Bois : le chauffeur vient à l'adresse exacte, y compris tôt le matin quand le métro ne circule pas encore.",
     ],
-    routes: R([9.2, 12], [11.6, 16], [196.1, 119], [129.4, 103]),
+    routes: R([8.7, 12], [10.87, 16], [196.09, 119], [129.57, 103]),
   },
   {
     slug: "marcq-en-baroeul", name: "Marcq-en-Barœul", inName: "à Marcq-en-Barœul", fromName: "de Marcq-en-Barœul", query: "Marcq-en-Barœul",
@@ -76,7 +76,7 @@ export const VILLES: Ville[] = [
       "Marcq-en-Barœul, le long du Grand Boulevard, est à une dizaine de minutes de la gare Lille-Europe : c'est le point de départ idéal pour un Eurostar ou un TGV. Pour l'aéroport de Lesquin, il faut traverser Lille par le périphérique : comptez une vingtaine de minutes hors pointe.",
       "Beaucoup de trajets partent ici de sièges d'entreprises et de cabinets : le chauffeur peut accueillir vos clients ou collaborateurs à la gare et les conduire jusqu'à vos bureaux, avec une facture au nom de l'entreprise.",
     ],
-    routes: R([15.6, 21], [5.5, 10], [202.4, 128], [123.3, 99]),
+    routes: R([15.22, 21], [5.66, 10], [202.61, 128], [123.48, 99]),
   },
   {
     slug: "lambersart", name: "Lambersart", inName: "à Lambersart", fromName: "de Lambersart", query: "Lambersart",
@@ -89,7 +89,7 @@ export const VILLES: Ville[] = [
       "Lambersart borde la Citadelle et le bois de Boulogne, à l'ouest de Lille. La gare Lille-Europe est à un quart d'heure environ, l'aéroport de Lesquin à une vingtaine de minutes par le périphérique, davantage aux heures de pointe.",
       "Quartier résidentiel calme, Canteleu, avenue de l'Hippodrome, bords de la Deûle : le chauffeur vient vous chercher devant chez vous, ce qui évite de rejoindre une station de métro avec des valises.",
     ],
-    routes: R([15.7, 23], [6.2, 15], [202.9, 129], [130.2, 103]),
+    routes: R([15.66, 23], [6.09, 15], [203.05, 129], [130.44, 103]),
   },
   {
     slug: "la-madeleine", name: "La Madeleine", inName: "à La Madeleine", fromName: "de La Madeleine", query: "La Madeleine",
@@ -102,7 +102,7 @@ export const VILLES: Ville[] = [
       "La Madeleine touche le centre de Lille : la gare Lille-Europe n'est qu'à quelques minutes en voiture, ce qui en fait l'un des trajets les moins chers vers les gares. Pour l'aéroport, comptez un quart d'heure hors pointe.",
       "Le chauffeur vous prend en charge le long du Grand Boulevard comme dans les rues résidentielles, et peut aussi vous ramener d'un dîner ou d'une sortie à Lille, sans vous soucier du stationnement.",
     ],
-    routes: R([12.1, 16], [2.6, 8], [199.3, 122], [126.2, 102]),
+    routes: R([12.18, 16], [2.61, 8], [199.14, 122], [126.09, 102]),
   },
   {
     slug: "lesquin", name: "Lesquin", inName: "à Lesquin", fromName: "de Lesquin", query: "Lesquin",
@@ -115,7 +115,7 @@ export const VILLES: Ville[] = [
       "Lesquin, c'est la commune de l'aéroport, et c'est aussi là qu'est installé votre chauffeur : il est à quelques minutes de chez vous ou du terminal. Les trajets courts vers l'aérogare sont au prix de la course minimum en journée.",
       "Pour vos voyages en train, la gare Lille-Europe et la gare Lille Flandres sont à environ un quart d'heure. Les entreprises de la zone d'activités peuvent réserver des trajets réguliers pour leurs visiteurs, avec une facturation regroupée.",
     ],
-    routes: R([3.3, 6], [10.8, 16], [191.9, 116], [135.9, 106]),
+    routes: R([3.48, 6], [10.87, 16], [191.74, 116], [134.79, 106]),
   },
   {
     slug: "seclin", name: "Seclin", inName: "à Seclin", fromName: "de Seclin", query: "Seclin",
@@ -128,7 +128,7 @@ export const VILLES: Ville[] = [
       "Au sud de la métropole, Seclin est tout près de l'aéroport de Lesquin et de l'autoroute A1 : c'est un bon point de départ vers Paris et l'aéroport Charles-de-Gaulle, qui se rejoint directement sans traverser Lille.",
       "Le chauffeur vous prend en charge en centre-ville, près de la collégiale Saint-Piat, à l'hôpital ou dans les zones d'activités. Pour les gares de Lille, comptez une vingtaine de minutes hors pointe.",
     ],
-    routes: R([9.4, 16], [17.6, 24], [186, 112], [143.1, 113]),
+    routes: R([9.57, 16], [17.4, 24], [188.7, 112], [141.74, 113]),
   },
   {
     slug: "armentieres", name: "Armentières", inName: "à Armentières", fromName: "d'Armentières", query: "Armentières",
@@ -141,7 +141,7 @@ export const VILLES: Ville[] = [
       "Armentières, sur la Lys et tout près de la Belgique, est plus éloignée de l'aéroport que le reste de la métropole : une bonne demi-heure de route, parfois davantage aux heures de pointe. Un trajet réservé à l'avance, avec une heure de prise en charge calculée large, évite tout stress avant un vol.",
       "Pour un train à Lille, le chauffeur vous dépose devant la gare Lille Flandres ou Lille Europe, sans correspondance. Il prend aussi en charge dans les communes voisines, de Houplines à Erquinghem-Lys, à l'adresse exacte.",
     ],
-    routes: R([28.7, 36], [25.4, 35], [209.6, 137], [139.4, 112]),
+    routes: R([31.31, 36], [28.27, 35], [218.7, 137], [139.57, 112]),
   },
   {
     slug: "wasquehal", name: "Wasquehal", inName: "à Wasquehal", fromName: "de Wasquehal", query: "Wasquehal",
@@ -154,7 +154,7 @@ export const VILLES: Ville[] = [
       "Wasquehal, entre Lille, Marcq-en-Barœul, Croix et Roubaix, est desservie par le Grand Boulevard : la gare Lille-Europe est à un quart d'heure environ, l'aéroport de Lesquin à une vingtaine de minutes hors pointe.",
       "Résidents, entreprises de la zone d'activités ou visiteurs de passage : le chauffeur vient à l'adresse exacte et vous dépose devant le terminal ou la gare, avec un prix fixé avant la réservation.",
     ],
-    routes: R([16.5, 22], [7, 13], [202.8, 128], [124.6, 100]),
+    routes: R([15.66, 22], [6.96, 13], [203.05, 128], [124.35, 100]),
   },
 ];
 

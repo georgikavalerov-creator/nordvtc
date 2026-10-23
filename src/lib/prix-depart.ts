@@ -1,6 +1,7 @@
 // Prix « à partir de » affichés sur le site, calculés avec la même formule que le calculateur
 // (prise en charge + prix au km, course minimum, tarif de jour) à partir des distances routières réelles.
-// Distances et durées relevées le 23/10/2026 avec le calcul du site (HERE), départ depuis le centre de la commune.
+// Distances relevées le 23/10/2026 avec le calcul du site (itinéraire HERE sans circulation, donc stable), départ
+// depuis le centre de la commune : chaque prix « dès » est égal au prix du calculateur. Durées : temps habituel.
 // Si les tarifs changent dans l'admin, mettre à jour DEFAULT_PRICING (src/lib/pricing.ts) pour que ces prix suivent.
 import { DEFAULT_PRICING } from "./pricing";
 
@@ -19,18 +20,18 @@ export function dureeTexte(min: number): string {
 
 // Trajets de référence depuis Lille centre (ou Lesquin pour Beauvais) : distance en km, durée en minutes.
 export const TRAJETS = {
-  lesquin: { km: 10.2, min: 15 }, // Lille → Aéroport de Lille-Lesquin
-  cdg: { km: 197, min: 121 }, // Lille → Paris-Charles-de-Gaulle
-  zaventem: { km: 129.6, min: 104 }, // Lille → Bruxelles-Zaventem
-  charleroi: { km: 118.3, min: 84 }, // Lille → Bruxelles-Sud Charleroi
-  schiphol: { km: 286.3, min: 195 }, // Lille → Amsterdam-Schiphol
-  beauvais: { km: 189.1, min: 116 }, // Lesquin → Paris-Beauvais
-  roubaix: { km: 12.1, min: 18 },
-  tourcoing: { km: 13.6, min: 21 },
-  villeneuve: { km: 9.3, min: 13 },
-  lens: { km: 37.8, min: 39 },
-  dunkerque: { km: 78.6, min: 61 },
-  touquet: { km: 151.5, min: 122 }, // Lille → Le Touquet-Paris-Plage
+  lesquin: { km: 10.0, min: 15 }, // Lille → Aéroport de Lille-Lesquin
+  cdg: { km: 196.96, min: 121 }, // Lille → Paris-Charles-de-Gaulle
+  zaventem: { km: 128.7, min: 104 }, // Lille → Bruxelles-Zaventem
+  charleroi: { km: 118.27, min: 84 }, // Lille → Bruxelles-Sud Charleroi
+  schiphol: { km: 286.09, min: 195 }, // Lille → Amsterdam-Schiphol
+  beauvais: { km: 189.14, min: 116 }, // Lesquin → Paris-Beauvais
+  roubaix: { km: 13.05, min: 18 },
+  tourcoing: { km: 13.92, min: 21 },
+  villeneuve: { km: 5.66, min: 13 },
+  lens: { km: 37.83, min: 39 },
+  dunkerque: { km: 78.7, min: 61 },
+  touquet: { km: 151.74, min: 122 }, // Lille → Le Touquet-Paris-Plage
 } as const;
 
 export type TrajetKey = keyof typeof TRAJETS;
