@@ -22,7 +22,7 @@ export default function DriverCard() {
             </p>
             <div className="driver-stats">
               <div><b>{RIDES}+</b><span>courses réalisées sur les applications VTC</span></div>
-              <div><b>{RATING}<small>/5</small> <i aria-hidden="true">★</i></b><span>note moyenne des passagers</span></div>
+              <div><b>{RATING}<small>/5</small> <i aria-hidden="true">★</i></b><span>note moyenne des passagers sur les applications VTC</span></div>
             </div>
             <div className="lang">
               <Icon name="globe" size={18} /> Français · English · Български

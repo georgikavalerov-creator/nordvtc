@@ -95,8 +95,8 @@ export default function Home() {
         <div className="cine-stats">
           <div><small>Prix</small><b>Figé</b></div>
           <div><small>Annulation</small><b>Gratuite 24 h</b></div>
-          <div className="cs-rate"><small>Note passagers</small><b>{RATING}<span>/5</span> <i aria-hidden="true">★</i></b></div>
-          <div className="cs-rate"><small>Courses réalisées</small><b>{RIDES}+</b></div>
+          <div className="cs-rate"><small>Note · applis VTC</small><b>{RATING}<span>/5</span> <i aria-hidden="true">★</i></b></div>
+          <div className="cs-rate"><small>Courses · applis VTC</small><b>{RIDES}+</b></div>
         </div>
       </section>
 

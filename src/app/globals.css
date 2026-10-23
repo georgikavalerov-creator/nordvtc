@@ -4007,3 +4007,5 @@ html.over-canvas .edge-blur { display: none !important; }
   :root[data-theme="dark"] .mbar { background: linear-gradient(180deg, rgba(214, 216, 224, .94), rgba(200, 203, 212, .9)) !important; border-color: rgba(11, 20, 48, .22) !important; }
   :root[data-theme="dark"] .mbar a.on { background: linear-gradient(180deg, rgba(255, 255, 255, .98), rgba(240, 242, 248, .95)) !important; }
 }
+/* Chiffres clés de l'accueil : libellés (« Courses · applis VTC ») sur une ligne sur téléphone */
+@media (max-width: 480px) { .cine-stats small { letter-spacing: .12em; white-space: nowrap; } }
