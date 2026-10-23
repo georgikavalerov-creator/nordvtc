@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
-import { Loader } from "./Loader";
+import { Ring } from "./Loader";
 
 export type Place = { label: string; lat: number; lng: number };
 
@@ -128,7 +128,7 @@ export default function AddressField({ label, value, onChange, initialText = "",
           inputMode="search"
           enterKeyHint="next"
         />
-        {(searching || resolving) && <Loader className="af-spin" size={18} />}
+        {(searching || resolving) && <Ring className="af-spin" size={18} />}
       </span>
       {open && (
         <ul id={`${id}-list`} role="listbox">

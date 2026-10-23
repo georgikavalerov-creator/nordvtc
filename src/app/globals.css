@@ -4015,3 +4015,33 @@ html.over-canvas .edge-blur { display: none !important; }
 @media (max-width: 900px) {
   .story-inner .map2d, .story-inner .cine-canvas { top: 0; bottom: auto; height: 100vh; height: 100lvh; }
 }
+
+/* Anneau de chargement plat (champs de recherche) */
+.ld-ring { display: inline-grid; place-items: center; flex: none; width: var(--ld-s); height: var(--ld-s); vertical-align: middle; }
+.ld-ring svg { display: block; animation: ldSpin var(--ld-d) linear infinite; }
+@keyframes ldSpin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .ld-ring svg { animation-duration: calc(var(--ld-d) * 3); } }
+.af-spin.ld-ring { color: #1f5bff; }
+:root[data-theme="dark"] .af-spin.ld-ring { color: #1f5bff; }
+
+/* Accueil : prix affiché dans le bloc de saisie rapide */
+.quick-price { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 14px 18px; border-radius: 16px; background: rgba(255, 255, 255, .72); box-shadow: var(--surface-ring); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); min-height: 64px; }
+.quick-price .qp-wait { display: inline-flex; align-items: center; gap: 10px; color: #4a5a86; font-weight: 600; font-size: .92rem; }
+.quick-price .qp-main { display: grid; gap: 2px; }
+.quick-price .qp-main small { font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #4a5a86; }
+.quick-price .qp-main strong { font-size: 1.9rem; font-weight: 800; letter-spacing: -.03em; line-height: 1; color: #0b0b0c; font-variant-numeric: tabular-nums; }
+.quick-price .qp-meta { text-align: right; font-size: .8rem; line-height: 1.45; color: #4a5a86; font-variant-numeric: tabular-nums; }
+.quick-price .qp-err { color: #b42318; font-size: .9rem; font-weight: 600; }
+@media (prefers-reduced-motion: no-preference) { .quick-price.on .qp-main strong { animation: qpIn .35s cubic-bezier(.2, 0, 0, 1); } }
+@keyframes qpIn { from { opacity: 0; transform: translateY(4px); filter: blur(3px); } to { opacity: 1; transform: none; filter: none; } }
+/* Accueil en mode nuit : mêmes couleurs que les champs d'adresse juste au-dessus (verre sombre, texte clair) */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .hero.cine .quick-price { background: rgba(255, 255, 255, .07) !important; box-shadow: 0 0 0 1px rgba(255, 255, 255, .2) !important; }
+  :root:not([data-theme="light"]) .hero.cine .quick-price .qp-main strong { color: #fff !important; }
+  :root:not([data-theme="light"]) .hero.cine .quick-price :is(small, .qp-meta, .qp-wait) { color: #b8c6ee !important; }
+  :root:not([data-theme="light"]) .hero.cine .af-spin.ld-ring { color: #9db7ff !important; }
+}
+:root[data-theme="dark"] .hero.cine .quick-price { background: rgba(255, 255, 255, .07) !important; box-shadow: 0 0 0 1px rgba(255, 255, 255, .2) !important; }
+:root[data-theme="dark"] .hero.cine .quick-price .qp-main strong { color: #fff !important; }
+:root[data-theme="dark"] .hero.cine .quick-price :is(small, .qp-meta, .qp-wait) { color: #b8c6ee !important; }
+:root[data-theme="dark"] .hero.cine .af-spin.ld-ring { color: #9db7ff !important; }

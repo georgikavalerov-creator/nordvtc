@@ -22,6 +22,18 @@ export function Loader({ size = 18, duration = 1200, className = "", label }: Pr
   );
 }
 
+/** Anneau plat : cercle de fond discret + arc aux bouts arrondis qui tourne (champs de recherche). */
+export function Ring({ size = 18, duration = 800, className = "", label }: Props) {
+  return (
+    <span className={`ld-ring ${className}`} style={vars(size, duration)} {...a11y(label)}>
+      <svg viewBox="0 0 24 24" width={size} height={size} fill="none">
+        <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="3" opacity=".16" />
+        <path d="M12 3a9 9 0 0 1 9 9" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+      </svg>
+    </span>
+  );
+}
+
 /** Trois points en ligne qui pulsent tour à tour (calculs, attente courte dans un texte). */
 export function Dots({ size = 18, duration = 1000, className = "", label }: Props) {
   return (
