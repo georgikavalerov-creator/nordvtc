@@ -30,21 +30,32 @@ export default function ScrollFX() {
     const els = Array.from(document.querySelectorAll<HTMLElement>("[data-fx]"));
     let raf = 0;
     const clamp = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v);
+    // Lectures d'abord, écritures ensuite (sinon le navigateur recalcule la mise en page à chaque élément),
+    // et seulement les valeurs qui changent.
+    const last = new Map<HTMLElement, string>();
     const update = () => {
       raf = 0;
       const vh = window.innerHeight;
-      for (const el of els) {
-        const r = el.getBoundingClientRect();
-        if (r.bottom < -vh || r.top > vh * 2) continue;
-        el.style.setProperty("--enter", clamp((vh - r.top) / (vh * 0.75)).toFixed(3));
-        el.style.setProperty("--p", clamp((vh - r.top) / (vh + r.height)).toFixed(3));
-        el.style.setProperty("--leave", clamp(-r.top / Math.max(r.height, 1)).toFixed(3));
+      const rects = els.map((el) => el.getBoundingClientRect());
+      els.forEach((el, i) => {
+        const r = rects[i];
+        if (r.bottom < -vh || r.top > vh * 2) return;
+        const enter = clamp((vh - r.top) / (vh * 0.75)).toFixed(3);
+        const p = clamp((vh - r.top) / (vh + r.height)).toFixed(3);
+        const leave = clamp(-r.top / Math.max(r.height, 1)).toFixed(3);
         // section collante : progression à l'intérieur du conteneur
-        if (el.dataset.fx === "sticky") el.style.setProperty("--s", clamp(-r.top / Math.max(r.height - vh, 1)).toFixed(3));
-      }
+        const sticky = el.dataset.fx === "sticky" ? clamp(-r.top / Math.max(r.height - vh, 1)).toFixed(3) : "";
+        const key = enter + p + leave + sticky;
+        if (last.get(el) === key) return;
+        last.set(el, key);
+        el.style.setProperty("--enter", enter);
+        el.style.setProperty("--p", p);
+        el.style.setProperty("--leave", leave);
+        if (sticky) el.style.setProperty("--s", sticky);
+      });
     };
     const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
-    update();
+    onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
     return () => {

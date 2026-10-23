@@ -1,8 +1,14 @@
 "use client";
 import { useEffect, useState } from "react";
 
-const fmt = () => new Intl.DateTimeFormat("fr-FR", { timeZone: "Europe/Paris", hour: "2-digit", minute: "2-digit" }).format(new Date());
-const hourParis = () => Number(new Intl.DateTimeFormat("fr-FR", { timeZone: "Europe/Paris", hour: "2-digit", hourCycle: "h23" }).format(new Date()));
+// Formateurs créés une seule fois (les créer coûte cher sur mobile), à la première utilisation.
+let F: { hm: Intl.DateTimeFormat; h: Intl.DateTimeFormat } | null = null;
+const fmts = () => (F ??= {
+  hm: new Intl.DateTimeFormat("fr-FR", { timeZone: "Europe/Paris", hour: "2-digit", minute: "2-digit" }),
+  h: new Intl.DateTimeFormat("fr-FR", { timeZone: "Europe/Paris", hour: "2-digit", hourCycle: "h23" }),
+});
+const fmt = () => fmts().hm.format(new Date());
+const hourParis = () => Number(fmts().h.format(new Date()));
 
 /** Heure de Lille en direct (et rappel du tarif de nuit entre 22 h et 6 h). Rien n'est rendu côté serveur : pas de décalage d'hydratation. */
 export default function LiveClock() {

@@ -55,7 +55,7 @@ export default function CookieNotice() {
             <span><b>Mesure d&apos;audience</b><small>Plausible, sans cookie ni donnée personnelle : nombre de visites, pages vues.</small></span>
             <span className={`ck-switch${stats ? " on" : ""}`}><input type="checkbox" checked={stats} onChange={(e) => setAudience(e.target.checked)} aria-label="Mesure d'audience anonyme" /><i /></span>
           </label>
-          <p className="ck-foot">Aucun cookie publicitaire, aucun réseau social, aucune revente. <Link href="/confidentialite#cookies" onClick={close}>Politique de confidentialité</Link></p>
+          <p className="ck-foot">Aucun cookie publicitaire, aucun réseau social, aucune revente. <Link prefetch={false} href="/confidentialite#cookies" onClick={close}>Politique de confidentialité</Link></p>
         </div>
       )}
     </div>

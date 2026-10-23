@@ -3987,7 +3987,7 @@ ol.steps > li.is-lit::before { box-shadow: 0 0 0 4px rgba(31, 91, 255, .28), 0 8
 .ag-price input { width: 110px; height: 38px; padding: 0 12px; border-radius: 10px; border: 1.5px solid #c2c2c7; font: inherit; font-size: 16px; font-variant-numeric: tabular-nums; }
 
 /* Pas de flou d'arrière-plan au-dessus de la carte animée : évite le scintillement sur iPhone */
-html.over-canvas .edge-blur { display: none !important; }
+.edge-blur.over-canvas { display: none !important; }
 /* Mode nuit : la puce sélectionnée garde son contraste (la règle générale des puces lui imposait le fond gris) */
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) :is(.chip.on, .chip[aria-pressed="true"]):not(.date-chips .chip):not(.faq-tabs .chip) { background: #000 !important; color: #fff !important; border-color: #000 !important; } }
 :root[data-theme="dark"] :is(.chip.on, .chip[aria-pressed="true"]):not(.date-chips .chip):not(.faq-tabs .chip) { background: #000 !important; color: #fff !important; border-color: #000 !important; }

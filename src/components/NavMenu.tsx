@@ -25,12 +25,12 @@ export default function NavMenu({ items }: { items: readonly Item[] }) {
     <>
       <nav className={`nav${open ? " open" : ""}`} id="menu-principal" aria-label="Navigation principale">
         {items.map((n) => (
-          <Link key={n.href} href={n.href}>
+          <Link prefetch={false} key={n.href} href={n.href}>
             {n.label}
           </Link>
         ))}
-        <Link href="/compte">Mon compte</Link>
-        <Link href="/reservation" className="btn small">
+        <Link prefetch={false} href="/compte">Mon compte</Link>
+        <Link prefetch={false} href="/reservation" className="btn small">
           Réserver
         </Link>
       </nav>

@@ -59,4 +59,6 @@ export function ThemeSwitch() {
 }
 
 /** Script exécuté avant l'affichage pour éviter le flash de thème. */
-export const THEME_INIT = `try{var t=localStorage.getItem("${KEY}");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}`;
+// Thème choisi + effets de défilement activés dès le premier affichage (classe posée avant le rendu :
+// pas de recalcul de toute la page quand le JavaScript démarre).
+export const THEME_INIT = `try{var t=localStorage.getItem("${KEY}");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}try{if(!matchMedia("(prefers-reduced-motion: reduce)").matches)document.documentElement.classList.add("fx-on")}catch(e){}`;

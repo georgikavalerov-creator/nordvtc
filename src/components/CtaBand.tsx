@@ -10,8 +10,8 @@ export default function CtaBand({ title = "Votre prix en 30 secondes, sans compt
           <h2>{title}</h2>
           <p>{text}</p>
           <div className="cta-actions">
-            <Link href={`/reservation${q}`} className="btn btn-arrow">Voir mon prix maintenant</Link>
-            <Link href="/contact#appel" className="btn ghost-light">Être rappelé gratuitement</Link>
+            <Link prefetch={false} href={`/reservation${q}`} className="btn btn-arrow">Voir mon prix maintenant</Link>
+            <Link prefetch={false} href="/contact#appel" className="btn ghost-light">Être rappelé gratuitement</Link>
           </div>
           <ul className="cta-points" aria-label="Nos engagements">
             <li>Prix ferme affiché d'avance</li>

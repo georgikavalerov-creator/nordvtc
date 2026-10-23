@@ -6,12 +6,18 @@ import { track } from "@/lib/track";
 export default function CtaTracker() {
   useEffect(() => {
     // Après le premier affichage : les pages suivantes (navigation interne) auront leur fondu d'entrée.
-    document.querySelectorAll(".page-enter").forEach((el) => el.setAttribute("data-seen", ""));
-    document.documentElement.classList.add("nav-ready");
+    // Posé au premier clic sur un lien interne (pas au chargement : changer une classe de <html> pendant
+    // le chargement oblige le navigateur à recalculer toute la page).
+    const ready = () => {
+      if (document.documentElement.classList.contains("nav-ready")) return;
+      document.querySelectorAll(".page-enter").forEach((el) => el.setAttribute("data-seen", ""));
+      document.documentElement.classList.add("nav-ready");
+    };
     const onClick = (e: MouseEvent) => {
       const a = (e.target as Element | null)?.closest?.("a");
       if (!a) return;
       const href = a.getAttribute("href") || "";
+      if (href.startsWith("/")) ready();
       const page = location.pathname;
       if (href.startsWith("tel:")) track("Clic Appeler", { page });
       else if (href.startsWith("/reservation")) track("Clic Réserver", { page });

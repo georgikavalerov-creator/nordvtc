@@ -85,7 +85,7 @@ export default function Home() {
             </p>
             <HeroBooking />
             <p className="hero-note">
-              <Link href="/tarifs">Voir la grille de tarifs</Link>
+              <Link prefetch={false} href="/tarifs">Voir la grille de tarifs</Link>
             </p>
           </div>
           <Suspense>
@@ -95,7 +95,7 @@ export default function Home() {
             <ul className="hd-cards">
               {TRIPS.map((t) => (
                 <li key={t.to}>
-                  <Link href={`/reservation?${new URLSearchParams({ from: t.fromQ, to: t.toQ }).toString()}`}>
+                  <Link prefetch={false} href={`/reservation?${new URLSearchParams({ from: t.fromQ, to: t.toQ }).toString()}`}>
                     <span className="hd-img">
                       {/* Vraie image (et non fond CSS) : décodée en arrière-plan, n'empêche pas le premier affichage du texte. */}
                       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -150,7 +150,7 @@ export default function Home() {
               <h2>À l'heure, devant la porte.</h2>
               <p>En salle d'arrivée ou devant chez vous. Le solde se règle à bord, la facture est fournie.</p>
               <div className="chap-stat"><b data-count={TRAJETS.lesquin.min}>{TRAJETS.lesquin.min}</b><em>min</em><small>Lille centre → Lesquin</small></div>
-              <Link href="/reservation" className="btn btn-arrow">Voir mon prix</Link>
+              <Link prefetch={false} href="/reservation" className="btn btn-arrow">Voir mon prix</Link>
             </div>
           </div>
           <div className="story-hud" aria-hidden="true"><span className="story-num">01 / 04</span><div className="story-bar"><i /><u style={{ left: "25%" }} /><u style={{ left: "50%" }} /><u style={{ left: "75%" }} /></div><span className="story-scroll"><b>Faites défiler</b><em>↓</em></span></div>
@@ -178,7 +178,7 @@ export default function Home() {
                 <li>Chauffeur titulaire des cartes VTC et taxi</li>
                 <li>Écran Apple CarPlay / Android Auto, chargeur, eau et Wi-Fi à bord</li>
               </ul>
-              <Link href="/reservation" className="btn btn-arrow" style={{ marginTop: 14 }}>Réserver mon trajet</Link>
+              <Link prefetch={false} href="/reservation" className="btn btn-arrow" style={{ marginTop: 14 }}>Réserver mon trajet</Link>
             </div>
             <div className="gallery4">
               {CAR_PICS.map((ph, i) => (
@@ -208,7 +208,7 @@ export default function Home() {
           </div>
           <div className="grid cols-3 fx-stagger" data-fx="" suppressHydrationWarning>
             {SERVICES.filter((s) => HOME_SERVICES.includes(s.slug)).map((s) => (
-              <Link key={s.slug} href={`/services/${s.slug}`} className="card svc">
+              <Link prefetch={false} key={s.slug} href={`/services/${s.slug}`} className="card svc">
                 <div className="thumb">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={SERVICE_PIC[s.slug].src} srcSet={srcSetOf(SERVICE_PIC[s.slug].src)} sizes="(max-width: 760px) 130px, 420px" alt={SERVICE_PIC[s.slug].alt} loading="lazy" width={1000} height={666} style={{ objectPosition: SERVICE_PIC[s.slug].pos }} />
@@ -223,7 +223,7 @@ export default function Home() {
               </Link>
             ))}
           </div>
-          <p className="center" style={{ marginTop: 28 }}><Link href="/services" className="more">Tous les trajets et services →</Link></p>
+          <p className="center" style={{ marginTop: 28 }}><Link prefetch={false} href="/services" className="more">Tous les trajets et services →</Link></p>
         </div>
       </section>
       </Suspense>
@@ -244,11 +244,11 @@ export default function Home() {
                 <h3>{r.route}</h3>
                 <div className="amount">{r.price}</div>
                 <p>Acompte en ligne, solde à bord</p>
-                <Link href={`/reservation?${new URLSearchParams({ from: TRIPS[i].fromQ, to: TRIPS[i].toQ }).toString()}`} className={i === 1 ? "btn" : "btn ghost"} style={{ marginTop: 10 }}>Réserver ce trajet</Link>
+                <Link prefetch={false} href={`/reservation?${new URLSearchParams({ from: TRIPS[i].fromQ, to: TRIPS[i].toQ }).toString()}`} className={i === 1 ? "btn" : "btn ghost"} style={{ marginTop: 10 }}>Réserver ce trajet</Link>
               </div>
             ))}
           </div>
-          <p className="center" style={{ marginTop: 28 }}><Link href="/tarifs" className="more">Toute la grille de prix →</Link></p>
+          <p className="center" style={{ marginTop: 28 }}><Link prefetch={false} href="/tarifs" className="more">Toute la grille de prix →</Link></p>
           <div style={{ display: "flex", justifyContent: "center", marginTop: 22 }}><PaymentBadges /></div>
         </div>
       </section>
@@ -281,9 +281,9 @@ export default function Home() {
           </p>
           <p className="chips" style={{ marginTop: 14 }}>
             {VILLES.map((v) => (
-              <Link key={v.slug} href={`/vtc/${v.slug}`} className="chip">VTC {v.name}</Link>
+              <Link prefetch={false} key={v.slug} href={`/vtc/${v.slug}`} className="chip">VTC {v.name}</Link>
             ))}
-            <Link href="/vtc" className="chip">Toutes les villes →</Link>
+            <Link prefetch={false} href="/vtc" className="chip">Toutes les villes →</Link>
           </p>
         </div>
       </section>
@@ -305,7 +305,7 @@ export default function Home() {
               ))}
             </div>
           </div>
-          <p className="muted" style={{ marginTop: 18 }}><Link href="/faq">Les {ALL_FAQ.length} questions fréquentes</Link> · <Link href="/contact">Nous écrire</Link></p>
+          <p className="muted" style={{ marginTop: 18 }}><Link prefetch={false} href="/faq">Les {ALL_FAQ.length} questions fréquentes</Link> · <Link prefetch={false} href="/contact">Nous écrire</Link></p>
         </div>
       </section>
       </Suspense>

@@ -21,9 +21,10 @@ export default function MobileBar() {
   useEffect(() => {
     const story = document.getElementById("cine-story");
     if (hidden || !story) return;
-    const io = new IntersectionObserver(([e]) => document.documentElement.classList.toggle("over-canvas", e.isIntersecting));
+    const blur = document.querySelector(".edge-blur");
+    const io = new IntersectionObserver(([e]) => blur?.classList.toggle("over-canvas", e.isIntersecting));
     io.observe(story);
-    return () => { io.disconnect(); document.documentElement.classList.remove("over-canvas"); };
+    return () => { io.disconnect(); blur?.classList.remove("over-canvas"); };
   }, [hidden, path]);
   if (hidden) return null;
   return (
@@ -33,7 +34,7 @@ export default function MobileBar() {
       {TABS.map((t) => {
         const on = t.match(path);
         return (
-          <Link key={t.href} href={t.href} className={on ? "on" : ""} aria-current={on ? "page" : undefined}>
+          <Link prefetch={false} key={t.href} href={t.href} className={on ? "on" : ""} aria-current={on ? "page" : undefined}>
             <IconC name={t.icon} size={24} />
             <span>{t.label}</span>
           </Link>

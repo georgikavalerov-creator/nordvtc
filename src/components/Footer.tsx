@@ -31,20 +31,20 @@ export default function Footer() {
         <div className="ft-brand">
           <strong><Logo size={34} variant="light" />{SITE.name}</strong>
           <p>Chauffeur privé (VTC) à Lille et dans la métropole : aéroports, gares, Paris, Bruxelles, sur réservation.</p>
-          <p className="ft-contact"><Link href="/reservation">Réserver</Link> · <Link href="/contact#appel">Être rappelé</Link> · <a href="mailto:contact@nordvtc.fr">contact@nordvtc.fr</a></p>
+          <p className="ft-contact"><Link prefetch={false} href="/reservation">Réserver</Link> · <Link prefetch={false} href="/contact#appel">Être rappelé</Link> · <a href="mailto:contact@nordvtc.fr">contact@nordvtc.fr</a></p>
         </div>
         <details className="ft-col">
           <summary>Trajets</summary>
           <ul className="ft-trips">
             {SERVICES.map((s) => (
-              <li key={s.slug}><Link href={`/services/${s.slug}`}>{s.label}</Link></li>
+              <li key={s.slug}><Link prefetch={false} href={`/services/${s.slug}`}>{s.label}</Link></li>
             ))}
           </ul>
         </details>
         <details className="ft-col">
           <summary>Informations</summary>
           <ul>
-            {INFOS.map(([h, l]) => <li key={h}><Link href={h}>{l}</Link></li>)}
+            {INFOS.map(([h, l]) => <li key={h}><Link prefetch={false} href={h}>{l}</Link></li>)}
           </ul>
         </details>
       </div>
@@ -54,7 +54,7 @@ export default function Footer() {
       </div>
       <div className="wrap ft-legal">
         <span>© {new Date().getFullYear()} {SITE.name} — {SITE.legal.form}, SIRET {SITE.legal.siret}</span>
-        <span className="ft-legal-links">{LEGAL.map(([h, l]) => <Link key={h} href={h}>{l}</Link>)}<CookieLink /></span>
+        <span className="ft-legal-links">{LEGAL.map(([h, l]) => <Link prefetch={false} key={h} href={h}>{l}</Link>)}<CookieLink /></span>
         <small>{CREDITS}</small>
       </div>
     </footer>

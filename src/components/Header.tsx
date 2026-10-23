@@ -8,7 +8,7 @@ export default function Header() {
   return (
     <header className="site-header">
       <div className="wrap">
-        <Link href="/" className="brand" title="Accueil">
+        <Link prefetch={false} href="/" className="brand" title="Accueil">
           <Logo size={44} variant="light" />
           <span className="brand-text">
             <span className="brand-name">NORD VTC</span>

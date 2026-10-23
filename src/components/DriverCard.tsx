@@ -34,7 +34,7 @@ export default function DriverCard() {
           <div className="cred"><Icon name="shield" size={22} /><span><strong>Carte taxi (CCPCT)</strong><small>Double qualification transport de personnes</small></span></div>
           <div className="cred"><Icon name="receipt" size={22} /><span><strong>Entreprise immatriculée</strong><small>SIRET {siret}</small></span></div>
           <div className="cred"><Icon name="check" size={22} /><span><strong>Prix fixé à la réservation</strong><small>Eau, chargeurs et siège enfant sur demande</small></span></div>
-          <Link href="/contact" className="btn ghost-light">Poser une question</Link>
+          <Link prefetch={false} href="/contact" className="btn ghost-light">Poser une question</Link>
         </div>
       </div>
     </section>

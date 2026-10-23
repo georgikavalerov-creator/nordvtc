@@ -125,7 +125,7 @@ export default function TripPass({ trips }: { trips: Trip[] }) {
             <small>Prix annoncé</small>
             <span className="price">{t.price}</span>
           </div>
-          <Link href={`/reservation?${new URLSearchParams({ from: t.fromQ ?? t.from, to: t.toQ ?? t.to }).toString()}`} className="btn small">Réserver</Link>
+          <Link prefetch={false} href={`/reservation?${new URLSearchParams({ from: t.fromQ ?? t.from, to: t.toQ ?? t.to }).toString()}`} className="btn small">Réserver</Link>
         </div>
       </div>
       <div className="pass-ctrl">
