@@ -23,6 +23,8 @@ import OnBoard from "@/components/OnBoard";
 import TrustBar from "@/components/TrustBar";
 import DriverCard from "@/components/DriverCard";
 import PaymentBadges from "@/components/PaymentBadges";
+import LiveClock from "@/components/LiveClock";
+import StepsTrack from "@/components/StepsTrack";
 
 const STATEMENT = "Un prix fixé avant de partir, jamais revu à la hausse. Un chauffeur qui suit votre vol ou votre train. Une seule personne au volant, de la réservation à l'arrivée.".split(" ");
 
@@ -59,7 +61,7 @@ export default function Home() {
         <div className="cine-frame" aria-hidden="true"><i /><i /><i /><i /></div>
         <div className="wrap">
           <div>
-            <span className="cine-label"><b>01</b> Chauffeur privé · Lille</span>
+            <span className="cine-label"><b>01</b> <span>Chauffeur privé · Lille<LiveClock /></span></span>
             <h1>
               <span className="ln">Le prix ne bouge pas.</span>
               <span className="ln ln2">Le chauffeur non plus.</span>
@@ -225,7 +227,7 @@ export default function Home() {
             <span className="eyebrow">Simple et rapide</span>
             <h2>Une minute pour être tranquille</h2>
           </div>
-          <ol className="steps fx-stagger" data-fx="" suppressHydrationWarning style={{ marginTop: 0 }}>
+          <ol id="etapes" className="steps fx-stagger" data-fx="" suppressHydrationWarning style={{ marginTop: 0 }}>
             <li>
               <span className="step-ico" aria-hidden="true"><Icon name="pin" size={30} /></span>
               <h3>Entrez votre trajet</h3>
@@ -242,6 +244,7 @@ export default function Home() {
               <p className="muted">Je suis là à l'heure, devant chez vous ou en salle d'arrivée. Vous réglez le solde à bord, facture fournie.</p>
             </li>
           </ol>
+          <StepsTrack target="etapes" />
         </div>
       </section>
 

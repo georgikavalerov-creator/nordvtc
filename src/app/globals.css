@@ -3883,3 +3883,57 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
 .suggest ul, .site-header .nav, .pk-pop, .adm-threads, .adm-msgs { overscroll-behavior: contain; }
 /* Bascule jour / nuit : aucune transition pendant le changement, les couleurs changent d'un coup */
 html.theme-switching *, html.theme-switching *::before, html.theme-switching *::after { transition: none !important; }
+
+/* ===== Effets inspirés de mikes.cv ===== */
+/* 1. Flou progressif en bas d'écran, sous la barre de navigation mobile */
+.edge-blur { display: none; }
+@media (max-width: 900px) {
+  @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .edge-blur { display: block; position: fixed; left: 0; right: 0; bottom: 0; height: calc(118px + env(safe-area-inset-bottom, 0px)); z-index: 39; pointer-events: none; }
+    .edge-blur i { position: absolute; inset: 0; }
+    .edge-blur i:nth-child(1) { backdrop-filter: blur(1px); -webkit-backdrop-filter: blur(1px); mask-image: linear-gradient(to top, #000 0%, #000 70%, transparent 100%); -webkit-mask-image: linear-gradient(to top, #000 0%, #000 70%, transparent 100%); }
+    .edge-blur i:nth-child(2) { backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); mask-image: linear-gradient(to top, #000 0%, #000 45%, transparent 75%); -webkit-mask-image: linear-gradient(to top, #000 0%, #000 45%, transparent 75%); }
+    .edge-blur i:nth-child(3) { backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); mask-image: linear-gradient(to top, #000 0%, #000 25%, transparent 50%); -webkit-mask-image: linear-gradient(to top, #000 0%, #000 25%, transparent 50%); }
+    .edge-blur i:nth-child(4) { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); mask-image: linear-gradient(to top, #000 0%, transparent 30%); -webkit-mask-image: linear-gradient(to top, #000 0%, transparent 30%); }
+  }
+}
+html.in-app .edge-blur { display: none !important; }
+
+/* 2. Ligne de parcours des étapes (téléphone) et étapes qui s'allument */
+.steps-track { position: absolute; width: 2px; z-index: 1; pointer-events: none; }
+.steps-track[hidden] { display: none; }
+.steps-track span { position: absolute; left: 0; width: 2px; background: repeating-linear-gradient(to bottom, #c9ced9 0 4px, transparent 4px 9px); }
+.steps-track i { position: absolute; inset: 0; background: #1f5bff; border-radius: 2px; transform: scaleY(0); transform-origin: top; will-change: transform; }
+ol.steps > li::before { position: relative; z-index: 2; }
+/* Pulsation à l'allumage : un contour qui s'écarte et s'efface (peinture seule, pas de mise en page) */
+ol.steps > li::before { outline: 2px solid transparent; outline-offset: 0; }
+@media (prefers-reduced-motion: no-preference) {
+  ol.steps > li.is-lit::before { animation: stepPulse .72s cubic-bezier(.2, 0, 0, 1); }
+}
+@keyframes stepPulse { 0% { outline-color: rgba(31, 91, 255, .55); outline-offset: 0; } 100% { outline-color: rgba(31, 91, 255, 0); outline-offset: 14px; } }
+/* La ligne de parcours remplace les petits traits de liaison entre les cartes */
+ol.steps.has-track > li::after { display: none !important; }
+ol.steps > li::before { transition: box-shadow .3s cubic-bezier(.2, 0, 0, 1), background-color .3s; }
+ol.steps > li.is-lit::before { box-shadow: 0 0 0 4px rgba(31, 91, 255, .28), 0 8px 18px -10px rgba(31, 91, 255, .7) !important; }
+:root[data-theme="dark"] .steps-track span { background: repeating-linear-gradient(to bottom, #3a3f4b 0 4px, transparent 4px 9px); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .steps-track span { background: repeating-linear-gradient(to bottom, #3a3f4b 0 4px, transparent 4px 9px); } }
+
+/* 3. Heure de Lille en direct : deux-points qui battent doucement */
+.live-clock { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.live-clock em { font-style: normal; color: #ffb547; }
+@media (prefers-reduced-motion: no-preference) { .live-clock i { font-style: normal; animation: clockBlink 2s steps(1) infinite; } }
+.live-clock i { font-style: normal; }
+@keyframes clockBlink { 50% { opacity: .25; } }
+
+/* 4. Indication qui scintille (balayage de lumière) */
+@media (prefers-reduced-motion: no-preference) {
+  /* Le dégradé reprend la couleur du texte (jour comme nuit) avec un reflet bleu qui passe */
+  .story-scroll b { -webkit-text-fill-color: transparent; background-image: linear-gradient(90deg, currentColor 0%, currentColor 40%, #6f98ff 50%, currentColor 60%, currentColor 100%); background-size: 250% 100%; -webkit-background-clip: text; background-clip: text; animation: hintShimmer 2.6s linear infinite; }
+}
+@keyframes hintShimmer { from { background-position: 100% 0; } to { background-position: -150% 0; } }
+
+/* 5. Liens du pied de page : léger glissement au survol */
+.site-footer ul a { display: inline-block; transition: transform .16s cubic-bezier(.2, 0, 0, 1), color .15s; }
+@media (hover: hover) { .site-footer ul a:hover { transform: translateX(3px); } }
+/* Libellé d'accueil avec l'heure : tient sur une ligne sur téléphone (trait décoratif plus court, espacement réduit) */
+@media (max-width: 480px) { .hero.cine .cine-label { letter-spacing: .1em; gap: 10px; white-space: nowrap; } .hero.cine .cine-label::after { width: 24px; } }
