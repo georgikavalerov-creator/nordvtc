@@ -1,4 +1,4 @@
-import Icon from "@/components/Icon";
+import Icon, { iconSymbol } from "@/components/Icon";
 import CompareMore from "@/components/CompareMore";
 
 const SHOWN_ON_PHONE = 5; // le reste du comparatif se déplie sur téléphone
@@ -26,6 +26,8 @@ export default function AppCompare() {
           <h2>Un chauffeur privé, pas une application</h2>
           <p className="muted" style={{ maxWidth: 680 }}>Le même trajet, deux expériences très différentes. Voici ce que vous gagnez concrètement à réserver directement.</p>
         </div>
+        {/* Coche et croix définies une fois puis réutilisées (au lieu de recopier leurs tracés à chaque ligne). */}
+        <svg width="0" height="0" aria-hidden="true" focusable="false" style={{ position: "absolute", width: 0, height: 0, overflow: "hidden" }} dangerouslySetInnerHTML={{ __html: iconSymbol("cmp-ok", "check") + iconSymbol("cmp-no", "x", true) }} />
         <div className="cmp" role="table" aria-label="Comparatif Nord VTC et applications de VTC">
           <div className="cmp-row cmp-head" role="row">
             <span role="columnheader" />
@@ -35,8 +37,8 @@ export default function AppCompare() {
           {ROWS.map(([ic, k, us, them], i) => (
             <div key={k} className={`cmp-row${i >= SHOWN_ON_PHONE ? " cmp-x" : ""}`} role="row">
               <span role="rowheader" className="cmp-k"><span className="cmp-ki"><Icon name={ic} size={18} /></span>{k}</span>
-              <span role="cell" className="cmp-us"><Icon name="check" size={18} /><span>{us}</span></span>
-              <span role="cell" className="cmp-them"><Icon name="x" size={16} mono /><span>{them}</span></span>
+              <span role="cell" className="cmp-us"><svg className="ico-d ico-c" width={18} height={18} aria-hidden="true" focusable="false"><use href="#cmp-ok" /></svg><span>{us}</span></span>
+              <span role="cell" className="cmp-them"><svg className="ico-d" width={16} height={16} aria-hidden="true" focusable="false"><use href="#cmp-no" /></svg><span>{them}</span></span>
             </div>
           ))}
         </div>

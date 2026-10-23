@@ -1393,7 +1393,7 @@ input[type="date"]::-webkit-date-and-time-value, input[type="time"]::-webkit-dat
 
 /* Moyens de paiement : logo + nom */
 .pay-chip{display:inline-flex;align-items:center;gap:7px;padding:5px 10px 5px 8px}
-.pay-chip svg{flex:none;display:block}
+.pay-chip svg,.pay-chip img{flex:none;display:block}
 .paybadges.dark .pay-chip{background:#fff;border-color:#fff;color:#111}
 
 /* Galerie voiture : 3 photos, optimisée tablette et mobile */

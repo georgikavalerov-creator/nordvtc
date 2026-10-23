@@ -70,6 +70,15 @@ const PAL: Record<string, [string, string]> = {
   x: ["#cbd5e1", "#64748b"],
 };
 
+/** Contenu SVG d'une icône (pour la réutiliser plusieurs fois via <symbol>/<use> sans recopier ses tracés). */
+export function iconSymbol(id: string, name: string, mono = false): string {
+  const body = P[name] ?? P.route;
+  if (mono) return `<symbol id="${id}" viewBox="0 0 256 256" fill="currentColor">${body}</symbol>`;
+  const [, deep] = PAL[name] ?? ["#93c5fd", "#1d4ed8"];
+  const g = `icg-${PAL[name] ? name : "route"}`;
+  return `<symbol id="${id}" viewBox="0 0 256 256" fill="${deep}">${body.replace(/opacity="0\.2"/g, `fill="url(#${g})"`)}</symbol>`;
+}
+
 export default function Icon({ name, size = 22, mono = false }: { name: string; size?: number; mono?: boolean }) {
   const body = P[name] ?? P.route;
   if (mono) {
