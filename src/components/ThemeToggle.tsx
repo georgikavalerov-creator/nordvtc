@@ -8,10 +8,14 @@ const NEXT: Record<Mode, Mode> = { auto: "light", light: "dark", dark: "auto" };
 
 function apply(m: Mode) {
   const r = document.documentElement;
+  // Coupe les transitions le temps du changement : sinon chaque couleur glisse à sa propre vitesse.
+  r.classList.add("theme-switching");
   if (m === "auto") r.removeAttribute("data-theme");
   else r.setAttribute("data-theme", m);
   try { m === "auto" ? localStorage.removeItem(KEY) : localStorage.setItem(KEY, m); } catch { /* navigation privée */ }
   window.dispatchEvent(new CustomEvent("nordvtc-theme", { detail: m }));
+  void getComputedStyle(r).opacity; // applique les nouvelles couleurs tout de suite
+  requestAnimationFrame(() => requestAnimationFrame(() => r.classList.remove("theme-switching")));
 }
 
 function useMode(): [Mode, (m: Mode) => void] {
