@@ -111,7 +111,7 @@ export default function CallGate() {
                   <option key={c.code} value={c.code}>{c.flag} {c.label} ({c.dial})</option>
                 ))}
               </select>
-              <input value={phone} onChange={(e) => setPhone(e.target.value)} required type="tel" inputMode="tel" autoComplete="tel-national" placeholder={country === "FR" ? "06 12 34 56 78" : "Votre numéro"} />
+              <input value={phone} onChange={(e) => setPhone(e.target.value)} aria-label="Votre numéro de mobile" required type="tel" inputMode="tel" autoComplete="tel-national" placeholder={country === "FR" ? "06 12 34 56 78" : "Votre numéro"} />
             </span>
           </label>
           <label>Votre besoin (facultatif)<input value={need} onChange={(e) => setNeed(e.target.value)} maxLength={300} placeholder="Ex. aéroport de Lesquin vendredi 6h" /></label>

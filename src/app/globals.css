@@ -3244,7 +3244,7 @@ h2.bk-sub::before { content: ""; width: 4px; height: 1.1em; border-radius: 4px; 
 /* =========================== TARIFS =========================== */
 .tf-hero-grid { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 32px; align-items: end; }
 .tf-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
-.tf-points { list-style: none; margin: 18px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 22px; }
+.tf-points { list-style: none; margin: 18px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 14px; } /* 14 px : les 3 points tiennent sur une ligne même avant le chargement de la police (sinon décalage de mise en page) */
 .tf-points li { display: inline-flex; align-items: center; gap: 8px; font-size: .92rem; color: #3a3a3c; }
 .tf-points svg { color: #1f5bff; }
 .tf-rating { margin: 0 !important; }
