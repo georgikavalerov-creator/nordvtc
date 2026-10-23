@@ -174,11 +174,13 @@ export function mountCine(root) {
   }
 
   let last = 0;
+  const small = () => coarse || window.innerWidth < 900;
   function frame(now) {
     raf = 0;
     if (!visible) return;
-    // Téléphones : 24 images/s suffisent et soulagent le processeur (batterie, réactivité).
-    if (coarse && now - last < 41) { raf = requestAnimationFrame(frame); return; }
+    // Téléphones et petits écrans : 24 images/s suffisent et soulagent le processeur (batterie, réactivité).
+    // Ordinateur : pleine cadence, inchangé.
+    if (small() && now - last < 41) { raf = requestAnimationFrame(frame); return; }
     last = now;
     draw(now);
     if (!reduce) raf = requestAnimationFrame(frame);

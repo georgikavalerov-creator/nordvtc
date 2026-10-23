@@ -1,5 +1,5 @@
-import { Fragment } from "react";
-import { prix, PRIX_MINIMUM } from "@/lib/prix-depart";
+import { Fragment, Suspense } from "react";
+import { prix, PRIX_MINIMUM, TRAJETS } from "@/lib/prix-depart";
 import Link from "next/link";
 import GoogleReviews from "@/components/GoogleReviews";
 import CtaBand from "@/components/CtaBand";
@@ -132,7 +132,7 @@ export default function Home() {
               <span className="cine-label"><b>04</b> Arrivée</span>
               <h2>À l'heure, devant la porte.</h2>
               <p>En salle d'arrivée ou devant chez vous. Le solde se règle à bord, la facture est fournie.</p>
-              <div className="chap-stat"><b data-count="25">25</b><em>min</em><small>Lille centre → Lesquin</small></div>
+              <div className="chap-stat"><b data-count={TRAJETS.lesquin.min}>{TRAJETS.lesquin.min}</b><em>min</em><small>Lille centre → Lesquin</small></div>
               <Link href="/reservation" className="btn btn-arrow">Voir mon prix</Link>
             </div>
           </div>
@@ -145,6 +145,9 @@ export default function Home() {
       <CineMount target="cine-story" near />
       <MapMount target="cine-story" near />
 
+      {/* Blocs sous le premier écran : chacun dans sa propre limite <Suspense>, React les rend interactifs
+          un par un (petites tâches) au lieu d'un seul gros bloc qui fige le téléphone. Aucun changement visible. */}
+      <Suspense>
       <TrustBar />
 
       <section className="section vehicle" data-fx="" suppressHydrationWarning>
@@ -175,7 +178,9 @@ export default function Home() {
           <p className="muted" style={{ fontSize: "0.8rem", marginTop: 12 }}>Photos extérieures d'illustration d'une Toyota Auris identique ; l'habitacle est celui du véhicule.</p>
         </div>
       </section>
+      </Suspense>
 
+      <Suspense>
       <section className="section">
         <div className="wrap">
           <div className="section-head" data-fx="" suppressHydrationWarning>
@@ -190,9 +195,13 @@ export default function Home() {
           </div>
         </div>
       </section>
+      </Suspense>
 
+      <Suspense>
+      </Suspense>
       <AppCompare />
 
+      <Suspense>
       <section className="section alt">
         <div className="wrap">
           <div className="section-head" data-fx="" suppressHydrationWarning>
@@ -223,7 +232,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+      </Suspense>
 
+      <Suspense>
       <section className="section">
         <div className="wrap">
           <div className="section-head" data-fx="" suppressHydrationWarning>
@@ -250,7 +261,9 @@ export default function Home() {
           <StepsTrack target="etapes" />
         </div>
       </section>
+      </Suspense>
 
+      <Suspense>
       <section className="section alt">
         <div className="wrap">
           <div className="section-head" data-fx="" suppressHydrationWarning>
@@ -273,7 +286,9 @@ export default function Home() {
           <div style={{ display: "flex", justifyContent: "center", marginTop: 22 }}><PaymentBadges /></div>
         </div>
       </section>
+      </Suspense>
 
+      <Suspense>
       <section className="statement" data-fx="sticky" suppressHydrationWarning>
         <div className="statement-inner">
           {/* Mots rendus côté serveur (et non découpés après coup par un script) : évite l'erreur d'hydratation React #418. */}
@@ -286,7 +301,9 @@ export default function Home() {
           </p>
         </div>
       </section>
+      </Suspense>
 
+      <Suspense>
       <DriverCard />
 
       <section className="section zones">
@@ -304,7 +321,9 @@ export default function Home() {
           </p>
         </div>
       </section>
+      </Suspense>
 
+      <Suspense>
       <section className="section alt">
         <div className="wrap" style={{ maxWidth: 820 }}>
           <span className="eyebrow">Vos questions</span>
@@ -314,9 +333,12 @@ export default function Home() {
           <p className="muted" style={{ marginTop: 18 }}>Vous ne trouvez pas votre réponse ? <Link href="/faq">Toutes les questions</Link> · <Link href="/contact">Nous écrire</Link></p>
         </div>
       </section>
+      </Suspense>
 
+      <Suspense>
       <GoogleReviews />
       <CtaBand />
+      </Suspense>
     </>
   );
 }
