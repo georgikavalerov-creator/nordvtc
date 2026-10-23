@@ -158,7 +158,7 @@ export default function ChatPanel({ open, onClose, raised, anchor }: { open: boo
         )}
         <input id="chat-hp" name="website" tabIndex={-1} autoComplete="off" className="chat-hp" aria-hidden="true" />
         {err && <p className="chat-err" role="alert">{err}</p>}
-        <div className="chat-row">
+        <div className="chat-row" data-empty={!text.trim() || undefined}>
           <textarea
             ref={inputRef} rows={1} value={text} maxLength={1500} placeholder="Votre message…" aria-label="Votre message"
             onChange={(e) => setText(e.target.value)}

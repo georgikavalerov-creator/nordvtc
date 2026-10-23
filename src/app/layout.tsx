@@ -5,6 +5,7 @@ import "./globals.css";
 import ScrollFX from "@/components/ScrollFX";
 import Interact from "@/components/Interact";
 import MobileBar from "@/components/MobileBar";
+import Gliders from "@/components/Gliders";
 import AppBridge from "@/components/AppBridge";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -93,6 +94,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* Flou progressif sous la barre du bas (mobile) : le contenu s'y fond au lieu d'être coupé net */}
         <div className="edge-blur" aria-hidden="true"><i /><i /><i /><i /></div>
         <MobileBar />
+        <Gliders />
         <ChatButton />
         <Analytics />
         <CookieNotice />

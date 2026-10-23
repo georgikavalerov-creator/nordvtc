@@ -24,7 +24,7 @@ export default function HeroBooking() {
       }}
     >
       <div className="quick-fields">
-        <span className="quick-line" aria-hidden="true"><i /><b /><i className="sq" /></span>
+        <span className={`quick-line${from && to ? " ready" : ""}`} aria-hidden="true"><i /><b /><i className="sq" /></span>
         <div className="quick-field">
           <AddressField label="" value={from} onChange={setFrom} placeholder="Adresse de départ" />
         </div>
