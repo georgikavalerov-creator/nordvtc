@@ -188,7 +188,14 @@ export function mountCine(root) {
   build();
   if (reduce) { chaps.forEach((c) => c.style.transition = "none"); }
   kick();
-  const ro = new ResizeObserver(() => { build(); kick(); });
+  // Même garde que la carte : la scène n'est reconstruite (canvas effacé, particules retirées)
+  // que si la largeur change ou si la hauteur change nettement.
+  let lastW = canvas.getBoundingClientRect().width, lastH = canvas.getBoundingClientRect().height;
+  const ro = new ResizeObserver(() => {
+    const r = canvas.getBoundingClientRect();
+    if (Math.abs(r.width - lastW) < 1 && Math.abs(r.height - lastH) < lastH * 0.25) return;
+    lastW = r.width; lastH = r.height; build(); kick();
+  });
   ro.observe(canvas);
   const io = new IntersectionObserver((es) => { visible = es[0].isIntersecting; if (visible) kick(); else if (raf) { cancelAnimationFrame(raf); raf = 0; } }, { rootMargin: "0px" });
   io.observe(root);

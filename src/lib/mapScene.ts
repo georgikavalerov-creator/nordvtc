@@ -185,7 +185,14 @@ export function mountMap(root) {
   }
   const kick = () => { if (!raf && vis) raf = requestAnimationFrame(draw); };
   const onMove = (e) => { const r = root.getBoundingClientRect(); px = ((e.clientX - r.left) / r.width - 0.5) * 2; py = ((e.clientY - r.top) / r.height - 0.5) * 2; kick(); };
-  const ro = new ResizeObserver(() => { resize(); kick(); }); ro.observe(canvas);
+  // Pas de redimensionnement (qui efface le canvas) pour les petites variations de hauteur
+  // (barre Safari qui se replie au défilement) : seulement si la largeur change vraiment.
+  let lastW = 0, lastH = 0;
+  const ro = new ResizeObserver(() => {
+    const r = canvas.getBoundingClientRect();
+    if (Math.abs(r.width - lastW) < 1 && Math.abs(r.height - lastH) < lastH * 0.25) return;
+    lastW = r.width; lastH = r.height; resize(); kick();
+  }); ro.observe(canvas);
   const io = new IntersectionObserver((e) => { vis = e[0].isIntersecting; if (vis) kick(); }, { rootMargin: "0px" }); io.observe(root);
   addEventListener("pointermove", onMove, { passive: true });
   if (reduced) addEventListener("scroll", kick, { passive: true });
