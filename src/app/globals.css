@@ -3990,3 +3990,20 @@ html.over-canvas .edge-blur { display: none !important; }
 :root[data-theme="dark"] :is(.chip.on, .chip[aria-pressed="true"]):not(.date-chips .chip):not(.faq-tabs .chip) { background: #000 !important; color: #fff !important; border-color: #000 !important; }
 /* Admin : boutons d'en-tête sur une ligne chacun (ils passent à la ligne entre eux, pas au milieu du texte) */
 .adm-head-actions .btn { white-space: nowrap; }
+
+/* ===== Mode nuit (page inversée) : surfaces et barre du bas bien détachées du fond noir =====
+   Valeurs « avant inversion » : un gris foncé ici devient un gris clair une fois la page inversée. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --surface-ring: 0 0 0 1px rgba(11, 20, 48, .2), 0 10px 26px -14px rgba(11, 20, 48, .25); }
+  :root:not([data-theme="light"]) :is(.acc-search, .acc-next, .acc-nav, .acc-tabs, .acc-stats, .acc-body .callgate, .trip-card) { background-color: #f3f3f5 !important; }
+}
+:root[data-theme="dark"] { --surface-ring: 0 0 0 1px rgba(11, 20, 48, .2), 0 10px 26px -14px rgba(11, 20, 48, .25); }
+:root[data-theme="dark"] :is(.acc-search, .acc-next, .acc-nav, .acc-tabs, .acc-stats, .acc-body .callgate, .trip-card) { background-color: #f3f3f5 !important; }
+@media (max-width: 1100px) {
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .mbar { background: linear-gradient(180deg, rgba(214, 216, 224, .94), rgba(200, 203, 212, .9)) !important; border-color: rgba(11, 20, 48, .22) !important; }
+    :root:not([data-theme="light"]) .mbar a.on { background: linear-gradient(180deg, rgba(255, 255, 255, .98), rgba(240, 242, 248, .95)) !important; }
+  }
+  :root[data-theme="dark"] .mbar { background: linear-gradient(180deg, rgba(214, 216, 224, .94), rgba(200, 203, 212, .9)) !important; border-color: rgba(11, 20, 48, .22) !important; }
+  :root[data-theme="dark"] .mbar a.on { background: linear-gradient(180deg, rgba(255, 255, 255, .98), rgba(240, 242, 248, .95)) !important; }
+}
