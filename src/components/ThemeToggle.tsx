@@ -36,7 +36,7 @@ export function ThemeButton() {
   const [mode, set] = useMode();
   return (
     <button type="button" className="theme-btn" onClick={() => set(NEXT[mode])} aria-label={`Affichage : ${LABEL[mode]}. Changer`} title={`Affichage : ${LABEL[mode]}`}>
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" dangerouslySetInnerHTML={{ __html: ICON[mode] }} />
+      <svg key={mode} width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" dangerouslySetInnerHTML={{ __html: ICON[mode] }} />
     </button>
   );
 }

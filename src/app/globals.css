@@ -1341,9 +1341,9 @@ input[type="date"]::-webkit-date-and-time-value, input[type="time"]::-webkit-dat
 
 /* ── Carte postale (carrousel des trajets) ── */
 .pass-wrap { isolation: isolate; }
-.pass-wrap::before, .pass-wrap::after { content: ""; position: absolute; z-index: -1; left: 10px; right: 10px; top: 14px; bottom: 56px; border-radius: 12px; background: #e9e9e9; transform: rotate(-3deg); box-shadow: 0 8px 20px -12px rgba(0,0,0,.4); }
+.pass-wrap::before, .pass-wrap::after { content: ""; position: absolute; z-index: -1; left: 10px; right: 10px; top: 14px; bottom: 56px; border-radius: 16px; background: #e9e9e9; transform: rotate(-3deg); box-shadow: 0 8px 20px -12px rgba(0,0,0,.4); }
 .pass-wrap::after { background: #f3f3f3; transform: rotate(2.4deg); }
-.pass { background: #fff; border: 0; border-radius: 12px; padding: 10px 10px 0; transform: rotate(-.8deg); box-shadow: 0 1px 0 rgba(0,0,0,.05), 0 30px 54px -24px rgba(0,0,0,.5); }
+.pass { background: #fff; border: 0; border-radius: 16px; padding: 10px 10px 0; transform: rotate(-.8deg); box-shadow: 0 1px 0 rgba(0,0,0,.05), 0 30px 54px -24px rgba(0,0,0,.5); }
 .pass.has-photo { overflow: visible; }
 .pass-photo { border-radius: 6px; height: 230px; box-shadow: inset 0 0 0 1px rgba(0,0,0,.1); }
 .pass-photo::after { background: linear-gradient(180deg, rgba(0,0,0,.12) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,0) 55%, rgba(0,0,0,.62) 100%); }
@@ -3786,3 +3786,17 @@ input[type="file"][hidden] { display: none !important; }
 .ag-more .linklike { color: #5e5e5e; font-size: .82rem; }
 .ag-more .ag-del { color: #b42318; }
 .ag-ask { display: flex; gap: 6px; }
+
+/* ===== Finitions inspirées d'interfaces.dev ===== */
+/* Texte net (macOS / iOS) */
+body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+/* Chiffres à largeur fixe là où ils changent ou s'alignent : pas de tressautement pendant les compteurs */
+[data-count], .chap-stat b, .story-num, .pricing .amount, .price, time { font-variant-numeric: tabular-nums; }
+/* Contour discret des photos : bords nets sur fond clair comme sombre */
+.gallery4 img, .card.svc .thumb img, .split-img { outline: 1px solid rgba(0, 0, 0, .1); outline-offset: -1px; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .gallery4 img, :root:not([data-theme="light"]) .card.svc .thumb img, :root:not([data-theme="light"]) .split-img { outline-color: rgba(255, 255, 255, .1); } }
+:root[data-theme="dark"] .gallery4 img, :root[data-theme="dark"] .card.svc .thumb img, :root[data-theme="dark"] .split-img { outline-color: rgba(255, 255, 255, .1); }
+/* Icône du mode d'affichage : changement fondu (opacité, échelle, flou) plutôt qu'un saut */
+.theme-btn svg { animation: iconSwap .2s cubic-bezier(.2, 0, 0, 1); }
+@keyframes iconSwap { from { opacity: 0; transform: scale(.25); filter: blur(4px); } to { opacity: 1; transform: none; filter: none; } }
+@media (prefers-reduced-motion: reduce) { .theme-btn svg { animation: none; } }
