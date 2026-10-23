@@ -318,7 +318,7 @@ img, svg { max-width: 100%; }
 .pass-bot .btn.small { align-self: end; }
 .hero h1, .hero .lead, .hero-actions, .hero .eyebrow { animation: rise .7s cubic-bezier(.2,.8,.2,1) both; }
 .hero .lead { animation-delay: .08s; } .hero-actions { animation-delay: .16s; }
-@keyframes rise { from { opacity: .01; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+@keyframes rise { from { opacity: .55; transform: translateY(18px); } to { opacity: 1; transform: none; } }
 .rv { opacity: 0; transform: translateY(22px); transition: opacity .6s ease, transform .6s cubic-bezier(.2,.8,.2,1); }
 .rv.rv-in { opacity: 1; transform: none; }
 .iconbox .ico { transition: transform .3s; }
@@ -2908,7 +2908,7 @@ h2.bk-sub::before { content: ""; width: 4px; height: 1.1em; border-radius: 4px; 
 /* Espace réservé du formulaire chargé à l'approche */
 .when-near { border-radius: 22px; background: linear-gradient(180deg, #f6f7fb, #fff); }
 /* Vitesse : apparition du haut de page sans flou (le flou animé coûte très cher sur mobile), plus courte */
-@keyframes cineIn { from { opacity: .01; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+@keyframes cineIn { from { opacity: .55; transform: translateY(16px); } to { opacity: 1; transform: none; } }
 .hero.cine h1 .ln { animation-duration: .7s; }
 .hero.cine h1 .ln2 { animation-delay: .12s; }
 .hero.cine .lead { animation-duration: .7s; animation-delay: .2s; }
