@@ -15,9 +15,11 @@ export default function LiveClock() {
   const [now, setNow] = useState<{ t: string; night: boolean } | null>(null);
   useEffect(() => {
     const tick = () => { const h = hourParis(); setNow({ t: fmt(), night: h >= 22 || h < 6 }); };
-    tick();
+    // Première lecture quand le téléphone est libre (l'heure n'est pas utile dès la première image).
+    const w = window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number; cancelIdleCallback?: (id: number) => void };
+    const first = w.requestIdleCallback ? w.requestIdleCallback(tick, { timeout: 2000 }) : window.setTimeout(tick, 600);
     const id = setInterval(tick, 15_000);
-    return () => clearInterval(id);
+    return () => { clearInterval(id); if (w.cancelIdleCallback) w.cancelIdleCallback(first); else window.clearTimeout(first); };
   }, []);
   if (!now) return null;
   const [h, m] = now.t.split(":");
