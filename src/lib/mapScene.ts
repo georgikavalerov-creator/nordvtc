@@ -1,10 +1,13 @@
 // @ts-nocheck
+import { prix } from "./prix-depart";
 // Carte 2D animée de la métropole lilloise : trajet A → B piloté par le défilement.
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 const lerp = (a, b, t) => a + (b - a) * t;
 const sm = (t) => { t = clamp(t, 0, 1); return t * t * (3 - 2 * t); };
 const KX = Math.cos((50.63 * Math.PI) / 180);
 const W = (lon, lat) => [(lon - 3.1) * KX, -(lat - 50.62)]; // monde : degrés (x vers l'est, y vers le sud)
+// Ordre des couches dans public/lille-map.bin (identique à LAYERS dans scripts/compact-map.mjs).
+const MAP_LAYERS = ["min", "ter", "sec", "pri", "trunk", "mw", "ww", "aero", "water"];
 
 // Lissage Catmull-Rom d'une polyligne [lon, lat].
 function smooth(pts, n = 8) {
@@ -47,10 +50,25 @@ export function mountMap(root) {
 
   // Vrais tracés (OpenStreetMap) : routes, eau, pistes. Chargés une fois, dessinés via Path2D.
   const LAY = {}; let loaded = 0;
-  const decode = (arr, closed) => { const p = new Path2D(); for (const f of arr) { let x = f[0], y = f[1]; let q = W(x / 1e4, y / 1e4); p.moveTo(q[0], q[1]); for (let i = 2; i < f.length; i += 2) { x += f[i]; y += f[i + 1]; q = W(x / 1e4, y / 1e4); p.lineTo(q[0], q[1]); } if (closed) p.closePath(); } return p; };
-  const ready = (d) => { for (const k of ["min", "ter", "sec", "pri", "trunk", "mw", "ww", "aero"]) LAY[k] = decode(d[k] || [], false); LAY.water = decode(d.water || [], true); loaded = performance.now(); kick(); };
-  if (window.__LILLE_MAP) setTimeout(() => ready(window.__LILLE_MAP), 0);
-  else fetch(root.getAttribute("data-map") || "/lille-map.json").then((r) => r.json()).then(ready).catch(() => {});
+  // Fichier binaire compact (scripts/compact-map.mjs) : lu directement, sans analyse de texte JSON.
+  // Par couche : Uint32 nb de lignes ; par ligne : Uint32 nb de points, Int32 x0, Int32 y0, puis Int16 dx, dy (unités 1e-4 degré).
+  // Une couche par tâche (pause entre chaque) : pas de longue tâche qui bloque le défilement pendant la lecture.
+  const ready = async (buf) => {
+    const v = new DataView(buf); let o = 0;
+    for (const k of MAP_LAYERS) {
+      await new Promise((r) => setTimeout(r, 0));
+      const p = new Path2D(), closed = k === "water", n = v.getUint32(o, true); o += 4;
+      for (let f = 0; f < n; f++) {
+        const len = v.getUint32(o, true); let x = v.getInt32(o + 4, true), y = v.getInt32(o + 8, true); o += 12;
+        p.moveTo((x / 1e4 - 3.1) * KX, -(y / 1e4 - 50.62));
+        for (let i = 1; i < len; i++) { x += v.getInt16(o, true); y += v.getInt16(o + 2, true); o += 4; p.lineTo((x / 1e4 - 3.1) * KX, -(y / 1e4 - 50.62)); }
+        if (closed) p.closePath();
+      }
+      LAY[k] = p;
+    }
+    loaded = performance.now(); kick();
+  };
+  fetch(root.getAttribute("data-map") || "/lille-map.bin").then((r) => (r.ok ? r.arrayBuffer() : Promise.reject(r.status))).then(ready).catch(() => {});
   // Longueur cumulée du trajet.
   const cum = [0];
   for (let i = 1; i < ROUTE.length; i++) cum.push(cum[i - 1] + Math.hypot(ROUTE[i][0] - ROUTE[i - 1][0], ROUTE[i][1] - ROUTE[i - 1][1]));
@@ -173,7 +191,7 @@ export function mountMap(root) {
     pin(B, "B · AÉROPORT LESQUIN", sm((s - 0.26) / 0.1), C.pinB, s > 0.9 || s < 0.5);
     // Étiquette prix au milieu du trajet.
     { const k = sm((s - 0.34) / 0.12) * (1 - sm((s - 0.6) / 0.1) * 0.0); if (k > 0.01) {
-      const m = at(RL * 0.5), y = Y([m.x, m.y]) + (1 - k) * 8, txt = "68 € · PRIX FERME"; ctx.font = "600 11px ui-monospace, Menlo, monospace"; ctx.letterSpacing = "1.2px";
+      const m = at(RL * 0.5), y = Y([m.x, m.y]) + (1 - k) * 8, txt = `${prix("lesquin")} € · PRIX FERME`; ctx.font = "600 11px ui-monospace, Menlo, monospace"; ctx.letterSpacing = "1.2px";
       const tw = ctx.measureText(txt).width + 22; let x = X([m.x, m.y]) + 14; if (x + tw > w - 8) x = X([m.x, m.y]) - 14 - tw; ctx.globalAlpha = k; ctx.fillStyle = C.price; ctx.beginPath(); ctx.roundRect(x, y - 13, tw, 26, 13); ctx.fill();
       ctx.fillStyle = C.priceTx; ctx.textAlign = "left"; ctx.fillText(txt, x + 11, y); ctx.globalAlpha = 1; } }
     // Arrivée : durée.
