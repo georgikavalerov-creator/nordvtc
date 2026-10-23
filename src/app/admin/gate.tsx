@@ -32,7 +32,7 @@ export async function AdminPage({ title, children, actions }: { title: string; c
             <a href="/admin/reglages#photo" className="acc-avatar adm-avatar" title="Ma photo" aria-label="Ma photo">{photo ? <img src={photo} alt="" width={44} height={44} /> : "G"}</a>
             <h1 style={{ fontSize: "1.8rem", margin: 0 }}>{title}</h1>
           </div>
-          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <div className="adm-head-actions" style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
             {actions}
             <form action={logout}><button className="btn ghost small">Se déconnecter</button></form>
           </div>

@@ -91,8 +91,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ScrollFX />
         <Interact />
         <Footer />
-        {/* Flou progressif sous la barre du bas (mobile) : le contenu s'y fond au lieu d'être coupé net */}
-        <div className="edge-blur" aria-hidden="true"><i /><i /><i /><i /></div>
         <MobileBar />
         <Gliders />
         <ChatButton />

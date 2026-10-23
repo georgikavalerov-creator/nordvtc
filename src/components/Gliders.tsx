@@ -60,7 +60,9 @@ export default function Gliders() {
           layer.setAttribute("aria-hidden", "true");
           layer.style.opacity = "0";
           el.classList.add("has-glider");
-          if (getComputedStyle(el).position === "static") el.style.position = "relative";
+          // Point d'ancrage pour la pastille sans déplacer le groupe : un « top » prévu pour le mode
+          // collant (ordinateur) s'appliquerait sinon à une position relative (téléphone).
+          if (getComputedStyle(el).position === "static") { el.style.position = "relative"; el.style.inset = "auto"; }
           el.prepend(layer);
           const g = { el, items, layer };
           groups.set(el, g);
@@ -87,7 +89,8 @@ export default function Gliders() {
     const mo = new MutationObserver((list) => {
       let structure = false, state = false;
       for (const m of list) {
-        if (m.type === "childList") structure = true;
+        // Ajout ou retrait d'éléments seulement : les compteurs animés (texte) ne déclenchent rien.
+        if (m.type === "childList") { if ([...m.addedNodes, ...m.removedNodes].some((n) => n.nodeType === 1)) structure = true; }
         else if (m.target instanceof HTMLElement && m.target.closest(".has-glider") && m.attributeName !== "data-glide-on") state = true;
       }
       if (structure || state) schedule(structure);

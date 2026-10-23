@@ -3926,8 +3926,9 @@ ol.steps > li.is-lit::before { box-shadow: 0 0 0 4px rgba(31, 91, 255, .28), 0 8
 @keyframes clockBlink { 50% { opacity: .25; } }
 
 /* 4. Indication qui scintille (balayage de lumière) */
-@media (prefers-reduced-motion: no-preference) {
-  /* Le dégradé reprend la couleur du texte (jour comme nuit) avec un reflet bleu qui passe */
+@media (prefers-reduced-motion: no-preference) and (hover: hover) {
+  /* (Ordinateur seulement : sur iPhone, un texte animé posé sur la carte animée peut scintiller.)
+     Le dégradé reprend la couleur du texte (jour comme nuit) avec un reflet bleu qui passe */
   .story-scroll b { -webkit-text-fill-color: transparent; background-image: linear-gradient(90deg, currentColor 0%, currentColor 40%, #6f98ff 50%, currentColor 60%, currentColor 100%); background-size: 250% 100%; -webkit-background-clip: text; background-clip: text; animation: hintShimmer 2.6s linear infinite; }
 }
 @keyframes hintShimmer { from { background-position: 100% 0; } to { background-position: -150% 0; } }
@@ -3981,3 +3982,11 @@ ol.steps > li.is-lit::before { box-shadow: 0 0 0 4px rgba(31, 91, 255, .28), 0 8
 .ag-price-t { flex: 1 1 100%; font-size: .85rem; color: #8a5a00; font-weight: 600; }
 .ag-price label { display: grid; gap: 4px; font-size: .8rem; font-weight: 600; }
 .ag-price input { width: 110px; height: 38px; padding: 0 12px; border-radius: 10px; border: 1.5px solid #c2c2c7; font: inherit; font-size: 16px; font-variant-numeric: tabular-nums; }
+
+/* Pas de flou d'arrière-plan au-dessus de la carte animée : évite le scintillement sur iPhone */
+html.over-canvas .edge-blur { display: none !important; }
+/* Mode nuit : la puce sélectionnée garde son contraste (la règle générale des puces lui imposait le fond gris) */
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) :is(.chip.on, .chip[aria-pressed="true"]):not(.date-chips .chip):not(.faq-tabs .chip) { background: #000 !important; color: #fff !important; border-color: #000 !important; } }
+:root[data-theme="dark"] :is(.chip.on, .chip[aria-pressed="true"]):not(.date-chips .chip):not(.faq-tabs .chip) { background: #000 !important; color: #fff !important; border-color: #000 !important; }
+/* Admin : boutons d'en-tête sur une ligne chacun (ils passent à la ligne entre eux, pas au milieu du texte) */
+.adm-head-actions .btn { white-space: nowrap; }
