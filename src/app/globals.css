@@ -2363,7 +2363,7 @@ html:not(.in-app) .btn-arrow:active::after, html:not(.in-app) .quick-btn:active:
 .ft-bottom { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.12); }
 .ft-legal { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: baseline; margin-top: 10px; font-size: .78rem; opacity: .8; }
 .ft-legal-links { display: inline-flex; flex-wrap: wrap; gap: 4px 14px; }
-.ft-legal small { flex-basis: 100%; opacity: .7; font-size: .72rem; }
+.ft-legal small { flex-basis: 100%; font-size: .72rem; }
 @media (max-width: 900px) {
   .ft-top { grid-template-columns: 1fr; gap: 6px; }
   .ft-col { border-top: 1px solid rgba(255,255,255,.12); }
@@ -3308,7 +3308,7 @@ h2.bk-sub::before { content: ""; width: 4px; height: 1.1em; border-radius: 4px; 
 /* =========================== GUIDE =========================== */
 .gd-tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 0; }
 .gd-tag { --c: #1f5bff; --t: #eef3ff; display: inline-flex; align-items: center; gap: 6px; width: fit-content; padding: 4px 11px; border-radius: 999px; background: var(--t); color: var(--c); font-weight: 700; font-size: .78rem; }
-.c-blue { --c: #1f5bff; --t: #eef3ff; } .c-teal { --c: #0b7d7c; --t: #e3f6f5; } .c-amber { --c: #b45309; --t: #fff4e0; } .c-violet { --c: #6d28d9; --t: #f1eaff; } .c-green { --c: #15803d; --t: #e6f6ec; }
+.c-blue { --c: #1f5bff; --t: #eef3ff; } .c-teal { --c: #0a7271; --t: #e3f6f5; } .c-amber { --c: #b45309; --t: #fff4e0; } .c-violet { --c: #6d28d9; --t: #f1eaff; } .c-green { --c: #127436; --t: #e6f6ec; }
 .gd-feature { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); border-radius: 24px; overflow: hidden; background: #fff; border: 1px solid #e4e4e7; text-decoration: none; color: #0b0b0c; box-shadow: 0 24px 50px -36px rgba(11,20,48,.55); transition: transform .25s, box-shadow .25s; }
 .gd-feature-art { position: relative; display: grid; place-items: center; min-height: 260px; color: #fff; background: radial-gradient(420px 260px at 20% 0%, rgba(255,255,255,.28), transparent 60%), linear-gradient(140deg, var(--c), #0b0b0c); }
 .gd-feature-art svg { opacity: .95; }
