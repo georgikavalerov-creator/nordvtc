@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { Fragment, Suspense } from "react";
 import { prix, PRIX_MINIMUM, TRAJETS } from "@/lib/prix-depart";
 import Link from "next/link";
 import GoogleReviews from "@/components/GoogleReviews";
@@ -65,6 +65,8 @@ export default function Home() {
       />
 
       <Reveal />
+      {/* Sous le haut de page, chaque bloc a sa propre limite <Suspense> : React rend la page interactive
+          par petits morceaux au lieu d'une seule longue tâche qui bloque le téléphone. Aucun changement visible. */}
       <section className="hero cine cine-root" id="cine-hero" data-mode="auto" data-xmin="0.52" data-fx="hero" suppressHydrationWarning>
         <canvas className="cine-canvas" aria-hidden="true" />
         <div className="cine-grid" aria-hidden="true" />
@@ -115,6 +117,7 @@ export default function Home() {
         </div>
       </section>
 
+      <Suspense>
       <section className="story cine-root" id="cine-story" data-mode="scroll" aria-label="Du clic à la portière">
         <div className="story-inner">
           <canvas className="cine-canvas" aria-hidden="true" />
@@ -152,12 +155,14 @@ export default function Home() {
           <div className="story-hint" aria-hidden="true"><span className="mouse"><i /></span>Faites défiler : le trajet se poursuit</div>
         </div>
       </section>
+      </Suspense>
 
       <CineMount target="cine-hero" />
       <CineMount target="cine-story" near />
       <MapMount target="cine-story" near />
 
 
+      <Suspense>
       <section className="section vehicle cv" data-fx="" suppressHydrationWarning>
         <div className="wrap">
           <div className="vehicle-grid">
@@ -185,10 +190,14 @@ export default function Home() {
           <p className="muted" style={{ fontSize: "0.8rem", marginTop: 12 }}>Photos extérieures d'illustration d'une Toyota Auris identique ; l'habitacle est celui du véhicule.</p>
         </div>
       </section>
+      </Suspense>
 
 
+      <Suspense>
       <AppCompare />
+      </Suspense>
 
+      <Suspense>
       <section className="section alt cv">
         <div className="wrap">
           <div className="section-head" data-fx="" suppressHydrationWarning>
@@ -215,8 +224,10 @@ export default function Home() {
           <p className="center" style={{ marginTop: 28 }}><Link href="/services" className="more">Tous les trajets et services →</Link></p>
         </div>
       </section>
+      </Suspense>
 
 
+      <Suspense>
       <section className="section cv">
         <div className="wrap">
           <div className="section-head" data-fx="" suppressHydrationWarning>
@@ -239,7 +250,9 @@ export default function Home() {
           <div style={{ display: "flex", justifyContent: "center", marginTop: 22 }}><PaymentBadges /></div>
         </div>
       </section>
+      </Suspense>
 
+      <Suspense>
       <section className="statement" data-fx="sticky" suppressHydrationWarning>
         <div className="statement-inner">
           {/* Mots rendus côté serveur (et non découpés après coup par un script) : évite l'erreur d'hydratation React #418. */}
@@ -252,7 +265,9 @@ export default function Home() {
           </p>
         </div>
       </section>
+      </Suspense>
 
+      <Suspense>
       <DriverCard />
 
       <section className="section zones cv">
@@ -270,7 +285,9 @@ export default function Home() {
           </p>
         </div>
       </section>
+      </Suspense>
 
+      <Suspense>
       <section className="section alt cv">
         <div className="wrap" style={{ maxWidth: 820 }}>
           <span className="eyebrow">Vos questions</span>
@@ -289,9 +306,12 @@ export default function Home() {
           <p className="muted" style={{ marginTop: 18 }}><Link href="/faq">Les {ALL_FAQ.length} questions fréquentes</Link> · <Link href="/contact">Nous écrire</Link></p>
         </div>
       </section>
+      </Suspense>
 
+      <Suspense>
       <GoogleReviews />
       <CtaBand />
+      </Suspense>
     </>
   );
 }
