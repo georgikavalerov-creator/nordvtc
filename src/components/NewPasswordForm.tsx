@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { browserClient } from "@/lib/supabase-browser";
 import PasswordMeter from "./PasswordMeter";
+import { BusyLabel } from "./Loader";
 
 export default function NewPasswordForm() {
   const [pw, setPw] = useState("");
@@ -30,7 +31,7 @@ export default function NewPasswordForm() {
       </label>
       <PasswordMeter value={pw} onLeaked={setLeaked} />
       {err && <p className="error" role="alert">{err}</p>}
-      <button className="btn" disabled={busy}>{busy ? "Enregistrement…" : "Enregistrer le mot de passe"}</button>
+      <button className="btn" disabled={busy}><BusyLabel busy={busy} busyText="Enregistrement…">Enregistrer le mot de passe</BusyLabel></button>
     </form>
   );
 }

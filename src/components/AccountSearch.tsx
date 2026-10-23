@@ -5,6 +5,7 @@ import AddressField, { type Place } from "./AddressField";
 import DateField from "./DateField";
 import TimeField from "./TimeField";
 import IconC from "./IconC";
+import { Dots } from "./Loader";
 
 type Saved = { id: string; kind: "home" | "work" | "other"; label: string; address: string; lat: number; lng: number; sig?: string };
 type Quote = { priceCents: number; distanceKm: number; durationMin: number; night?: boolean };
@@ -86,7 +87,7 @@ export default function AccountSearch({ places = [] }: { places?: Saved[] }) {
         <div className="tf-label"><span>Heure <span className="muted">(facultatif)</span></span><TimeField value={time} onChange={setTime} /></div>
       </div>
       <div className={`ab-price${quote ? " on" : ""}`} aria-live="polite">
-        {loading ? <span className="muted">Calcul du prix…</span>
+        {loading ? <span className="muted ld-inline"><Dots size={16} />Calcul du prix…</span>
           : quote ? (
             <>
               <div><small>{time ? "Prix du trajet" : "Prix de jour"}</small><strong>{euro(quote.priceCents)}</strong></div>

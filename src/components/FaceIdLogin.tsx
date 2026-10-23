@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { rememberId } from "@/lib/faceid-local";
 import { browserSupportsWebAuthn, browserSupportsWebAuthnAutofill, startAuthentication, WebAuthnAbortService } from "@simplewebauthn/browser";
+import { BusyLabel } from "./Loader";
 
 type Opts = Parameters<typeof startAuthentication>[0]["optionsJSON"];
 type Resp = Awaited<ReturnType<typeof startAuthentication>>;
@@ -57,7 +58,7 @@ export default function FaceIdLogin({ getOptions, verify, next, orText = "ou ave
     <div className="faceid-login">
       <button type="button" className="btn faceid-btn" onClick={go} disabled={busy}>
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2M9 9v1.5M15 9v1.5M12 9v4h-1M9.5 16a3.5 3.5 0 0 0 5 0" /></svg>
-        {busy ? "Vérification…" : `Se connecter avec ${label}`}
+        <BusyLabel busy={busy} busyText="Vérification…">{`Se connecter avec ${label}`}</BusyLabel>
       </button>
       {err && <p className="error" role="alert">{err}</p>}
       <p className="faceid-or"><span>{orText}</span></p>

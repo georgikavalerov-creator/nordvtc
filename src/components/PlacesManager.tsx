@@ -5,6 +5,7 @@ import AddressField, { type Place } from "./AddressField";
 import IconC from "./IconC";
 import { deletePlace, savePlace } from "@/app/compte/(espace)/actions";
 import type { SavedPlace } from "@/lib/account";
+import { BusyLabel } from "./Loader";
 
 const KINDS = { home: ["house", "Domicile"], work: ["briefcase", "Travail"], other: ["pin", "Autre"] } as const;
 
@@ -49,7 +50,7 @@ export default function PlacesManager({ places }: { places: SavedPlace[] }) {
         {kind === "other" && <label className="form" style={{ display: "block", marginBottom: 12 }}>Nom<input value={label} onChange={(e) => setLabel(e.target.value)} maxLength={40} placeholder="Parents, Salle de sport…" /></label>}
         <AddressField key={key} label="Adresse" value={place} onChange={setPlace} placeholder="Rue, ville…" />
         {err && <p className="error" role="alert">{err}</p>}
-        <button type="button" className="btn" style={{ marginTop: 12 }} disabled={pending} onClick={add}>{pending ? "Enregistrement…" : "Enregistrer"}</button>
+        <button type="button" className="btn" style={{ marginTop: 12 }} disabled={pending} onClick={add}><BusyLabel busy={pending} busyText="Enregistrement…">Enregistrer</BusyLabel></button>
       </div>
     </>
   );

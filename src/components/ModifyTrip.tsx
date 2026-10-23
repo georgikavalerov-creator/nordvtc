@@ -6,6 +6,7 @@ import AddressField, { type Place } from "./AddressField";
 import DateField from "./DateField";
 import TimeField from "./TimeField";
 import type { ModifyResult } from "@/lib/modify";
+import { BusyLabel } from "./Loader";
 
 export type ModifyInitial = {
   origin: Place; dest: Place; date: string; time: string;
@@ -98,11 +99,11 @@ export default function ModifyTrip({ initial, action, contactHref = "/contact", 
       <div className="trip-actions">
         {preview?.ok ? (
           <>
-            <button type="button" className="btn small" disabled={pending} onClick={() => run(true)}>{pending ? "…" : "Confirmer la modification"}</button>
+            <button type="button" className="btn small" disabled={pending} onClick={() => run(true)}><BusyLabel busy={pending}>Confirmer la modification</BusyLabel></button>
             <button type="button" className="btn small ghost" disabled={pending} onClick={() => setPreview(null)}>Changer encore</button>
           </>
         ) : (
-          <button type="button" className="btn small" disabled={pending} onClick={() => run(false)}>{pending ? "Calcul…" : "Voir le nouveau prix"}</button>
+          <button type="button" className="btn small" disabled={pending} onClick={() => run(false)}><BusyLabel busy={pending} busyText="Calcul…">Voir le nouveau prix</BusyLabel></button>
         )}
         <button type="button" className="btn small ghost" disabled={pending} onClick={() => setOpen(false)}>Annuler</button>
       </div>

@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { deleteAgendaEvent, ignoreAgendaEvent, quickBon } from "./actions";
+import { BusyLabel } from "@/components/Loader";
 
 export type AgendaItem = { ref: string; date: string; time: string; title: string; route: string; done?: { url: string }; recurring?: boolean };
 type St = "wait" | { url: string } | { error: string };
@@ -35,7 +36,7 @@ export default function AgendaCourses({ items }: { items: AgendaItem[] }) {
   if (!items.length) return <p className="muted" style={{ margin: 0 }}>Aucune course dans votre agenda pour ce mois.</p>;
   return (
     <div className="ag-list">
-      {todo.length > 1 && <button type="button" className="btn small" onClick={runAll} disabled={all}>{all ? "Création des bons…" : `Créer tous les bons (${todo.length})`}</button>}
+      {todo.length > 1 && <button type="button" className="btn small" onClick={runAll} disabled={all}><BusyLabel busy={all} busyText="Création des bons…">{`Créer tous les bons (${todo.length})`}</BusyLabel></button>}
       <ul>
         {items.filter((it) => !gone[it.ref]).map((it) => {
           const s = st[it.ref];

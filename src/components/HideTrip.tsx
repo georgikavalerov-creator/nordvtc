@@ -3,6 +3,7 @@ import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { hideTrips } from "@/app/compte/(espace)/actions";
+import { BusyLabel } from "./Loader";
 
 export const UNDO_EVENT = "nvtc-trips-hidden";
 
@@ -32,7 +33,7 @@ export default function HideTrip({ ids, label = "Supprimer", confirmText = "Supp
       {booked ? (
         <span><strong>Ce trajet est toujours réservé.</strong> Le supprimer de votre espace ne l&apos;annule pas.{detailHref && <> Pour ne plus faire la course, <Link href={detailHref}>annulez-la d&apos;abord</Link>.</>}</span>
       ) : <span>{confirmText}</span>}
-      <button type="button" className="btn small danger" onClick={go} disabled={pending}>{pending ? "…" : booked ? "Supprimer quand même" : "Oui, supprimer"}</button>
+      <button type="button" className="btn small danger" onClick={go} disabled={pending}><BusyLabel busy={pending}>{booked ? "Supprimer quand même" : "Oui, supprimer"}</BusyLabel></button>
       <button type="button" className="btn small ghost" onClick={() => setAsk(false)} disabled={pending}>Non</button>
       {err && <span className="error" role="alert">{err}</span>}
     </span>

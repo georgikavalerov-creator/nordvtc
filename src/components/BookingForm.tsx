@@ -7,6 +7,7 @@ import { track } from "@/lib/track";
 import AddressField, { type Place } from "./AddressField";
 import IconC from "./IconC";
 import CompanyField from "./CompanyField";
+import { BusyLabel } from "./Loader";
 
 type Quote = {
   distanceKm: number;
@@ -492,7 +493,7 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
           {quoteErr && <span className="error">{quoteErr}</span>}
         </div>
         <button key="pay" className="btn" type="submit" disabled={submitting}>
-          {submitting ? "Redirection…" : quote ? `Payer ${eur(payMode === "full" ? totalFull : totalDeposit)}` : "Voir le prix et payer"}
+          <BusyLabel busy={submitting} busyText="Redirection…">{quote ? `Payer ${eur(payMode === "full" ? totalFull : totalDeposit)}` : "Voir le prix et payer"}</BusyLabel>
         </button>
       </div>
       <p className="muted bk-foot" style={{ marginBottom: 4 }}>

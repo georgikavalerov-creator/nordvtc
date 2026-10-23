@@ -2,6 +2,7 @@
 import { useActionState, useState } from "react";
 import { saveProfile } from "@/app/compte/(espace)/actions";
 import type { Profile } from "@/lib/account";
+import { BusyLabel } from "./Loader";
 
 type C = { code: string; dial: string; label: string; flag: string };
 export default function ProfileForm({ profile, email, countries }: { profile: Profile; email: string; countries: C[] }) {
@@ -28,7 +29,7 @@ export default function ProfileForm({ profile, email, countries }: { profile: Pr
       <label className="cg-consent"><input type="checkbox" name="marketing_opt_in" defaultChecked={profile.marketing_opt_in} /><span>Recevoir les offres et actualités de Nord VTC</span></label>
       {state.error && <p className="error" role="alert">{state.error}</p>}
       {state.ok && <p className="notice" role="status">Profil enregistré ✓</p>}
-      <button className="btn" disabled={pending}>{pending ? "Enregistrement…" : "Enregistrer"}</button>
+      <button className="btn" disabled={pending}><BusyLabel busy={pending} busyText="Enregistrement…">Enregistrer</BusyLabel></button>
     </form>
   );
 }

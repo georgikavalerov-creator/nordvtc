@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { browserClient } from "@/lib/supabase-browser";
+import { BusyLabel } from "./Loader";
 
 /** Deuxième étape de connexion : code à 6 chiffres de l'application d'authentification. */
 export default function MfaVerify({ next }: { next: string }) {
@@ -31,7 +32,7 @@ export default function MfaVerify({ next }: { next: string }) {
         value={code} onChange={(e) => { const v = e.target.value.replace(/\D/g, "").slice(0, 6); setCode(v); if (v.length === 6) submit(v); }}
       />
       {err && <p className="error" role="alert" style={{ margin: 0 }}>{err}</p>}
-      <button className="btn" disabled={busy}>{busy ? "Vérification…" : "Valider"}</button>
+      <button className="btn" disabled={busy}><BusyLabel busy={busy} busyText="Vérification…">Valider</BusyLabel></button>
     </form>
   );
 }

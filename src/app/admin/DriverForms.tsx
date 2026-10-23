@@ -1,6 +1,7 @@
 "use client";
 import { useActionState } from "react";
 import { adminSaveDriver, createDriver, resetDriverPassword } from "./actions";
+import { BusyLabel } from "@/components/Loader";
 
 function Result({ s }: { s: { error?: string; ok?: string; password?: string } | undefined }) {
   if (s?.error) return <p className="error">{s.error}</p>;
@@ -19,7 +20,7 @@ export function NewDriverForm() {
       <label>Nom et prénom<input name="name" required /></label>
       <label>E-mail (identifiant de connexion)<input name="email" type="email" required autoComplete="off" /></label>
       <label>Téléphone<input name="phone" inputMode="tel" /></label>
-      <button className="btn small" disabled={pending}>{pending ? "…" : "Créer le compte"}</button>
+      <button className="btn small" disabled={pending}><BusyLabel busy={pending}>Créer le compte</BusyLabel></button>
       <div style={{ gridColumn: "1 / -1" }}><Result s={s} /></div>
     </form>
   );
@@ -59,7 +60,7 @@ export function AdminDriverForm({ d }: { d: DrvFull }) {
         {f("insurer", "Assurance RC pro (assureur, n° de contrat)")}
         {f("vat_note", "Mention TVA", "TVA non applicable, art. 293 B du CGI")}
         <div className="adm-span">{s?.error && <p className="error" style={{ margin: 0 }}>{s.error}</p>}{s?.ok && <p className="notice" style={{ margin: 0 }}>Enregistré ✓ — ces informations figurent sur ses bons.</p>}</div>
-        <button className="btn small adm-save" disabled={pending}>{pending ? "…" : "Enregistrer"}</button>
+        <button className="btn small adm-save" disabled={pending}><BusyLabel busy={pending}>Enregistrer</BusyLabel></button>
       </form>
     </details>
   );

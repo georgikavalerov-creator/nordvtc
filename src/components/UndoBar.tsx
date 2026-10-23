@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { restoreTrips } from "@/app/compte/(espace)/actions";
 import { UNDO_EVENT } from "./HideTrip";
+import { BusyLabel } from "./Loader";
 
 /** Après une suppression : « 1 trajet supprimé · Annuler » pendant 12 secondes (sinon : corbeille). */
 export default function UndoBar() {
@@ -35,7 +36,7 @@ export default function UndoBar() {
           setMsg(r.error ? r.error : ids.length > 1 ? "Trajets restaurés" : "Trajet restauré");
           timer.current = setTimeout(() => setMsg(""), 3_000);
           router.refresh();
-        })}>{pending ? "…" : "Annuler"}</button>
+        })}><BusyLabel busy={pending}>Annuler</BusyLabel></button>
       )}
       {!msg && <Link href="/compte/trajets?v=corbeille" className="undo-link" onClick={close}>Corbeille</Link>}
       <button type="button" className="undo-x" aria-label="Fermer" onClick={close}>×</button>

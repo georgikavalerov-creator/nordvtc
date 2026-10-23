@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { browserSupportsWebAuthn, startRegistration } from "@simplewebauthn/browser";
 import { biometricLabel } from "./FaceIdLogin";
 import { markHere, rememberId } from "@/lib/faceid-local";
+import { BusyLabel } from "./Loader";
 
 type Opts = Parameters<typeof startRegistration>[0]["optionsJSON"];
 type Resp = Awaited<ReturnType<typeof startRegistration>>;
@@ -48,7 +49,7 @@ export default function FaceIdPrompt({ count, getOptions, save, storeKey }: { co
         {msg && <span className="faceid-prompt-msg" role="status">{msg}</span>}
       </div>
       <div className="faceid-prompt-act">
-        <button type="button" className="btn small faceid-btn" onClick={on} disabled={busy}>{busy ? "…" : "Activer"}</button>
+        <button type="button" className="btn small faceid-btn" onClick={on} disabled={busy}><BusyLabel busy={busy}>Activer</BusyLabel></button>
         <button type="button" className="linklike" onClick={later}>Plus tard</button>
       </div>
     </div>

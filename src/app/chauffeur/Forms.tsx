@@ -3,6 +3,7 @@ import { useActionState } from "react";
 import { changeDriverPassword, driverPkLogin, driverPkLoginOptions, loginDriver, saveDriverProfile } from "./actions";
 import FaceIdLogin from "@/components/FaceIdLogin";
 import type { Driver } from "@/lib/driver-auth";
+import { BusyLabel } from "@/components/Loader";
 
 const Msg = ({ s, ok = "Enregistré ✓" }: { s: { error?: string; ok?: boolean } | undefined; ok?: string }) =>
   s?.error ? <p className="error">{s.error}</p> : s?.ok ? <p className="notice okmsg">{ok}</p> : null;
@@ -15,7 +16,7 @@ export function DriverLogin() {
       <label>E-mail<input name="email" type="email" required autoComplete="username webauthn" /></label>
       <label>Mot de passe<input name="password" type="password" required autoComplete="current-password" /></label>
       <Msg s={s} />
-      <button className="btn" disabled={pending}>{pending ? "Connexion…" : "Se connecter"}</button>
+      <button className="btn" disabled={pending}><BusyLabel busy={pending} busyText="Connexion…">Se connecter</BusyLabel></button>
     </form>
   );
 }
@@ -40,7 +41,7 @@ export function ProfileForm({ d }: { d: Driver }) {
       <label>Assurance RC professionnelle (assureur, adresse)<input name="insurer" required defaultValue={d.insurer ?? ""} /></label>
       <label>Mention TVA<input name="vat_note" defaultValue={d.vat_note ?? "TVA non applicable, art. 293 B du CGI"} /></label>
       <Msg s={s} />
-      <button className="btn" disabled={pending}>{pending ? "Enregistrement…" : "Enregistrer mon profil"}</button>
+      <button className="btn" disabled={pending}><BusyLabel busy={pending} busyText="Enregistrement…">Enregistrer mon profil</BusyLabel></button>
     </form>
   );
 }

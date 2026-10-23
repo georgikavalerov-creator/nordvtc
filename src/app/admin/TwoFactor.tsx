@@ -1,6 +1,7 @@
 "use client";
 import { useActionState, useState } from "react";
 import { confirm2fa, disable2fa, makeBackupCodes, set2faChannel, start2fa } from "./actions";
+import { BusyLabel } from "@/components/Loader";
 
 type R = { error?: string; ok?: boolean | string } | undefined;
 const Msg = ({ s }: { s: R }) => (s?.error ? <p className="error">{s.error}</p> : s?.ok ? <p className="notice okmsg">{typeof s.ok === "string" ? s.ok : "Enregistré ✓"}</p> : null);
@@ -66,7 +67,7 @@ export default function TwoFactor({ enabled }: { enabled: boolean }) {
           <small className="muted">Sur le téléphone lui-même : <a href={setup.uri}>ajouter directement</a> · clé manuelle : <code style={{ wordBreak: "break-all" }}>{setup.secret}</code></small>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             <input name="code" inputMode="numeric" maxLength={7} placeholder="123 456" autoComplete="one-time-code" required style={{ maxWidth: 160 }} />
-            <button className="btn small" disabled={cPending}>{cPending ? "Vérification…" : "Confirmer"}</button>
+            <button className="btn small" disabled={cPending}><BusyLabel busy={cPending} busyText="Vérification…">Confirmer</BusyLabel></button>
           </div>
           <Msg s={cs} />
         </form>

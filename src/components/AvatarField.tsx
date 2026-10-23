@@ -2,6 +2,7 @@
 import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { saveAvatar } from "@/app/compte/(espace)/actions";
+import { BusyLabel } from "./Loader";
 
 // Recadrage carré au centre + réduction à 256 px en JPEG, directement sur le téléphone (envoi léger, rapide).
 async function toSquareJpeg(file: File, size = 256): Promise<string> {
@@ -50,7 +51,7 @@ export default function AvatarField({ avatar, name, save: saveFn = saveAvatar, h
         <strong>Photo de profil</strong>
         <p className="muted" style={{ margin: "2px 0 10px", fontSize: ".9rem" }}>{hint}</p>
         <div className="trip-actions" style={{ margin: 0 }}>
-          <button type="button" className="btn small" onClick={() => input.current?.click()} disabled={pending}>{pending ? "Envoi…" : src ? "Changer la photo" : "Ajouter une photo"}</button>
+          <button type="button" className="btn small" onClick={() => input.current?.click()} disabled={pending}><BusyLabel busy={pending} busyText="Envoi…">{src ? "Changer la photo" : "Ajouter une photo"}</BusyLabel></button>
           {src && <button type="button" className="btn small ghost" onClick={() => save(null)} disabled={pending}>Retirer</button>}
         </div>
         {msg.error && <p className="error" role="alert">{msg.error}</p>}

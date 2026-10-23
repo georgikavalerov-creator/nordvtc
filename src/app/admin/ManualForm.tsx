@@ -3,6 +3,7 @@ import { useActionState, useState } from "react";
 import AddressField, { type Place } from "@/components/AddressField";
 import { createManualBooking } from "./actions";
 import CompanyField from "@/components/CompanyField";
+import { BusyLabel } from "@/components/Loader";
 
 export type ManualInitial = {
   name?: string; phone?: string; email?: string; date?: string; time?: string; passengers?: number; luggage?: number;
@@ -92,7 +93,7 @@ export default function ManualForm({ mode = "booking", action = createManualBook
         <label>Déjà encaissé (€)<input name="paid" inputMode="decimal" defaultValue="0" /></label>
       </div>
       {s?.error && <p className="error">{s.error}</p>}
-      <button className="btn" disabled={pending || !o || !d}>{pending ? "Création…" : mode === "bon" ? "Générer le bon de commande" : "Créer la réservation"}</button>
+      <button className="btn" disabled={pending || !o || !d}><BusyLabel busy={pending} busyText="Création…">{mode === "bon" ? "Générer le bon de commande" : "Créer la réservation"}</BusyLabel></button>
       {(!o || !d) && <small className="muted">Choisissez les deux adresses dans la liste proposée.</small>}
     </form>
   );

@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import { adminPkLogin, adminPkLoginOptions, login, sendCode } from "./actions";
 import FaceIdLogin from "@/components/FaceIdLogin";
+import { BusyLabel } from "@/components/Loader";
 
 export default function LoginForm() {
   const [state, action, pending] = useActionState(login, undefined);
@@ -33,7 +34,7 @@ export default function LoginForm() {
         </>
       )}
       {state?.error && <p className="error" role="alert">{state.error}</p>}
-      <button className="btn" disabled={pending}>{pending ? "Connexion…" : "Se connecter"}</button>
+      <button className="btn" disabled={pending}><BusyLabel busy={pending} busyText="Connexion…">Se connecter</BusyLabel></button>
     </form>
   );
 }

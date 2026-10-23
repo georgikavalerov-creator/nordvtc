@@ -1,6 +1,7 @@
 "use client";
 import { useActionState, useState } from "react";
 import IconC from "./IconC";
+import { BusyLabel } from "./Loader";
 
 type R = { ok?: boolean; error?: string } | undefined;
 
@@ -43,7 +44,7 @@ export default function ClaimCancel({ action, status }: { action: (prev: R, form
       </label>
       {state?.error && <p className="error" role="alert">{state.error}</p>}
       <div className="trip-actions">
-        <button type="submit" className="btn small" disabled={pending}>{pending ? "Envoi…" : "Envoyer le justificatif"}</button>
+        <button type="submit" className="btn small" disabled={pending}><BusyLabel busy={pending} busyText="Envoi…">Envoyer le justificatif</BusyLabel></button>
         <button type="button" className="btn small ghost" disabled={pending} onClick={() => setOpen(false)}>Fermer</button>
       </div>
     </form>

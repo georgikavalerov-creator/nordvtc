@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { savePricing } from "./actions";
 import type { Pricing } from "@/lib/pricing";
+import { BusyLabel } from "@/components/Loader";
 
 const FIELDS: { name: keyof Pricing; label: string; step?: string }[] = [
   { name: "baseFare", label: "Prise en charge (€)", step: "0.5" },
@@ -32,7 +33,7 @@ export default function PricingForm({ pricing }: { pricing: Pricing }) {
       {state?.error && <p className="error" role="alert">{state.error}</p>}
       {state?.ok && <p className="notice">Tarifs enregistrés : ils s'appliquent aux prochains calculs.</p>}
       <button className="btn" disabled={pending} style={{ justifySelf: "start" }}>
-        {pending ? "Enregistrement…" : "Enregistrer les tarifs"}
+        <BusyLabel busy={pending} busyText="Enregistrement…">Enregistrer les tarifs</BusyLabel>
       </button>
     </form>
   );

@@ -2,6 +2,7 @@
 import { useActionState } from "react";
 import { decideClaim, refundBooking, savePost, saveSettings, tiimeCatchUp } from "./actions";
 import type { SiteSettings } from "@/lib/content";
+import { BusyLabel } from "@/components/Loader";
 
 type R = { error?: string; ok?: boolean | string } | undefined;
 const Msg = ({ s }: { s: R }) => (s?.error ? <p className="error">{s.error}</p> : s?.ok ? <p className="notice okmsg">{typeof s.ok === "string" ? s.ok : "Enregistré ✓"}</p> : null);
@@ -23,7 +24,7 @@ export function SettingsForm({ v, envPhone }: { v: Partial<SiteSettings>; envPho
       <label>Adresse de dépôt Tiime (chaque facture y est envoyée en PDF)<input name="tiimeEmail" type="email" defaultValue={v.tiimeEmail ?? ""} placeholder="votre-adresse@…tiime…" /></label>
       <small className="muted adm-span" style={{ marginTop: -6 }}>Dans Tiime : bloc « Déposer ici un document » en bas à gauche (web) ou Réglages → Gestion des documents (appli). Cliquez sur l&apos;adresse pour la copier.</small>
       <div className="adm-span"><Msg s={s} /></div>
-      <button className="btn adm-save" disabled={pending}>{pending ? "Enregistrement…" : "Enregistrer"}</button>
+      <button className="btn adm-save" disabled={pending}><BusyLabel busy={pending} busyText="Enregistrement…">Enregistrer</BusyLabel></button>
     </form>
   );
 }
@@ -47,7 +48,7 @@ export function PostForm({ p }: { p: PostInit }) {
       </label>
       <label className="inline"><input type="checkbox" name="published" defaultChecked={p.published} /> <span>Publié (décoché = masqué du site)</span></label>
       <Msg s={s} />
-      <button className="btn" disabled={pending}>{pending ? "Enregistrement…" : "Enregistrer l'article"}</button>
+      <button className="btn" disabled={pending}><BusyLabel busy={pending} busyText="Enregistrement…">Enregistrer l'article</BusyLabel></button>
     </form>
   );
 }
@@ -60,7 +61,7 @@ export function RefundForm({ id, max }: { id: string; max: number }) {
       <label>Rembourser (€, max {(max / 100).toFixed(2)})<input name="amount" inputMode="decimal" defaultValue={(max / 100).toFixed(2)} /></label>
       <label className="inline"><input type="checkbox" name="cancel" /> <span>Annuler aussi la course</span></label>
       <Msg s={s} />
-      <button className="btn ghost small" disabled={pending}>{pending ? "…" : "Rembourser via Stripe"}</button>
+      <button className="btn ghost small" disabled={pending}><BusyLabel busy={pending}>Rembourser via Stripe</BusyLabel></button>
     </form>
   );
 }
@@ -71,7 +72,7 @@ export function ClaimDecision({ id }: { id: string }) {
   return (
     <form action={act} className="trip-actions" style={{ marginTop: 6 }}>
       <input type="hidden" name="claim" value={id} />
-      <button className="btn small" name="decision" value="accept" disabled={pending}>{pending ? "…" : "Accepter : annuler et tout rembourser"}</button>
+      <button className="btn small" name="decision" value="accept" disabled={pending}><BusyLabel busy={pending}>Accepter : annuler et tout rembourser</BusyLabel></button>
       <button className="btn small ghost" name="decision" value="refuse" disabled={pending}>Refuser</button>
       <Msg s={s} />
     </form>
@@ -85,7 +86,7 @@ export function TiimeCatchUp() {
       <strong>Tiime : factures déjà émises</strong>
       <small className="muted">Les nouvelles factures partent automatiquement. Ce bouton envoie celles émises avant l&apos;activation (25 par clic).</small>
       <Msg s={s} />
-      <button className="btn ghost small" disabled={pending} style={{ justifySelf: "start" }}>{pending ? "Envoi…" : "Envoyer les factures en attente"}</button>
+      <button className="btn ghost small" disabled={pending} style={{ justifySelf: "start" }}><BusyLabel busy={pending} busyText="Envoi…">Envoyer les factures en attente</BusyLabel></button>
     </form>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { BusyLabel } from "./Loader";
 
 export default function ContactForm({ initialSubject = "" }: { initialSubject?: string }) {
   const [state, setState] = useState<"idle" | "sending" | "done">("idle");
@@ -73,7 +74,7 @@ export default function ContactForm({ initialSubject = "" }: { initialSubject?: 
         </p>
       )}
       <button className="btn" type="submit" disabled={state === "sending"}>
-        {state === "sending" ? "Envoi…" : "Envoyer"}
+        <BusyLabel busy={state === "sending"} busyText="Envoi…">Envoyer</BusyLabel>
       </button>
     </form>
   );

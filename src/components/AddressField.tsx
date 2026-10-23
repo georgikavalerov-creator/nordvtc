@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
+import { Loader } from "./Loader";
 
 export type Place = { label: string; lat: number; lng: number };
 
@@ -28,6 +29,7 @@ export default function AddressField({ label, value, onChange, initialText = "",
   const seq = useRef(0);
   const resolvedInitial = useRef(!!value);
   const [resolving, setResolving] = useState(!value && !!initialText && autoResolve);
+  const [searching, setSearching] = useState(false);
 
   async function search(q: string): Promise<Place[]> {
     const my = ++seq.current;
@@ -64,12 +66,17 @@ export default function AddressField({ label, value, onChange, initialText = "",
     setActive(-1);
     if (timer.current) clearTimeout(timer.current);
     if (v.trim().length < 3) {
+      setSearching(false);
       setItems([]);
       setOpen(false);
       return;
     }
+    setSearching(true);
     timer.current = setTimeout(async () => {
+      const my = seq.current + 1;
+      setSearching(true);
       const r = await search(v.trim());
+      if (my === seq.current) setSearching(false);
       setItems(r);
       setOpen(r.length > 0);
     }, 250);
@@ -102,24 +109,27 @@ export default function AddressField({ label, value, onChange, initialText = "",
   return (
     <label className="suggest" htmlFor={id}>
       {label}
-      <input
-        id={id}
-        value={text}
-        onChange={(e) => onInput(e.target.value)}
-        onKeyDown={onKey}
-        onBlur={() => setTimeout(() => setOpen(false), 150)}
-        placeholder={placeholder}
-        autoComplete="off"
-        role="combobox"
-        aria-expanded={open}
-        aria-controls={`${id}-list`}
-        aria-autocomplete="list"
-        aria-invalid={!!error || (text.length > 2 && !value && !resolving)}
-        aria-busy={resolving || undefined}
-        aria-describedby={error ? `${id}-err` : undefined}
-        inputMode="search"
-        enterKeyHint="next"
-      />
+      <span className="af-box">
+        <input
+          id={id}
+          value={text}
+          onChange={(e) => onInput(e.target.value)}
+          onKeyDown={onKey}
+          onBlur={() => setTimeout(() => setOpen(false), 150)}
+          placeholder={placeholder}
+          autoComplete="off"
+          role="combobox"
+          aria-expanded={open}
+          aria-controls={`${id}-list`}
+          aria-autocomplete="list"
+          aria-invalid={!!error || (text.length > 2 && !value && !resolving && !searching)}
+          aria-busy={resolving || searching || undefined}
+          aria-describedby={error ? `${id}-err` : undefined}
+          inputMode="search"
+          enterKeyHint="next"
+        />
+        {(searching || resolving) && <Loader className="af-spin" size={18} />}
+      </span>
       {open && (
         <ul id={`${id}-list`} role="listbox">
           {items.map((p, i) => (
@@ -140,7 +150,7 @@ export default function AddressField({ label, value, onChange, initialText = "",
           {error}
         </span>
       )}
-      {!error && text.length > 2 && !value && !open && !resolving && (
+      {!error && text.length > 2 && !value && !open && !resolving && !searching && (
         <span className="muted" style={{ fontWeight: 400, fontSize: "0.82rem" }}>
           Choisissez une adresse dans la liste proposée.
         </span>

@@ -1,5 +1,6 @@
 "use client";
 import { useActionState } from "react";
+import { BusyLabel } from "./Loader";
 
 type R = { error?: string; ok?: boolean } | undefined;
 // Envoi / suppression d'un logo. Les actions viennent de l'administration ou de l'espace chauffeur.
@@ -18,7 +19,7 @@ export default function LogoUploader({ current, save, remove }: { current: strin
         <input type="file" name="logo" accept="image/png,image/jpeg,image/webp" required />
         {s?.error && <p className="error">{s.error}</p>}
         {s?.ok && <p className="notice okmsg">Logo enregistré ✓</p>}
-        <button className="btn small" disabled={pending}>{pending ? "Envoi…" : current ? "Remplacer le logo" : "Ajouter le logo"}</button>
+        <button className="btn small" disabled={pending}><BusyLabel busy={pending} busyText="Envoi…">{current ? "Remplacer le logo" : "Ajouter le logo"}</BusyLabel></button>
       </form>
       {current && (
         <form action={ract}>

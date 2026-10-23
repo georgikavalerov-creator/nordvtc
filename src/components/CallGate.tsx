@@ -2,6 +2,7 @@
 import { track } from "@/lib/track";
 
 import { useEffect, useRef, useState } from "react";
+import { BusyLabel } from "./Loader";
 
 declare global { interface Window { turnstile?: { render: (el: HTMLElement, o: Record<string, unknown>) => void } } }
 const SITEKEY = process.env.NEXT_PUBLIC_TURNSTILE_SITEKEY;
@@ -119,14 +120,14 @@ export default function CallGate() {
           {SITEKEY && <div ref={box} />}
           {capErr && <p className="error" role="alert">La vérification anti-robot ne se charge pas : un VPN, un DNS filtrant (NextDNS, AdGuard…) ou un bloqueur l&apos;empêche. Autorisez <b>challenges.cloudflare.com</b>, ou <a href="/reservation">réservez directement en ligne</a> ou écrivez à <a href="mailto:contact@nordvtc.fr">contact@nordvtc.fr</a>.</p>}
           {error && <p className="error" role="alert">{error}</p>}
-          <button className="btn" type="submit" disabled={busy || !token}>{busy ? "Vérification…" : otp ? "Recevoir mon code" : "Afficher le numéro"}</button>
+          <button className="btn" type="submit" disabled={busy || !token}><BusyLabel busy={busy} busyText="Vérification…">{otp ? "Recevoir mon code" : "Afficher le numéro"}</BusyLabel></button>
         </form>
       ) : (
         <form className="form" onSubmit={verify}>
           <p>Un code vient d'être envoyé au {e164}.</p>
           <label>Code reçu par SMS<input value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))} required inputMode="numeric" autoComplete="one-time-code" maxLength={8} /></label>
           {error && <p className="error" role="alert">{error}</p>}
-          <button className="btn" type="submit" disabled={busy || code.length < 4}>{busy ? "Vérification…" : "Afficher le numéro"}</button>
+          <button className="btn" type="submit" disabled={busy || code.length < 4}><BusyLabel busy={busy} busyText="Vérification…">Afficher le numéro</BusyLabel></button>
           <button type="button" className="linklike" onClick={() => { setStep("form"); setCode(""); setError(""); }}>Modifier mon numéro</button>
         </form>
       )}

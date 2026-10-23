@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { browserClient } from "@/lib/supabase-browser";
+import { BusyLabel, Loader } from "./Loader";
 
 type Factor = { id: string; friendly_name?: string; status: string; created_at: string };
 
@@ -48,7 +49,7 @@ export default function ClientTwoFactor() {
     setMsg("Double authentification désactivée."); load();
   }
 
-  if (factor === undefined) return <div className="callgate tfa-box"><p className="muted" style={{ margin: 0 }}>Chargement…</p></div>;
+  if (factor === undefined) return <div className="callgate tfa-box"><p className="muted ld-inline" style={{ margin: 0 }}><Loader size={16} />Chargement…</p></div>;
   return (
     <div className="callgate tfa-box">
       <div className="tfa-head">
@@ -81,13 +82,13 @@ export default function ClientTwoFactor() {
               <span className="tfa-confirm">
                 <input inputMode="numeric" autoComplete="one-time-code" maxLength={6} placeholder="000000" value={code} aria-label="Code à 6 chiffres"
                   onChange={(e) => { const v = e.target.value.replace(/\D/g, "").slice(0, 6); setCode(v); if (v.length === 6) confirm(v); }} />
-                <button type="button" className="btn small" onClick={() => confirm()} disabled={busy}>{busy ? "…" : "Activer"}</button>
+                <button type="button" className="btn small" onClick={() => confirm()} disabled={busy}><BusyLabel busy={busy}>Activer</BusyLabel></button>
               </span>
             </li>
           </ol>
         </div>
       ) : (
-        <button type="button" className="btn small" onClick={start} disabled={busy}>{busy ? "…" : "Activer la double authentification"}</button>
+        <button type="button" className="btn small" onClick={start} disabled={busy}><BusyLabel busy={busy}>Activer la double authentification</BusyLabel></button>
       )}
     </div>
   );
