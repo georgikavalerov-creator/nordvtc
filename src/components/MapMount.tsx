@@ -1,6 +1,5 @@
 "use client";
 import { useEffect } from "react";
-import { mountMap } from "@/lib/mapScene";
 
 // Carte animée de la métropole lilloise (trajet A → B au défilement).
 export default function MapMount({ target, near = false, margin = "150% 0px" }: { target: string; near?: boolean; margin?: string }) {
@@ -10,7 +9,8 @@ export default function MapMount({ target, near = false, margin = "150% 0px" }: 
     // Démarre après le chargement, quand le navigateur est libre.
     let stop: (() => void) | undefined;
     let cancelled = false;
-    const start = () => { if (!cancelled) stop = mountMap(el) ?? undefined; };
+    // Code de la scène chargé seulement au démarrage de l'animation (pas au chargement de la page).
+    const start = () => { if (!cancelled) import("@/lib/mapScene").then((m) => { if (!cancelled) stop = m.mountMap(el) ?? undefined; }); };
     const w = window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number };
     const go = () => (w.requestIdleCallback ? w.requestIdleCallback(start, { timeout: 1500 }) : window.setTimeout(start, 300));
     // near : rien n'est préparé (ni téléchargé) avant que le bloc approche de l'écran.

@@ -1,6 +1,5 @@
 "use client";
 import { useEffect } from "react";
-import { mountCine } from "@/lib/cineScene";
 
 // Démarre la scène animée (canvas) d'une section marquée .cine-root.
 export default function CineMount({ target, near = false, margin = "150% 0px" }: { target: string; near?: boolean; margin?: string }) {
@@ -10,7 +9,8 @@ export default function CineMount({ target, near = false, margin = "150% 0px" }:
     // Démarre après le chargement, quand le navigateur est libre : la page devient interactive plus vite.
     let stop: (() => void) | undefined;
     let cancelled = false;
-    const start = () => { if (!cancelled) stop = mountCine(el); };
+    // Code de la scène chargé seulement au démarrage de l'animation (pas au chargement de la page).
+    const start = () => { if (!cancelled) import("@/lib/cineScene").then((m) => { if (!cancelled) stop = m.mountCine(el) ?? undefined; }); };
     const w = window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number };
     // Haut de page : on laisse d'abord la page s'afficher et devenir utilisable, puis l'animation démarre.
     const idle = () => (w.requestIdleCallback ? w.requestIdleCallback(start, { timeout: 1500 }) : window.setTimeout(start, 300));

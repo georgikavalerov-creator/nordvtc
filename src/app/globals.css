@@ -2913,6 +2913,8 @@ h2.bk-sub::before { content: ""; width: 4px; height: 1.1em; border-radius: 4px; 
 .hero.cine h1 .ln2 { animation-delay: .12s; }
 .hero.cine .lead { animation-duration: .7s; animation-delay: .2s; }
 .hero.cine .quick { animation-duration: .7s; animation-delay: .28s; }
+.hero-dests { animation-duration: .7s; animation-delay: .36s; }
+.cine-stats { animation-duration: .7s; animation-delay: .44s; }
 
 /* Face ID / clé d'accès */
 .faceid-login { display: grid; gap: 10px; }
