@@ -3837,3 +3837,24 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .af-spin { color: #a1a1aa; } }
 /* Bloc « en attente » (chargement d'un encadré) */
 .ld-inline { display: inline-flex; align-items: center; gap: 10px; }
+
+/* Carte de trajet : états revus (page d'états) */
+.tc-past .tc-date, .tc-confirmed.tc-past .tc-date { background: #f5f5f7; color: #0b0b0c; } .tc-confirmed.tc-past .tc-date small { color: #5e5e5e; }
+.tc-price s { color: #8a8a8e; text-decoration-thickness: 1.5px; font-weight: 700; }
+.tc-note { font-size: .8rem; font-weight: 600; color: #5e5e5e; font-variant-numeric: tabular-nums; }
+.tc-note.ok { color: #0a7a3a; } .tc-note.warn { color: #8a5a00; }
+:root[data-theme="dark"] .tc-past .tc-date { background: rgba(255,255,255,.08); color: #f4f4f5; }
+:root[data-theme="dark"] .tc-note { color: #a1a1aa; } :root[data-theme="dark"] .tc-note.ok { color: #4ade80; } :root[data-theme="dark"] .tc-note.warn { color: #fbbf24; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .tc-past .tc-date { background: rgba(255,255,255,.08); color: #f4f4f5; }
+  :root:not([data-theme="light"]) .tc-note { color: #a1a1aa; } :root:not([data-theme="light"]) .tc-note.ok { color: #4ade80; } :root:not([data-theme="light"]) .tc-note.warn { color: #fbbf24; }
+}
+.tc-foot { flex-wrap: wrap; row-gap: 2px; }
+
+/* Carte de trajet sur téléphone : boutons sur toute la largeur de la carte, « Supprimer » réduit à son icône */
+@media (max-width: 560px) {
+  .tc-main > .tc-actions { margin-left: calc(-52px - 12px); }
+  .tc-actions .trip-del { width: 40px; padding-left: 0; padding-right: 0; justify-content: center; }
+  .tc-actions .trip-del .trip-del-t { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .tc-actions .trip-del-ask { flex: 1 1 100%; }
+}

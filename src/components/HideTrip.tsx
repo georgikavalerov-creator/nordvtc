@@ -25,7 +25,7 @@ export default function HideTrip({ ids, label = "Supprimer", confirmText = "Supp
   if (!ask) return (
     <button type="button" className="btn small ghost trip-del" onClick={() => { setErr(""); setAsk(true); }}>
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" /></svg>
-      {label}
+      <span className="trip-del-t">{label}</span>
     </button>
   );
   return (

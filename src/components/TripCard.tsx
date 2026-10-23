@@ -33,10 +33,40 @@ export function Route({ from, to }: { from: string; to: string }) {
   );
 }
 
+/** « Aujourd'hui » / « Demain » plutôt que le jour de la semaine (heure de Paris). */
+function dayLabel(iso: string) {
+  const key = (d: Date) => new Intl.DateTimeFormat("fr-CA", { timeZone: TZ }).format(d);
+  const day = key(new Date(iso)), now = new Date();
+  if (day === key(now)) return "Aujourd'hui";
+  if (day === key(new Date(now.getTime() + 86_400_000))) return "Demain";
+  return part(iso, { weekday: "long" });
+}
+
+/** Montant avec centimes s'ils ne sont pas nuls (6,80 € et non 7 €). */
+const cents = (c: number) => new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR", minimumFractionDigits: c % 100 ? 2 : 0 }).format(c / 100);
+
+/** Ligne d'argent sous le prix : ce que le client doit savoir sans ouvrir le détail. */
+function moneyNote(b: Booking): { text: string; cls?: string } | null {
+  if (b.status === "pending_payment") return { text: "Paiement en cours de validation", cls: "warn" };
+  if (b.status === "cancelled") {
+    if (!b.paid_cents) return { text: "Aucun paiement débité" };
+    if (b.refunded_cents >= b.paid_cents) return { text: `Remboursé ${cents(b.refunded_cents)}`, cls: "ok" };
+    if (b.refunded_cents > 0) return { text: `Remboursé ${cents(b.refunded_cents)} · ${cents(b.paid_cents - b.refunded_cents)} retenus` };
+    return { text: "Remboursement en préparation" };
+  }
+  const rest = b.price_cents - b.paid_cents;
+  if (b.paid_cents > 0 && rest > 0) return { text: `Acompte ${cents(b.paid_cents)} · ${cents(rest)} à bord` };
+  if (b.discount_cents > 0) return { text: `${b.promo_code ? `Code ${b.promo_code}` : "Remise"} : −${cents(b.discount_cents)}`, cls: "ok" };
+  return null;
+}
+
 export default function TripCard({ b, rebook = false, trash = false }: { b: Booking; rebook?: boolean; trash?: boolean }) {
-  const st = STATUS[b.status] ?? { label: b.status, cls: "" };
+  // Date passée mais trajet pas encore clôturé : on ne l'affiche plus comme « à venir ».
+  const past = b.status === "confirmed" && new Date(b.pickup_at).getTime() < Date.now();
+  const st = past ? { label: "Date passée", cls: "" } : STATUS[b.status] ?? { label: "En traitement", cls: "" };
+  const note = moneyNote(b);
   return (
-    <article className={`trip-card tc-${b.status}${trash ? " tc-trash" : ""}`}>
+    <article className={`trip-card tc-${b.status}${past ? " tc-past" : ""}${trash ? " tc-trash" : ""}`}>
       {trash ? (
         <span className="tc-date">
           <span>{part(b.pickup_at, { day: "numeric" })}</span>
@@ -50,12 +80,13 @@ export default function TripCard({ b, rebook = false, trash = false }: { b: Book
       )}
       <div className="tc-main">
         <div className="tc-top">
-          <span className="tc-when">{part(b.pickup_at, { weekday: "long" })} · {part(b.pickup_at, { hour: "2-digit", minute: "2-digit" })}</span>
+          <span className="tc-when">{dayLabel(b.pickup_at)} · {part(b.pickup_at, { hour: "2-digit", minute: "2-digit" })}</span>
           <span className={`pill ${st.cls}`}>{st.label}</span>
         </div>
         <Route from={b.origin_label} to={b.dest_label} />
         <div className="tc-foot">
-          <span className="tc-price">{euro(b.price_cents)}</span>
+          <span className="tc-price">{b.status === "cancelled" ? <s>{euro(b.price_cents)}</s> : euro(b.price_cents)}</span>
+          {note && <span className={`tc-note${note.cls ? ` ${note.cls}` : ""}`}>{note.text}</span>}
           <span className="tc-ref">Réf. {b.id.slice(0, 8).toUpperCase()}</span>
         </div>
         {trash ? (
