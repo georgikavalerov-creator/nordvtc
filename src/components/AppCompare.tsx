@@ -1,4 +1,7 @@
 import Icon from "@/components/Icon";
+import CompareMore from "@/components/CompareMore";
+
+const SHOWN_ON_PHONE = 5; // le reste du comparatif se déplie sur téléphone
 
 // Comparatif objectif avec les applications de VTC (sans citer de marque) : ce qui change concrètement pour le client.
 const ROWS: [string, string, string, string][] = [
@@ -45,14 +48,15 @@ export default function AppCompare() {
             <span role="columnheader" className="cmp-us"><b>Nord VTC</b><small>Chauffeur privé, réservation directe</small></span>
             <span role="columnheader" className="cmp-them-h"><b>Applications de VTC</b><small>Chauffeur attribué par la plateforme</small></span>
           </div>
-          {ROWS.map(([ic, k, us, them]) => (
-            <div key={k} className="cmp-row" role="row">
+          {ROWS.map(([ic, k, us, them], i) => (
+            <div key={k} className={`cmp-row${i >= SHOWN_ON_PHONE ? " cmp-x" : ""}`} role="row">
               <span role="rowheader" className="cmp-k"><span className="cmp-ki"><Icon name={ic} size={18} /></span>{k}</span>
               <span role="cell" className="cmp-us"><Icon name="check" size={18} /><span>{us}</span></span>
               <span role="cell" className="cmp-them"><Icon name="x" size={16} mono /><span>{them}</span></span>
             </div>
           ))}
         </div>
+        <CompareMore count={ROWS.length - SHOWN_ON_PHONE} />
         <p className="muted" style={{ fontSize: ".8rem", marginTop: 10 }}>Comparaison générale avec le fonctionnement habituel des applications de réservation de VTC ; les conditions varient selon l&apos;application et le moment.</p>
       </div>
     </section>

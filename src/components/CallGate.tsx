@@ -83,7 +83,7 @@ export default function CallGate() {
   if (step === "done") {
     const tel = number.replace(/\s/g, "");
     return (
-      <div className="callgate done" id="appel">
+      <div className="callgate done">
         <p className="cg-ok">Merci {name || ""} 👋</p>
         {tel ? (
           <>
@@ -98,7 +98,7 @@ export default function CallGate() {
     );
   }
   return (
-    <div className="callgate" id="appel" onFocusCapture={loadCaptcha} onPointerDownCapture={loadCaptcha}>
+    <div className="callgate" onFocusCapture={loadCaptcha} onPointerDownCapture={loadCaptcha}>
       <h2 style={{ fontSize: "1.4rem" }}>Appeler ou être rappelé</h2>
       <p className="muted">Laissez-moi vos coordonnées : mon numéro s'affiche aussitôt{otp ? " après un code reçu par SMS" : ""}, et je vous rappelle si je suis en course.</p>
       {step === "form" ? (

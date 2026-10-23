@@ -5,7 +5,7 @@ import { SITE } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Politique de confidentialité",
-  description: "Politique de confidentialité de Nord VTC : données collectées, durée de conservation et vos droits.",
+  description: "Politique de confidentialité de Nord VTC : données collectées lors d'une réservation, pourquoi, combien de temps, et comment exercer vos droits.",
   alternates: { canonical: "/confidentialite" },
 };
 

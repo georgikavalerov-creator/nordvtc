@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Crumb } from "@/components/JsonLd";
 import Link from "next/link";
 import CtaBand from "@/components/CtaBand";
 import Icon from "@/components/Icon";
@@ -26,6 +27,7 @@ export default async function GuidePage() {
   const tags = [...new Set(posts.map((p) => p.tag))];
   return (
     <>
+      <Crumb name="Guide" path="/guide" />
       <section className="page-hero gd-hero">
         <div className="wrap">
           <span className="eyebrow">Le guide</span>

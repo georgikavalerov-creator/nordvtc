@@ -18,20 +18,31 @@ export async function suggestPlaces(q: string): Promise<Place[]> {
   url.searchParams.set("q", q);
   url.searchParams.set("lang", "fr");
   url.searchParams.set("limit", "6");
-  url.searchParams.set("in", "countryCode:FRA,BEL");
+  url.searchParams.set("in", "countryCode:FRA,BEL,NLD,LUX"); // Pays-Bas : Schiphol, Amsterdam
   url.searchParams.set("apiKey", KEY());
   const res = await fetch(url, { cache: "no-store" });
   if (!res.ok) throw new Error(`HERE discover ${res.status}`);
   const data = (await res.json()) as {
     items?: { title: string; address?: { label?: string }; position?: { lat: number; lng: number } }[];
   };
+  const seen = new Set<string>();
   return (data.items ?? [])
     .filter((i) => i.position)
-    .map((i) => ({
-      label: i.address?.label && !i.address.label.startsWith(i.title) ? `${i.title}, ${i.address.label}` : (i.address?.label ?? i.title),
-      lat: i.position!.lat,
-      lng: i.position!.lng,
-    }));
+    .map((i) => {
+      const addr = i.address?.label;
+      // « 10 Rue Pierre Mauroy (Rue de Paris) » + « 10 Rue Pierre Mauroy, 59800 Lille » : l'adresse suffit,
+      // sinon le libellé répétait la rue deux fois. Le nom d'un lieu (gare, aéroport…) reste devant l'adresse.
+      const base = i.title.replace(/\s*\([^)]*\)\s*$/, "");
+      const label = !addr ? i.title : addr.startsWith(i.title) || addr.startsWith(base) ? addr : `${i.title}, ${addr}`;
+      return { label, lat: i.position!.lat, lng: i.position!.lng };
+    })
+    .filter((p) => {
+      // Même adresse renvoyée deux fois (doublon HERE) : une seule ligne dans la liste.
+      const key = `${p.label}|${p.lat.toFixed(4)}|${p.lng.toFixed(4)}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
 }
 
 export async function routeSummary(

@@ -1,4 +1,5 @@
 import { Fragment } from "react";
+import { prix, PRIX_MINIMUM } from "@/lib/prix-depart";
 import Link from "next/link";
 import GoogleReviews from "@/components/GoogleReviews";
 import CtaBand from "@/components/CtaBand";
@@ -30,12 +31,12 @@ const STATEMENT = "Un prix fixé avant de partir, jamais revu à la hausse. Un c
 
 
 const TRIPS = [
-  { from: "Lille", to: "Lesquin", fromQ: "Lille", toQ: "Aéroport de Lille-Lesquin", label: "Aéroport de Lille-Lesquin", price: "dès 68 €", img: "/img/dest-lesquin.webp", alt: "Terminal de l'aéroport de Lille-Lesquin", pos: "50% 55%" },
-  { from: "Lille", to: "Zaventem", fromQ: "Lille", toQ: "Aéroport de Bruxelles-National, Zaventem", label: "Aéroport de Bruxelles", price: "dès 321 €", img: "/img/dest-zaventem.webp", alt: "Tapis roulant de l'aéroport de Bruxelles", pos: "50% 50%" },
-  { from: "Lille", to: "Roissy-CDG", fromQ: "Lille", toQ: "Aéroport Paris-Charles-de-Gaulle", label: "Aéroport Paris-Charles-de-Gaulle", price: "dès 481 €", img: "/img/dest-cdg.webp", alt: "Avions sur le tarmac de Paris-Charles-de-Gaulle", pos: "45% 60%" },
-  { from: "Domicile", to: "Flandres", fromQ: "", toQ: "Gare de Lille-Flandres", label: "Gare de Lille-Flandres", price: "dès 25 €", img: "/img/dest-flandres.webp", alt: "Façade de la gare de Lille-Flandres", pos: "50% 50%" },
-  { from: "Lille", to: "Roubaix", fromQ: "Lille", toQ: "Roubaix", label: "Roubaix", price: "dès 55 €", img: "/img/dest-roubaix.webp", alt: "Hôtel de ville de Roubaix", pos: "50% 45%" },
-  { from: "Lille", to: "Le Touquet", fromQ: "Lille", toQ: "Le Touquet-Paris-Plage", label: "Le Touquet-Paris-Plage", price: "dès 373 €", img: "/img/dest-touquet.webp", alt: "Dunes et plage du Touquet-Paris-Plage", pos: "50% 50%" },
+  { from: "Lille", to: "Lesquin", fromQ: "Lille", toQ: "Aéroport de Lille-Lesquin", label: "Aéroport de Lille-Lesquin", price: `dès ${prix("lesquin")} €`, img: "/img/dest-lesquin.webp", alt: "Terminal de l'aéroport de Lille-Lesquin", pos: "50% 55%" },
+  { from: "Lille", to: "Zaventem", fromQ: "Lille", toQ: "Aéroport de Bruxelles-National, Zaventem", label: "Aéroport de Bruxelles", price: `dès ${prix("zaventem")} €`, img: "/img/dest-zaventem.webp", alt: "Tapis roulant de l'aéroport de Bruxelles", pos: "50% 50%" },
+  { from: "Lille", to: "Roissy-CDG", fromQ: "Lille", toQ: "Aéroport Paris-Charles-de-Gaulle", label: "Aéroport Paris-Charles-de-Gaulle", price: `dès ${prix("cdg")} €`, img: "/img/dest-cdg.webp", alt: "Avions sur le tarmac de Paris-Charles-de-Gaulle", pos: "45% 60%" },
+  { from: "Domicile", to: "Flandres", fromQ: "", toQ: "Gare de Lille-Flandres", label: "Gare de Lille-Flandres", price: `dès ${PRIX_MINIMUM} €`, img: "/img/dest-flandres.webp", alt: "Façade de la gare de Lille-Flandres", pos: "50% 50%" },
+  { from: "Lille", to: "Roubaix", fromQ: "Lille", toQ: "Roubaix", label: "Roubaix", price: `dès ${prix("roubaix")} €`, img: "/img/dest-roubaix.webp", alt: "Hôtel de ville de Roubaix", pos: "50% 45%" },
+  { from: "Lille", to: "Le Touquet", fromQ: "Lille", toQ: "Le Touquet-Paris-Plage", label: "Le Touquet-Paris-Plage", price: `dès ${prix("touquet")} €`, img: "/img/dest-touquet.webp", alt: "Dunes et plage du Touquet-Paris-Plage", pos: "50% 50%" },
 ];
 
 export default function Home() {
@@ -63,6 +64,8 @@ export default function Home() {
           <div>
             <span className="cine-label"><b>01</b> <span>Chauffeur privé · Lille<LiveClock /></span></span>
             <h1>
+              {/* Mots-clés lus par Google et les lecteurs d'écran, sans changer l'accroche visible. */}
+              <span className="sr-only">Chauffeur VTC à Lille et aéroport de Lesquin : </span>
               <span className="ln">Le prix ne bouge pas.</span>
               <span className="ln ln2">Le chauffeur non plus.</span>
             </h1>
@@ -117,7 +120,7 @@ export default function Home() {
               <span className="cine-label"><b>02</b> Prix figé</span>
               <h2>Le prix ne bouge plus.</h2>
               <p>Annoncé avant que vous confirmiez, jamais revu à la hausse : ni heure de pointe, ni détour, ni embouteillage.</p>
-              <div className="chap-stat"><em>dès</em><b data-count="68">68</b><em>€</em><small>Lille → Lesquin</small></div>
+              <div className="chap-stat"><em>dès</em><b data-count={prix("lesquin")}>{prix("lesquin")}</b><em>€</em><small>Lille → Lesquin</small></div>
             </div>
             <div className="chap">
               <span className="cine-label"><b>03</b> Votre chauffeur</span>

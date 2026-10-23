@@ -8,7 +8,7 @@ export default function Header() {
   return (
     <header className="site-header">
       <div className="wrap">
-        <Link href="/" className="brand" aria-label="NORD VTC Chauffeur privé · Lille — accueil">
+        <Link href="/" className="brand" title="Accueil">
           <Logo size={44} variant="light" />
           <span className="brand-text">
             <span className="brand-name">NORD VTC</span>

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { trackPath, verifyTrack } from "@/lib/docsign";
 import TrackOnce from "@/components/TrackOnce";
 
@@ -12,6 +13,8 @@ type Props = { searchParams: Promise<{ ref?: string; k?: string }> };
 export default async function MerciPage({ searchParams }: Props) {
   const { ref, k } = await searchParams;
   const track = ref && /^[0-9a-f-]{36}$/.test(ref) && verifyTrack(ref, k) ? trackPath(ref) : null;
+  // Sans référence signée (adresse ouverte à la main, lien tronqué), rien ne prouve un paiement : retour au formulaire.
+  if (!track) redirect("/reservation");
   return (
     <section className="section">
       <div className="wrap" style={{ maxWidth: 680, textAlign: "center" }}>

@@ -1,6 +1,10 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { srcSetOf } from "@/lib/images";
+// La carte postale fait environ 420 px de large sur ordinateur, presque toute la largeur sur téléphone :
+// le navigateur choisit la photo 640 ou 1100 px au lieu de la 1400 px.
+const PASS_SIZES = "(max-width: 760px) 86vw, 420px";
 
 export type Trip = { from: string; to: string; label: string; price: string; img: string; alt: string; pos?: string; fromQ?: string; toQ?: string };
 
@@ -100,7 +104,7 @@ export default function TripPass({ trips }: { trips: Trip[] }) {
       <div className={`pass has-photo dir-${dir}`} key={i} style={{ "--rot": `${at(ROT, i)}deg`, "--dx": `${at(DX, i)}px`, "--dy": `${at(DY, i)}px` } as React.CSSProperties}>
         <div className="pass-photo">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={t.img} alt={t.alt} width={900} height={600} style={{ objectPosition: t.pos ?? "50% 50%" }} fetchPriority={i === 0 ? "high" : "auto"} />
+          <img src={t.img} srcSet={srcSetOf(t.img)} sizes={PASS_SIZES} alt={t.alt} width={900} height={600} style={{ objectPosition: t.pos ?? "50% 50%" }} fetchPriority={i === 0 ? "high" : "auto"} />
           <span className="pass-tag">{t.label}</span>
           <Stamp price={t.price} city={t.to} />
         </div>
@@ -136,7 +140,7 @@ export default function TripPass({ trips }: { trips: Trip[] }) {
       <div className="preload" aria-hidden="true">
         {trips.map((x) => (
           // eslint-disable-next-line @next/next/no-img-element
-          <img key={x.img} src={x.img} alt="" width={1} height={1} loading="lazy" />
+          <img key={x.img} src={x.img} srcSet={srcSetOf(x.img)} sizes={PASS_SIZES} alt="" width={1} height={1} loading="lazy" />
         ))}
       </div>
       <p className="sr-only" aria-live="polite">{`${t.from} vers ${t.to}, ${t.price}`}</p>

@@ -75,9 +75,17 @@ export default function Icon({ name, size = 22, mono = false }: { name: string; 
   if (mono) {
     return <svg className="ico-d" width={size} height={size} viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false" dangerouslySetInnerHTML={{ __html: body }} />;
   }
-  const [light, deep] = PAL[name] ?? ["#93c5fd", "#1d4ed8"];
-  const id = `icg-${name}`;
-  const html = `<defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${light}" stop-opacity=".45"/><stop offset="1" stop-color="${light}" stop-opacity=".95"/></linearGradient></defs>` +
-    body.replace(/opacity="0\.2"/g, `fill="url(#${id})"`);
+  const [, deep] = PAL[name] ?? ["#93c5fd", "#1d4ed8"];
+  // Dégradé défini une seule fois pour tout le site (IconDefs, dans le layout) : plus d'identifiants en double,
+  // et l'icône reste colorée même si la première icône de ce type est masquée.
+  const id = `icg-${PAL[name] ? name : "route"}`;
+  const html = body.replace(/opacity="0\.2"/g, `fill="url(#${id})"`);
   return <svg className="ico-d ico-c" width={size} height={size} viewBox="0 0 256 256" fill={deep} aria-hidden="true" focusable="false" dangerouslySetInnerHTML={{ __html: html }} />;
+}
+
+/** Dégradés des icônes, rendus une fois dans le layout (SVG invisible mais pas en display:none, sinon Safari ignore les dégradés). */
+export function IconDefs() {
+  const html = Object.entries(PAL).map(([n, [light]]) =>
+    `<linearGradient id="icg-${n}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${light}" stop-opacity=".45"/><stop offset="1" stop-color="${light}" stop-opacity=".95"/></linearGradient>`).join("");
+  return <svg width="0" height="0" aria-hidden="true" focusable="false" style={{ position: "absolute", width: 0, height: 0, overflow: "hidden" }} dangerouslySetInnerHTML={{ __html: `<defs>${html}</defs>` }} />;
 }

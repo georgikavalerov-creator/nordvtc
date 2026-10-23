@@ -18,8 +18,15 @@ export default function CookieNotice() {
     const open = () => { setDetails(true); setShow(true); };
     window.addEventListener("nvtc:cookies", open); // le lien « Cookies » du pied de page marche partout
     let t = 0;
-    if (!read(KEY) && !/^\/(admin|chauffeur|reservation|doc)/.test(location.pathname)) t = window.setTimeout(() => setShow(true), 2500); // jamais pendant une réservation
-    return () => { window.clearTimeout(t); window.removeEventListener("nvtc:cookies", open); };
+    // Sur téléphone, le bandeau attend que la personne ait commencé à lire (défilement) pour ne pas cacher le titre
+    // et le formulaire du premier écran ; sur ordinateur, il apparaît dans un coin après 2,5 s.
+    const mobile = window.matchMedia("(max-width: 900px)").matches;
+    const onScroll = () => { if (window.scrollY > 500) { setShow(true); window.removeEventListener("scroll", onScroll); } };
+    if (!read(KEY) && !/^\/(admin|chauffeur|reservation|doc)/.test(location.pathname)) { // jamais pendant une réservation
+      if (mobile) window.addEventListener("scroll", onScroll, { passive: true });
+      else t = window.setTimeout(() => setShow(true), 2500);
+    }
+    return () => { window.clearTimeout(t); window.removeEventListener("scroll", onScroll); window.removeEventListener("nvtc:cookies", open); };
   }, []);
 
   const close = () => { write(KEY, new Date().toISOString().slice(0, 10)); setShow(false); setDetails(false); };

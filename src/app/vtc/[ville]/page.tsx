@@ -21,12 +21,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!v) return {};
   const cheapest = Math.min(...v.routes.map((r) => r.price));
   const title = `VTC ${v.name} : chauffeur privé dès ${cheapest} €`;
-  const description = `Chauffeur privé ${v.inName} à prix fixé : aéroport de Lille-Lesquin, gares de Lille, Paris, Bruxelles. Réservation en 1 min, annulation gratuite.`;
+  const airport = v.routes[0];
+  // Description propre à chaque ville : lieux connus, prix et temps vers l'aéroport.
+  const desc = (n: number) => `VTC ${v.inName} : prise en charge ${v.places.slice(0, n).join(", ")}… Aéroport de Lille-Lesquin dès ${airport.price} € (~${airport.min} min), gares, Paris, Bruxelles.`;
+  const description = desc(2).length <= 155 ? desc(2) : desc(1);
   return {
     title,
     description,
     alternates: { canonical: `/vtc/${v.slug}` },
-    openGraph: { title, description, url: `${SITE.url}/vtc/${v.slug}`, type: "website", locale: "fr_FR", siteName: SITE.name, images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: title }] },
+    openGraph: { title, description, url: `${SITE.url}/vtc/${v.slug}`, type: "website", locale: "fr_FR", siteName: SITE.name, images: [{ url: "/opengraph-image.png", width: 1200, height: 630, alt: title }] },
     twitter: { card: "summary_large_image", title, description },
   };
 }
@@ -99,6 +102,11 @@ export default async function VillePage({ params }: Props) {
         <div className="wrap grid cols-2" style={{ gap: 48, alignItems: "start" }}>
           <div className="prose">
             {v.intro.map((p) => (
+              <p key={p}>{p}</p>
+            ))}
+
+            <h2>Vos trajets {v.fromName}</h2>
+            {v.local.map((p) => (
               <p key={p}>{p}</p>
             ))}
 

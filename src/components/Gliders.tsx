@@ -51,10 +51,16 @@ export default function Gliders() {
       item.setAttribute("data-glide-on", "");
     };
 
+    let waiting = false;
+    const hydrated = (el: HTMLElement) => Object.keys(el).some((k) => k.startsWith("__reactFiber$"));
     const attach = () => {
+      waiting = false;
       for (const [sel, items] of GROUPS) {
         document.querySelectorAll<HTMLElement>(sel).forEach((el) => {
           if (groups.has(el) || !el.querySelector(items)) return;
+          // Pas avant que React ait pris la main sur ce groupe (page en streaming, bloc Suspense) :
+          // modifier le HTML serveur avant l'hydratation provoquait l'erreur React n° 418 (ex. /compte/connexion).
+          if (!hydrated(el)) { waiting = true; return; }
           const layer = document.createElement("span");
           layer.className = "glider";
           layer.setAttribute("aria-hidden", "true");
@@ -86,6 +92,9 @@ export default function Gliders() {
     const relook = () => groups.forEach((g) => { const i = activeOf(g); if (i) { readLook(g, i); place(g, false); } });
 
     attach();
+    // Groupes encore en attente d'hydratation : nouvel essai régulier pendant quelques secondes.
+    let tries = 0;
+    const retry = setInterval(() => { if (!waiting || ++tries > 40) { clearInterval(retry); return; } schedule(true); }, 250);
     const mo = new MutationObserver((list) => {
       let structure = false, state = false;
       for (const m of list) {
@@ -101,7 +110,7 @@ export default function Gliders() {
     addEventListener("nordvtc-theme", () => requestAnimationFrame(relook));
     const mq = matchMedia("(prefers-color-scheme: dark)");
     mq.addEventListener("change", relook);
-    return () => { mo.disconnect(); removeEventListener("resize", onResize); mq.removeEventListener("change", relook); cancelAnimationFrame(raf); };
+    return () => { clearInterval(retry); mo.disconnect(); removeEventListener("resize", onResize); mq.removeEventListener("change", relook); cancelAnimationFrame(raf); };
   }, []);
   return null;
 }

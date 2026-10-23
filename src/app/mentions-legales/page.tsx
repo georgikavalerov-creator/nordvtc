@@ -7,8 +7,8 @@ import { getSiteSettings } from "@/lib/content";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Mentions légales",
-  description: "Mentions légales de Nord VTC, chauffeur privé à Lille : éditeur, hébergeur, assurance et médiation.",
+  title: "Mentions légales du site Nord VTC",
+  description: "Mentions légales de Nord VTC, chauffeur privé à Lesquin et Lille : éditeur, immatriculation VTC, hébergeur, assurance et médiateur de la consommation.",
   alternates: { canonical: "/mentions-legales" },
 };
 

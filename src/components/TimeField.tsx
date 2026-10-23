@@ -74,7 +74,7 @@ export default function TimeField({ value, onChange, invalid, label = "Heure" }:
   return (
     <div className="pk" ref={box}>
       {touch ? (
-        <button type="button" className={`pk-field${value ? "" : " empty"}`} aria-haspopup="dialog" aria-expanded={open} aria-invalid={invalid || undefined} aria-label={value ? `${label} : ${show(value)}` : label} onClick={() => { setOpen((o) => !o); setStep(value ? "m" : "h"); }}>
+        <button type="button" className={`pk-field${value ? "" : " empty"}`} aria-haspopup="dialog" aria-expanded={open} aria-invalid={invalid || undefined} aria-label={value ? `${label} : ${show(value)}` : `${label} : Choisir…`} onClick={() => { setOpen((o) => !o); setStep(value ? "m" : "h"); }}>
           <IconC name="clock" size={20} />
           <span>{value ? show(value) : "Choisir…"}</span>
         </button>

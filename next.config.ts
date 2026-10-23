@@ -2,6 +2,10 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  // Titre, description et canonical toujours dans le <head> du HTML, pour tous les visiteurs et robots
+  // (sinon Googlebot les recevait en fin de page sur les pages dynamiques comme le Guide).
+  htmlLimitedBots: /.*/,
+  env: { BUILD_DATE: new Date().toISOString().slice(0, 10) }, // date du déploiement (sitemap)
   reactStrictMode: true,
   experimental: { serverActions: { bodySizeLimit: "11mb" } }, // envoi du logo et des justificatifs (10 Mo max)
   async redirects() {

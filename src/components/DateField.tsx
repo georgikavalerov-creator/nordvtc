@@ -68,7 +68,7 @@ export default function DateField({ value, onChange, min, invalid, ariaLabel = "
 
   return (
     <div className="pk" ref={box}>
-      <button type="button" className={`pk-field${value ? "" : " empty"}`} aria-haspopup="dialog" aria-expanded={open} aria-invalid={invalid || undefined} aria-label={value ? `${ariaLabel} : ${label(value)}` : ariaLabel} onClick={() => setOpen((o) => !o)}>
+      <button type="button" className={`pk-field${value ? "" : " empty"}`} aria-haspopup="dialog" aria-expanded={open} aria-invalid={invalid || undefined} aria-label={value ? `${ariaLabel} : ${label(value)}` : `${ariaLabel} : Choisir…`} onClick={() => setOpen((o) => !o)}>
         <IconC name="calendar" size={20} />
         <span>{value ? label(value) : "Choisir…"}</span>
       </button>

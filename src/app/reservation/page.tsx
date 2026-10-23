@@ -6,6 +6,7 @@ import { currentUser } from "@/lib/auth";
 import { getPlaces, getProfile } from "@/lib/account";
 import { suggestPlaces } from "@/lib/here";
 import { signPlace } from "@/lib/place-sign";
+import { knownPlace } from "@/lib/known-places";
 import PaymentBadges from "@/components/PaymentBadges";
 
 export const metadata: Metadata = {
@@ -23,6 +24,8 @@ export default async function ReservationPage({ searchParams }: Props) {
   const resolve = async (q: string) => {
     const t = q.trim().slice(0, 120);
     if (t.length < 3) return null;
+    const known = knownPlace(t); // lieux des liens du site : coordonnées exactes, sans recherche
+    if (known) return signPlace(known);
     try {
       const list = await suggestPlaces(t);
       // On évite les parkings (« P4 », « parking ») quand un résultat plus juste existe.

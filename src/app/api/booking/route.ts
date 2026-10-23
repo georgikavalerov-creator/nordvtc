@@ -31,7 +31,8 @@ const schema = z.object({
   pet: z.boolean().optional().default(false),
   flight: z.string().trim().max(30).optional(),
   name: z.string().trim().min(2).max(100),
-  phone: z.string().trim().min(6).max(30),
+  // Numéro joignable : 9 à 15 chiffres (format national 06…, ou international +32…), pas « 12 » ni du texte.
+  phone: z.string().trim().min(6).max(30).refine((v) => /^[+0(]/.test(v) && /^[\d\s().+-]+$/.test(v) && (v.replace(/\D/g, "").length >= 9 && v.replace(/\D/g, "").length <= 15), "Numéro de téléphone invalide"),
   email: z.string().trim().email().max(200),
   notes: z.string().trim().max(500).optional(),
   returnTrip: z.object({ date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/), time: z.string().regex(/^\d{2}:\d{2}$/), origin: place.optional(), dest: place.optional() }).optional(),

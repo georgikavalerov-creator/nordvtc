@@ -17,6 +17,7 @@ import PricingFx from "@/components/PricingFx";
 import { THEME_INIT } from "@/components/ThemeToggle";
 import { SITE } from "@/lib/site";
 import { VILLES } from "@/lib/villes";
+import { IconDefs } from "@/components/Icon";
 import ChatButton from "@/components/ChatButton";
 
 export const metadata: Metadata = {
@@ -34,7 +35,7 @@ export const metadata: Metadata = {
     siteName: SITE.name,
     title: "Nord VTC — Chauffeur privé à Lille",
     description: "Prix ferme, même chauffeur, suivi de vol : transferts aéroport, gares et longues distances depuis Lille.",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Nord VTC, chauffeur privé à Lille" }],
+    images: [{ url: "/opengraph-image.png", width: 1200, height: 630, alt: "Nord VTC, chauffeur privé à Lille" }],
   },
   twitter: { card: "summary_large_image" },
   robots: { index: true, follow: true },
@@ -59,10 +60,10 @@ const localBusiness = {
     ...VILLES.map((v) => ({ "@type": "City", name: v.name })),
     { "@type": "AdministrativeArea", name: "Métropole européenne de Lille" },
   ],
-  image: `${SITE.url}/opengraph-image`,
+  image: `${SITE.url}/opengraph-image.png`,
   logo: `${SITE.url}/icon-512.png`,
   hasMap: "https://www.google.com/maps/search/?api=1&query=Nord+VTC+Lesquin",
-  knowsLanguage: ["fr", "en"],
+  knowsLanguage: ["fr", "en", "bg"],
   paymentAccepted: "Carte bancaire, Apple Pay, Google Pay",
   currenciesAccepted: "EUR",
   ...(SITE.email ? { email: SITE.email } : {}),
@@ -86,6 +87,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           Aller au contenu
         </a>
         <JsonLd data={localBusiness} />
+        <IconDefs />
         <Header />
         <main id="contenu">{children}</main>
         <ScrollFX />

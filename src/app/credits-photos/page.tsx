@@ -3,8 +3,8 @@ import LegalShell from "@/components/LegalShell";
 import { PHOTO_CREDITS, UNSPLASH_CREDIT, OWN_PHOTO_CREDIT, PRESS_CREDITS } from "@/lib/images";
 
 export const metadata: Metadata = {
-  title: "Crédits photos",
-  description: "Crédits et licences des photographies utilisées sur le site Nord VTC.",
+  title: "Crédits et licences des photos",
+  description: "Crédits et licences des photographies du site Nord VTC : auteurs, sources (Wikimedia Commons, Unsplash) et conditions de réutilisation de chaque image.",
   alternates: { canonical: "/credits-photos" },
 };
 

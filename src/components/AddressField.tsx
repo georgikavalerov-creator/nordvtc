@@ -115,6 +115,9 @@ export default function AddressField({ label, value, onChange, initialText = "",
           value={text}
           onChange={(e) => onInput(e.target.value)}
           onKeyDown={onKey}
+          // Adresse déjà choisie (ou reprise de la dernière réservation) : tout est sélectionné au toucher,
+          // la saisie remplace le texte au lieu de s'y ajouter.
+          onFocus={(e) => { if (value) { const el = e.currentTarget; requestAnimationFrame(() => el.select()); } }}
           onBlur={() => setTimeout(() => setOpen(false), 150)}
           placeholder={placeholder}
           autoComplete="off"

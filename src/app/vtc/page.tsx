@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
+import { prix } from "@/lib/prix-depart";
 import Link from "next/link";
-import JsonLd from "@/components/JsonLd";
+import JsonLd, { Crumb } from "@/components/JsonLd";
 import { SITE } from "@/lib/site";
 import { VILLES } from "@/lib/villes";
 
@@ -13,6 +14,7 @@ export const metadata: Metadata = {
 export default function VillesPage() {
   return (
     <>
+      <Crumb name="Villes desservies" path="/vtc" />
       <JsonLd
         data={{
           "@context": "https://schema.org",
@@ -37,7 +39,7 @@ export default function VillesPage() {
             <Link href="/" className="card">
               <span className="tag">Lille</span>
               <h2 style={{ fontSize: "1.2rem" }}>VTC Lille</h2>
-              <p className="muted">Centre, Vieux-Lille, Euralille, Wazemmes, Lille-Sud… aéroport dès 68 €.</p>
+              <p className="muted">Centre, Vieux-Lille, Euralille, Wazemmes, Lille-Sud… aéroport dès {prix("lesquin")} €.</p>
               <span className="more">Voir les prix →</span>
             </Link>
             {VILLES.map((v) => {

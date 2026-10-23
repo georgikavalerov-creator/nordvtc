@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Crumb } from "@/components/JsonLd";
 import CallGate from "@/components/CallGate";
 import ContactForm from "@/components/ContactForm";
 import Icon from "@/components/Icon";
@@ -8,7 +9,7 @@ import { getSiteSettings } from "@/lib/content";
 
 export const metadata: Metadata = {
   title: "Contact et devis chauffeur privé à Lille",
-  description: "Contactez Nord VTC pour un devis, un mariage, une mise à disposition ou une demande particulière.",
+  description: "Contactez Nord VTC, chauffeur privé à Lille : devis, mariage, mise à disposition, compte entreprise. Réponse du chauffeur, par e-mail ou téléphone.",
   alternates: { canonical: "/contact" },
 };
 
@@ -19,6 +20,7 @@ export default async function ContactPage({ searchParams }: Props) {
   const { sujet = "" } = await searchParams;
   return (
     <>
+      <Crumb name="Contact" path="/contact" />
       <section className="page-hero ct-hero">
         <div className="wrap">
           <span className="eyebrow">Contact</span>

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Crumb } from "@/components/JsonLd";
 import Link from "next/link";
 import CtaBand from "@/components/CtaBand";
 import Icon from "@/components/Icon";
@@ -22,6 +23,7 @@ const THEME: Record<(typeof ORDER)[number], { icon: string; cls: string }> = {
 export default function ServicesPage() {
   return (
     <>
+      <Crumb name="Trajets" path="/services" />
       <section className="page-hero">
         <div className="wrap">
           <span className="eyebrow">Nos trajets</span>

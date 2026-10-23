@@ -3,6 +3,7 @@
 // les prix réels sont toujours calculés en direct par le calculateur.
 
 import type { Faq } from "./services";
+import { prix } from "./prix-depart";
 
 export type Section = { title: string; body: string[] };
 export type Fact = { label: string; value: string };
@@ -28,9 +29,9 @@ export const CONTENT: Record<string, ServiceContent> = {
       { title: "Au retour", body: ["Indiquez votre numéro de vol à la réservation. Le chauffeur suit l'heure réelle d'atterrissage et vous attend en salle d'arrivée ; l'attente liée au retard du vol ne vous est pas facturée."] },
     ],
     facts: [
-      { label: "Distance depuis Lille", value: "environ 125 km" },
+      { label: "Distance depuis Lille", value: "environ 130 km" },
       { label: "Durée habituelle", value: "1 h 30 à 1 h 45" },
-      { label: "Prix", value: "dès 321 € depuis Lille, fixé avant de confirmer" },
+      { label: "Prix", value: `dès ${prix("zaventem")} € depuis Lille, fixé avant de confirmer` },
       { label: "Paiement", value: "acompte en ligne, solde à bord" },
     ],
     moreFaq: [
@@ -47,9 +48,9 @@ export const CONTENT: Record<string, ServiceContent> = {
       { title: "Ferry et Eurotunnel à Calais", body: ["Pour une traversée vers l'Angleterre, indiquez le terminal et l'heure de départ : le trajet est prévu avec une marge adaptée aux contrôles."] },
     ],
     facts: [
-      { label: "Distance Lille - Le Touquet", value: "environ 150 km" },
+      { label: "Distance Lille - Le Touquet", value: "environ 175 km" },
       { label: "Durée habituelle", value: "1 h 45 à 2 h" },
-      { label: "Prix", value: "dès 373 € depuis Lille, fixé avant de confirmer" },
+      { label: "Prix", value: `dès ${prix("touquet")} € depuis Lille, fixé avant de confirmer` },
       { label: "Paiement", value: "acompte en ligne, solde à bord" },
     ],
     moreFaq: [
@@ -376,7 +377,7 @@ export const CONTENT: Record<string, ServiceContent> = {
       {
         title: "Lille - Roissy-CDG en direct, sans correspondance",
         body: [
-          "L'aéroport Paris-Charles-de-Gaulle est à environ 220 kilomètres de Lille, soit à peu près 2 h 15 de route sans trafic dense. Avec un chauffeur privé, vous évitez le train, le RER et les correspondances avec vos valises : vous partez de votre adresse et vous êtes déposé devant votre terminal.",
+          "L'aéroport Paris-Charles-de-Gaulle est à environ 200 kilomètres de Lille, soit à peu près 2 h de route sans trafic dense. Avec un chauffeur privé, vous évitez le train, le RER et les correspondances avec vos valises : vous partez de votre adresse et vous êtes déposé devant votre terminal.",
         ],
       },
       {
@@ -399,8 +400,8 @@ export const CONTENT: Record<string, ServiceContent> = {
       },
     ],
     facts: [
-      { label: "Distance", value: "environ 220 km" },
-      { label: "Durée habituelle", value: "environ 2 h 15 hors trafic dense" },
+      { label: "Distance", value: "environ 200 km" },
+      { label: "Durée habituelle", value: "environ 2 h hors trafic dense" },
       { label: "Dépose", value: "devant votre terminal" },
       { label: "Prix", value: "fixé avant de confirmer" },
       { label: "Paiement", value: "acompte en ligne, solde à bord" },

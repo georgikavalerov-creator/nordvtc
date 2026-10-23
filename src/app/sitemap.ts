@@ -8,7 +8,8 @@ import { VILLES } from "@/lib/villes";
 export const dynamic = "force-dynamic";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const POSTS = await getAllPosts();
-  const now = new Date();
+  // Date du dernier déploiement (fixée au build, voir next.config.ts) plutôt que l'heure de la visite du robot.
+  const now = new Date(process.env.BUILD_DATE ?? Date.now());
   const fixed = ["", "/reservation", "/tarifs", "/services", "/vtc", "/faq", "/contact", "/guide", "/cgv", "/mentions-legales", "/confidentialite", "/credits-photos"];
   return [
     ...fixed.map((p) => ({
@@ -18,7 +19,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: p === "" ? 1 : p === "/reservation" ? 0.9 : ["/tarifs", "/vtc", "/services", "/faq"].includes(p) ? 0.8 : ["/cgv", "/mentions-legales", "/confidentialite", "/credits-photos"].includes(p) ? 0.2 : 0.6,
     })),
     ...VILLES.map((v) => ({ url: `${SITE.url}/vtc/${v.slug}`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.8 })),
-    ...POSTS.map((b) => ({ url: `${SITE.url}/guide/${b.slug}`, lastModified: new Date(b.date), changeFrequency: "yearly" as const, priority: 0.5 })),
+    ...POSTS.map((b) => ({ url: `${SITE.url}/guide/${b.slug}`, lastModified: new Date(b.updated ?? b.date), changeFrequency: "yearly" as const, priority: 0.5 })),
     ...SERVICES.map((s) => ({
       url: `${SITE.url}/services/${s.slug}`,
       lastModified: now,

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Crumb } from "@/components/JsonLd";
 import CtaBand from "@/components/CtaBand";
 import Link from "next/link";
 import Icon from "@/components/Icon";
@@ -6,6 +7,7 @@ import RatingBadge from "@/components/RatingBadge";
 import { FORFAITS } from "@/lib/forfaits";
 import { DEFAULT_PRICING } from "@/lib/pricing";
 import { imgThumb } from "@/lib/images";
+import { prix, duree } from "@/lib/prix-depart";
 
 export const metadata: Metadata = {
   title: "Tarifs chauffeur privé Lille",
@@ -17,9 +19,9 @@ export const metadata: Metadata = {
 const GROUP_ICON: Record<string, string> = { "Aéroports": "plane", "Gares": "train", "Métropole lilloise": "pin", "Longue distance": "route", "Mise à disposition": "clock" };
 const slug = (s: string) => s.toLowerCase().normalize("NFD").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 const TOP = [
-  { label: "Aéroport de Lille-Lesquin", sub: "Depuis Lille centre · ~25 min", price: "68", img: "/img/dest-lesquin.webp", pos: "50% 55%", from: "Lille", to: "Aéroport de Lille-Lesquin" },
-  { label: "Aéroport de Bruxelles", sub: "Zaventem · ~1 h 10", price: "321", img: "/img/dest-zaventem.webp", pos: "50% 50%", from: "Lille", to: "Aéroport de Bruxelles-National, Zaventem" },
-  { label: "Paris-Charles-de-Gaulle", sub: "Roissy · ~2 h 15", price: "481", img: "/img/dest-cdg.webp", pos: "45% 60%", from: "Lille", to: "Aéroport Paris-Charles-de-Gaulle" },
+  { label: "Aéroport de Lille-Lesquin", sub: `Depuis Lille centre · ${duree("lesquin")}`, price: String(prix("lesquin")), img: "/img/dest-lesquin.webp", pos: "50% 55%", from: "Lille", to: "Aéroport de Lille-Lesquin" },
+  { label: "Aéroport de Bruxelles", sub: `Zaventem · ${duree("zaventem")}`, price: String(prix("zaventem")), img: "/img/dest-zaventem.webp", pos: "50% 50%", from: "Lille", to: "Aéroport de Bruxelles-National, Zaventem" },
+  { label: "Paris-Charles-de-Gaulle", sub: `Roissy · ${duree("cdg")}`, price: String(prix("cdg")), img: "/img/dest-cdg.webp", pos: "45% 60%", from: "Lille", to: "Aéroport Paris-Charles-de-Gaulle" },
 ];
 /** Lien de réservation pré-rempli à partir d'un libellé « A → B ». */
 function bookHref(route: string) {
@@ -35,6 +37,7 @@ function bookHref(route: string) {
 export default function TarifsPage() {
   return (
     <>
+      <Crumb name="Tarifs" path="/tarifs" />
       <section className="page-hero tf-hero">
         <div className="wrap tf-hero-grid">
           <div>

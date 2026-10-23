@@ -403,7 +403,7 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
           </label>
           <label>
             Téléphone
-            <input required type="tel" inputMode="tel" autoComplete="tel" value={phone} onChange={(e) => setPhone(e.target.value)} />
+            <input required type="tel" inputMode="tel" autoComplete="tel" value={phone} pattern={"[+0\\(][0-9 \\(\\)\\.\\+\\-]{8,24}"} title="Numéro complet, par exemple 06 12 34 56 78 ou +32 470 12 34 56" onChange={(e) => setPhone(e.target.value)} />
           </label>
         </div>
         <label>
@@ -485,7 +485,9 @@ export default function BookingForm({ initialFrom = "", initialTo = "", accountN
               <small>
                 {withReturn
                   ? `Aller ${eur(quote.priceCents)} + retour ${eur(returnQuote!.priceCents)} · ${quote.distanceKm} km`
-                  : `${quote.distanceKm} km · ~${quote.durationMin} min${quote.night ? " · nuit incluse" : ""}`}
+                  : wantReturn
+                    ? "Aller seul · choisissez l'heure du retour pour le total"
+                    : `${quote.distanceKm} km · ~${quote.durationMin} min${quote.night ? " · nuit incluse" : ""}`}
               </small>
             </>
           )}

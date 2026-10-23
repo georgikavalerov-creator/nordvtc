@@ -21,10 +21,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!p) return {};
   const description = p.description.length > 160 ? `${p.description.slice(0, 155).replace(/\s+\S*$/, "")}…` : p.description;
   return {
-    title: { absolute: p.title.length > 52 ? p.title : `${p.title} | ${SITE.name}` },
+    // Titre court pour Google (seoTitle), toujours suivi du nom du site ; le titre complet reste le H1.
+    title: { absolute: `${p.seoTitle ?? (p.title.length > 48 ? p.title.slice(0, 48).replace(/\s+\S*$/, "") : p.title)} | ${SITE.name}` },
     description,
     alternates: { canonical: `/guide/${p.slug}` },
-    openGraph: { title: p.title, description: p.description, url: `${SITE.url}/guide/${p.slug}`, type: "article", locale: "fr_FR", siteName: SITE.name, publishedTime: p.date, images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: p.title }] },
+    openGraph: { title: p.title, description: p.description, url: `${SITE.url}/guide/${p.slug}`, type: "article", locale: "fr_FR", siteName: SITE.name, publishedTime: p.date, images: [{ url: "/opengraph-image.png", width: 1200, height: 630, alt: p.title }] },
     twitter: { card: "summary_large_image", title: p.title, description: p.description },
   };
 }
@@ -42,7 +43,7 @@ export default async function PostPage({ params }: Props) {
           headline: p.title,
           description: p.description,
           datePublished: p.date,
-          dateModified: p.date,
+          dateModified: p.updated ?? p.date,
           inLanguage: "fr-FR",
           mainEntityOfPage: `${SITE.url}/guide/${p.slug}`,
           author: { "@type": "Organization", name: SITE.name, url: SITE.url },
