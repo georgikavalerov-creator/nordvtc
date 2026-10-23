@@ -88,6 +88,7 @@ export default function Home() {
               <Link href="/tarifs">Voir la grille de tarifs</Link>
             </p>
           </div>
+          <Suspense>
           <aside className="hero-dests" aria-label="Trajets les plus demandés">
             <p className="hd-title">Trajets les plus demandés</p>
             <HeroPass trips={TRIPS} />
@@ -108,6 +109,7 @@ export default function Home() {
               ))}
             </ul>
           </aside>
+          </Suspense>
         </div>
         <div className="cine-stats">
           <div><small>Prix</small><b>Figé</b></div>

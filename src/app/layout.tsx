@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata, Viewport } from "next";
 import "@fontsource-variable/figtree";
 import "@fontsource/caveat/600.css";
@@ -90,17 +91,23 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <IconDefs />
         <Header />
         <main id="contenu">{children}</main>
-        <ScrollFX />
-        <Interact />
-        <Footer />
         <MobileBar />
-        <Gliders />
-        <ChatButton />
-        <Analytics />
-        <CookieNotice />
-        <CtaTracker />
-        <AppBridge />
-        <PricingFx />
+        {/* Limites <Suspense> : React rend ces parties interactives séparément (petites tâches),
+            le téléphone reste réactif pendant le chargement. Aucun changement visible. */}
+        <Suspense>
+          <Footer />
+        </Suspense>
+        <Suspense>
+          <ScrollFX />
+          <Interact />
+          <Gliders />
+          <ChatButton />
+          <Analytics />
+          <CookieNotice />
+          <CtaTracker />
+          <AppBridge />
+          <PricingFx />
+        </Suspense>
       </body>
     </html>
   );
