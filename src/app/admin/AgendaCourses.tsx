@@ -4,7 +4,7 @@ import { deleteAgendaEvent, ignoreAgendaEvent, quickBon } from "./actions";
 import { BusyLabel } from "@/components/Loader";
 
 export type AgendaItem = { ref: string; date: string; time: string; title: string; route: string; done?: { url: string }; recurring?: boolean };
-type St = "wait" | { url: string } | { error: string };
+type St = "wait" | { url: string } | { error: string; needPrice?: boolean };
 
 const dayLabel = (d: string) => new Intl.DateTimeFormat("fr-FR", { weekday: "short", day: "numeric", month: "short" }).format(new Date(`${d}T12:00:00`));
 
@@ -15,6 +15,7 @@ export default function AgendaCourses({ items }: { items: AgendaItem[] }) {
   const [gone, setGone] = useState<Record<string, string>>({});
   const [ask, setAsk] = useState("");
   const [errs, setErrs] = useState<Record<string, string>>({});
+  const [prices, setPrices] = useState<Record<string, string>>({});
   const hide = async (it: AgendaItem) => {
     const r = await ignoreAgendaEvent(it.ref).catch(() => ({ error: "Erreur réseau." }));
     if ("error" in r && r.error) setErrs((x) => ({ ...x, [it.ref]: r.error! })); else setGone((g) => ({ ...g, [it.ref]: "Ignoré" }));
@@ -24,10 +25,10 @@ export default function AgendaCourses({ items }: { items: AgendaItem[] }) {
     const r = await deleteAgendaEvent(it.ref, it.date).catch(() => ({ error: "Erreur réseau." }));
     if ("error" in r && r.error) setErrs((x) => ({ ...x, [it.ref]: r.error! })); else setGone((g) => ({ ...g, [it.ref]: "Supprimé de l'agenda" }));
   };
-  const run = async (it: AgendaItem) => {
+  const run = async (it: AgendaItem, price?: string) => {
     setSt((s) => ({ ...s, [it.ref]: "wait" }));
-    const r: { url?: string; error?: string } = await quickBon(it.ref, it.date).catch(() => ({ error: "Erreur réseau, réessayez." }));
-    setSt((s) => ({ ...s, [it.ref]: r.url ? { url: r.url } : { error: r.error ?? "Création impossible." } }));
+    const r: { url?: string; error?: string; needPrice?: boolean } = await quickBon(it.ref, it.date, price).catch(() => ({ error: "Erreur réseau, réessayez." }));
+    setSt((s) => ({ ...s, [it.ref]: r.url ? { url: r.url } : { error: r.error ?? "Création impossible.", needPrice: r.needPrice } }));
     return r;
   };
   const todo = items.filter((i) => !gone[i.ref] && !i.done && !(st[i.ref] && typeof st[i.ref] === "object" && "url" in (st[i.ref] as object)));
@@ -62,7 +63,14 @@ export default function AgendaCourses({ items }: { items: AgendaItem[] }) {
                 ))}
               </span>
               {errs[it.ref] && <p className="error ag-err">{errs[it.ref]}</p>}
-              {s && typeof s === "object" && "error" in s && <p className="error ag-err">{s.error} <a href="/admin/import">Ouvrir l&apos;import</a></p>}
+              {s && typeof s === "object" && "error" in s && (s.needPrice ? (
+                // Course privée sans prix noté : on demande le montant au lieu d'appliquer le tarif du site.
+                <form className="ag-price" onSubmit={(ev) => { ev.preventDefault(); if (prices[it.ref]) run(it, prices[it.ref]); }}>
+                  <span className="ag-price-t">Aucun prix noté dans l&apos;événement.</span>
+                  <label>Prix (€)<input inputMode="decimal" required placeholder="45" value={prices[it.ref] ?? ""} onChange={(e) => setPrices((x) => ({ ...x, [it.ref]: e.target.value.replace(/[^\d.,]/g, "") }))} /></label>
+                  <button type="submit" className="btn small">Créer le bon</button>
+                </form>
+              ) : <p className="error ag-err">{s.error} <a href="/admin/import">Ouvrir l&apos;import</a></p>)}
             </li>
           );
         })}

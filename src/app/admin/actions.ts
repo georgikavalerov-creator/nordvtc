@@ -480,8 +480,12 @@ export async function saveIcloudSource(form: FormData) {
   redirect(`/admin/calendrier${form.get("m") ? `?m=${String(form.get("m")).slice(0, 7)}` : ""}#agenda-courses`);
 }
 
-/** Lit une course notée dans l'agenda (IA) et crée directement le bon de commande. */
-export async function quickBon(ref: string, date: string): Promise<{ url?: string; id?: string; error?: string }> {
+/**
+ * Lit une course notée dans l'agenda (IA) et crée directement le bon de commande.
+ * Prix : celui saisi ici, sinon celui noté dans l'événement (titre ou notes). Jamais le tarif du site :
+ * une course privée de l'agenda a son propre prix ; s'il manque, on le demande (needPrice).
+ */
+export async function quickBon(ref: string, date: string, manualEur?: string): Promise<{ url?: string; id?: string; error?: string; needPrice?: boolean }> {
   if (!(await isAdmin())) return { error: "Non autorisé." };
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !ref.startsWith("ical:")) return { error: "Événement invalide." };
   const [{ icloudEventsBetween }, { getIcloudSource }, { pairUp, courseText }, { coursesFromText, withPlaces }, { createManual }] = await Promise.all([
@@ -503,6 +507,12 @@ export async function quickBon(ref: string, date: string): Promise<{ url?: strin
   } catch (err) { console.error("quick bon ia", err); return { error: "Lecture de l'événement impossible : utilisez « Importer des courses »." }; }
   if (!c.origin || !c.dest) return { error: "Adresses non trouvées dans l'événement : complétez-le dans « Importer des courses »." };
   if (!c.time) return { error: "Heure manquante : complétez-la dans « Importer des courses »." };
+  const { priceFromText } = await import("@/lib/price-text");
+  const typed = Number(String(manualEur ?? "").replace(/\s/g, "").replace(",", "."));
+  const priceCents = Number.isFinite(typed) && typed >= 1 && typed <= 5000 ? Math.round(typed * 100)
+    : priceFromText(e.title, e.notes, course.arr?.title, course.arr?.notes)
+      ?? (c.price && c.price > 0 ? Math.round(c.price * 100) : null);
+  if (!priceCents) return { needPrice: true, error: "Aucun prix noté dans l'événement : indiquez le montant de la course." };
   const f = new FormData();
   f.set("origin", JSON.stringify(c.origin)); f.set("dest", JSON.stringify(c.dest));
   f.set("name", (c.name || e.title || "Client").slice(0, 100).padEnd(2, "."));
@@ -512,7 +522,7 @@ export async function quickBon(ref: string, date: string): Promise<{ url?: strin
   f.set("passengers", String(Math.min(8, Math.max(1, c.passengers || 1)))); f.set("luggage", String(Math.min(20, Math.max(0, c.luggage || 0))));
   if (c.flight) f.set("flight", c.flight.slice(0, 30));
   if (c.notes) f.set("notes", c.notes.slice(0, 500));
-  if (c.price) f.set("price", String(c.price));
+  f.set("price", (priceCents / 100).toFixed(2));
   if (c.company) f.set("company", c.company.slice(0, 120));
   f.set("source_ref", ref); f.set("goto", "stay");
   const r = await createManual(f, null);
@@ -581,4 +591,18 @@ export async function deleteAgendaEvent(ref: string, date: string): Promise<{ ok
   }
   revalidatePath("/admin/calendrier");
   return { ok: true };
+}
+
+// ---------- Prix d'une course recopiée de l'agenda ----------
+/** Corrige le prix d'une course privée (agenda, capture ou saisie manuelle) non payée en ligne. */
+export async function setBookingPrice(form: FormData) {
+  if (!(await isAdmin())) redirect("/admin");
+  const id = z.string().uuid().safeParse(form.get("id"));
+  const eur = Number(String(form.get("price") ?? "").replace(/\s/g, "").replace(",", "."));
+  if (!id.success || !Number.isFinite(eur) || eur < 1 || eur > 5000) return;
+  const { data: b } = await db().from("bookings").select("stripe_payment_intent").eq("id", id.data).maybeSingle();
+  if (!b || b.stripe_payment_intent) return; // une course payée en ligne garde le prix payé
+  await db().from("bookings").update({ price_cents: Math.round(eur * 100) }).eq("id", id.data);
+  await pushBookingToIcloud(id.data);
+  wipe();
 }

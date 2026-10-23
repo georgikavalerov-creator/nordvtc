@@ -6,7 +6,7 @@ import { ClaimDecision, RefundForm } from "../Forms";
 import { claimFileUrl, purgeOldClaims, type Claim } from "@/lib/claim";
 import CalButtons from "../CalButtons";
 import DriverPick, { type DriverOpt } from "../DriverPick";
-import { saveBookingMeta, setStatus } from "../actions";
+import { saveBookingMeta, setBookingPrice, setStatus } from "../actions";
 import { STATUS, euro, fmtDT, type Booking } from "../lib";
 import { tollCostEur } from "@/lib/here";
 import { fuelCostEur, getCosts } from "@/lib/costs";
@@ -124,6 +124,14 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ q
                     );
                   })()}
                   <p className="muted" style={{ margin: 0, fontSize: ".8rem" }}>Réf. {b.id.slice(0, 8)}</p>
+                  {!b.stripe_payment_intent && b.status !== "cancelled" && (
+                    // Course privée (agenda, capture, saisie) : le prix se corrige ici, il n'est jamais recalculé.
+                    <form action={setBookingPrice} className="ag-price" style={{ marginTop: 10 }}>
+                      <input type="hidden" name="id" value={b.id} />
+                      <label>Prix de la course (€)<input name="price" inputMode="decimal" required defaultValue={(b.price_cents / 100).toFixed(2).replace(".", ",")} /></label>
+                      <button className="btn ghost small">Corriger le prix</button>
+                    </form>
+                  )}
                   {b.status !== "pending_payment" && <div style={{ marginTop: 10 }}><CalButtons b={b as never} /></div>}
                   {(b.status === "confirmed" || b.status === "completed") && (
                     <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 10 }}>
