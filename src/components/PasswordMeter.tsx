@@ -73,11 +73,13 @@ export default function PasswordMeter({ value, onLeaked }: { value: string; onLe
       <div className="pwm-road" aria-hidden="true">
         <span>🏠</span>
         <div className="pwm-lane">
-          <span className="pwm-car" style={{ left: `calc(${pos * 100}% - ${pos * 36}px)` }}>
-            {police && <span className="pwm-siren">🚨</span>}
-            {arrived && <span className="pwm-bubble" key="honk">POUET !</span>}
-            {moving && <span className="pwm-puff">💨</span>}
-            <span className={`pwm-car-i${len === 0 ? " idle" : ""}`}>{police ? "🚓" : "🚕"}</span>
+          <span className="pwm-track" style={{ transform: `translateX(${pos * 100}%)` }}>
+            <span className="pwm-car">
+              {police && <span className="pwm-siren">🚨</span>}
+              {arrived && <span className="pwm-bubble" key="honk">POUET !</span>}
+              {moving && <span className="pwm-puff">💨</span>}
+              <span className={`pwm-car-i${len === 0 ? " idle" : ""}`}>{police ? "🚓" : "🚕"}</span>
+            </span>
           </span>
           {arrived && (
             <span className="pwm-confetti" key="confetti">

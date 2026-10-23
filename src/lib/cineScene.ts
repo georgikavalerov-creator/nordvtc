@@ -164,7 +164,7 @@ export function mountCine(root) {
     if (mode === "scroll") {
       const i = clamp(Math.floor(p.s * chaps.length * 0.9999), 0, chaps.length - 1);
       setChapter(i, now);
-      if (bar) bar.style.width = (p.s * 100).toFixed(1) + "%";
+      if (bar) bar.style.transform = `scaleX(${p.s.toFixed(4)})`;
       const c = chaps[i];
       if (c) c.querySelectorAll("[data-count]").forEach((el) => {
         const tgt = parseFloat(el.dataset.count), v = tgt * ease((now - chapStart) / 900);
