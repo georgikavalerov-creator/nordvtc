@@ -264,7 +264,10 @@ function mountCineWorker(root, canvas) {
       chap = i;
       chaps.forEach((c, k) => c.classList.toggle("on", k === i));
       if (num) num.textContent = "0" + (i + 1) + " / 0" + chaps.length;
-      runCounters(chaps[i]);
+      // Compteurs animés seulement si le bloc est à l'écran (sinon : valeur finale, sans travail à chaque image).
+      const b = root.getBoundingClientRect();
+      if (b.bottom > 0 && b.top < window.innerHeight) runCounters(chaps[i]);
+      else chaps[i]?.querySelectorAll("[data-count]").forEach((el) => { el.textContent = el.dataset.count; });
     }
     if (bar) bar.style.transform = `scaleX(${s.toFixed(4)})`;
   };

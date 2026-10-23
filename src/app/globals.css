@@ -319,8 +319,9 @@ img, svg { max-width: 100%; }
 .hero h1, .hero .lead, .hero-actions, .hero .eyebrow { animation: rise .7s cubic-bezier(.2,.8,.2,1) both; }
 .hero .lead { animation-delay: .08s; } .hero-actions { animation-delay: .16s; }
 @keyframes rise { from { opacity: .55; transform: translateY(18px); } to { opacity: 1; transform: none; } }
-.rv { opacity: 0; transform: translateY(22px); transition: opacity .6s ease, transform .6s cubic-bezier(.2,.8,.2,1); }
-.rv.rv-in { opacity: 1; transform: none; }
+/* Masquage instantané (pas de transition pour cacher au chargement), transition seulement à l'apparition. */
+.rv { opacity: 0; transform: translateY(22px); }
+.rv.rv-in { opacity: 1; transform: none; transition: opacity .6s ease, transform .6s cubic-bezier(.2,.8,.2,1); }
 .iconbox .ico { transition: transform .3s; }
 @media (hover: hover) { .iconbox:hover .ico { transform: rotate(-8deg) scale(1.1); } }
 .pass-route svg path:first-child { stroke-dashoffset: 0; animation: dash 1.2s linear infinite; }
@@ -3927,7 +3928,7 @@ ol.steps > li.is-lit::before { box-shadow: 0 0 0 4px rgba(31, 91, 255, .28), 0 8
 .live-clock { font-variant-numeric: tabular-nums; white-space: nowrap; }
 .live-clock em { font-style: normal; color: #ffb547; }
 @media (prefers-reduced-motion: no-preference) { .live-clock i { font-style: normal; animation: clockBlink 2s steps(1) infinite; } }
-.live-clock i { font-style: normal; }
+.live-clock i { font-style: normal; display: inline-block; } /* boîte : clignotement géré par la carte graphique */
 @keyframes clockBlink { 50% { opacity: .25; } }
 
 /* 4. Indication qui scintille (balayage de lumière) */
