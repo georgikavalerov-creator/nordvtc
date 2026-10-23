@@ -1,4 +1,4 @@
-import { Fragment, Suspense } from "react";
+import { Fragment } from "react";
 import { prix, PRIX_MINIMUM, TRAJETS } from "@/lib/prix-depart";
 import Link from "next/link";
 import GoogleReviews from "@/components/GoogleReviews";
@@ -9,26 +9,35 @@ import { SERVICES } from "@/lib/services";
 import { FORFAITS } from "@/lib/forfaits";
 import { CAR_PICS, SERVICE_PIC, imgThumb, srcSetOf } from "@/lib/images";
 import { VILLES } from "@/lib/villes";
-import { FAQ_GROUPS, ALL_FAQ } from "@/lib/faq";
-import FaqList from "@/components/FaqList";
+import { ALL_FAQ } from "@/lib/faq";
 import AppCompare from "@/components/AppCompare";
 import ColorIcon, { colorIconFor } from "@/components/ColorIcon";
-import Icon, { iconFor } from "@/components/Icon";
 import MapMount from "@/components/MapMount";
 import CineMount from "@/components/CineMount";
 import HeroPass from "@/components/HeroPass";
 import { RATING, RIDES } from "@/components/RatingBadge";
 import HeroBooking from "@/components/HeroBooking";
 import Reveal from "@/components/Reveal";
-import OnBoard from "@/components/OnBoard";
-import TrustBar from "@/components/TrustBar";
 import DriverCard from "@/components/DriverCard";
 import PaymentBadges from "@/components/PaymentBadges";
 import LiveClock from "@/components/LiveClock";
-import StepsTrack from "@/components/StepsTrack";
 
 const STATEMENT = "Un prix fixé avant de partir, jamais revu à la hausse. Un chauffeur qui suit votre vol ou votre train. Une seule personne au volant, de la réservation à l'arrivée.".split(" ");
 
+
+// Questions affichées sur l'accueil (les autres sont sur /faq). Le balisage FAQ ne reprend que celles-ci,
+// comme Google le demande (questions visibles sur la page).
+const HOME_FAQ = [
+  "Comment réserver un chauffeur ?",
+  "Le prix peut-il changer après la réservation ?",
+  "Les péages et le carburant sont-ils compris ?",
+  "Puis-je annuler gratuitement ?",
+  "Mon vol ou mon train a du retard : que se passe-t-il ?",
+  "Où le chauffeur m'attend-il à l'aéroport ou à la gare ?",
+].map((q) => ALL_FAQ.find((f) => f.q === q)!).filter(Boolean);
+
+// Trajets mis en avant sur l'accueil (la liste complète est sur /services).
+const HOME_SERVICES = ["aeroport-lille-lesquin", "gare-lille-flandres", "aeroport-bruxelles-zaventem", "aeroport-roissy-cdg", "lille-paris", "lille-bruxelles", "mariage", "entreprises"];
 
 const TRIPS = [
   { from: "Lille", to: "Lesquin", fromQ: "Lille", toQ: "Aéroport de Lille-Lesquin", label: "Aéroport de Lille-Lesquin", price: `dès ${prix("lesquin")} €`, img: "/img/dest-lesquin.webp", alt: "Terminal de l'aéroport de Lille-Lesquin", pos: "50% 55%" },
@@ -47,7 +56,7 @@ export default function Home() {
         data={{
           "@context": "https://schema.org",
           "@type": "FAQPage",
-          mainEntity: ALL_FAQ.map((f) => ({
+          mainEntity: HOME_FAQ.map((f) => ({
             "@type": "Question",
             name: f.q,
             acceptedAnswer: { "@type": "Answer", text: f.a },
@@ -84,7 +93,10 @@ export default function Home() {
               {TRIPS.map((t) => (
                 <li key={t.to}>
                   <Link href={`/reservation?${new URLSearchParams({ from: t.fromQ, to: t.toQ }).toString()}`}>
-                    <span className="hd-img" style={{ backgroundImage: `url(${imgThumb(t.img)})`, backgroundPosition: t.pos }} role="img" aria-label={t.alt}>
+                    <span className="hd-img">
+                      {/* Vraie image (et non fond CSS) : décodée en arrière-plan, n'empêche pas le premier affichage du texte. */}
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={imgThumb(t.img)} alt={t.alt} width={152} height={92} loading="lazy" decoding="async" fetchPriority="low" style={{ objectPosition: t.pos }} />
                       <span className="hd-stamp">{t.price.replace("dès ", "")}<small>dès</small></span>
                     </span>
                     <span className="hd-txt"><b>{t.label}</b><small>{t.price}</small></span>
@@ -145,12 +157,8 @@ export default function Home() {
       <CineMount target="cine-story" near />
       <MapMount target="cine-story" near />
 
-      {/* Blocs sous le premier écran : chacun dans sa propre limite <Suspense>, React les rend interactifs
-          un par un (petites tâches) au lieu d'un seul gros bloc qui fige le téléphone. Aucun changement visible. */}
-      <Suspense>
-      <TrustBar />
 
-      <section className="section vehicle" data-fx="" suppressHydrationWarning>
+      <section className="section vehicle cv" data-fx="" suppressHydrationWarning>
         <div className="wrap">
           <div className="vehicle-grid">
             <div className="vehicle-copy">
@@ -169,47 +177,26 @@ export default function Home() {
               {CAR_PICS.map((ph, i) => (
                 <figure key={ph.src} className={i === 0 ? "g-main" : ""}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={ph.src} srcSet={srcSetOf(ph.src)} sizes="(max-width: 760px) 92vw, 50vw" alt={ph.alt} loading={i === 0 ? "eager" : "lazy"} width={1400} height={790} style={{ objectPosition: ph.pos }} />
+                  <img src={ph.src} srcSet={srcSetOf(ph.src)} sizes="(max-width: 760px) 92vw, 50vw" alt={ph.alt} loading="lazy" width={1400} height={790} style={{ objectPosition: ph.pos }} />
                 </figure>
               ))}
             </div>
           </div>
-          <OnBoard />
           <p className="muted" style={{ fontSize: "0.8rem", marginTop: 12 }}>Photos extérieures d'illustration d'une Toyota Auris identique ; l'habitacle est celui du véhicule.</p>
         </div>
       </section>
-      </Suspense>
 
-      <Suspense>
-      <section className="section">
-        <div className="wrap">
-          <div className="section-head" data-fx="" suppressHydrationWarning>
-            <span className="eyebrow">Pourquoi nous choisir</span>
-            <h2>Ce qu'une application ne vous garantit pas</h2>
-          </div>
-          <div className="grid cols-4 fx-stagger" data-fx="" suppressHydrationWarning>
-            <div className="iconbox"><div className="ico"><Icon name="euro" size={38} /></div><h3>Prix ferme, même quand tout le monde réserve</h3><p>Le montant affiché est celui que vous payez : pas de tarif dynamique selon la demande ou la météo. Les majorations prévues (nuit, par exemple) sont incluses avant que vous confirmiez.</p></div>
-            <div className="iconbox"><div className="ico"><Icon name="calendarCheck" size={38} /></div><h3>Un acompte, pas un prépaiement total</h3><p>Vous bloquez la course avec un acompte, le reste se règle à bord. Annulation gratuite jusqu'à 24 h avant.</p></div>
-            <div className="iconbox"><div className="ico"><Icon name="plane" size={38} /></div><h3>Je suis votre vol ou votre train</h3><p>Votre vol atterrit en retard ? Je suis déjà informé et je vous attends : un temps d'attente raisonnable est inclus.</p></div>
-            <div className="iconbox"><div className="ico"><Icon name="seal" size={38} /></div><h3>Un chauffeur qui ne se désiste pas</h3><p>Une course réservée est une course assurée : pas de chauffeur qui annule au dernier moment, pas de recherche à l'arrivée.</p></div>
-          </div>
-        </div>
-      </section>
-      </Suspense>
 
-      <Suspense>
-      </Suspense>
       <AppCompare />
 
-      <Suspense>
-      <section className="section alt">
+      <section className="section alt cv">
         <div className="wrap">
           <div className="section-head" data-fx="" suppressHydrationWarning>
             <span className="eyebrow">Nos trajets</span>
             <h2>Où voulez-vous aller ?</h2>
           </div>
           <div className="grid cols-3 fx-stagger" data-fx="" suppressHydrationWarning>
-            {SERVICES.map((s, i) => (
+            {SERVICES.filter((s) => HOME_SERVICES.includes(s.slug)).map((s) => (
               <Link key={s.slug} href={`/services/${s.slug}`} className="card svc">
                 <div className="thumb">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -220,51 +207,17 @@ export default function Home() {
                   <span className="tag">{s.category}</span>
                   <h3>{s.label}</h3>
                   <p>{CONTENT[s.slug].summary}</p>
-                  <ul className="taglist" aria-label="Points clés">
-                    {CONTENT[s.slug].tags.map((t) => (
-                      <li key={t}>{t}</li>
-                    ))}
-                  </ul>
                   <span className="more">Découvrir ce trajet →</span>
                 </div>
               </Link>
             ))}
           </div>
+          <p className="center" style={{ marginTop: 28 }}><Link href="/services" className="more">Tous les trajets et services →</Link></p>
         </div>
       </section>
-      </Suspense>
 
-      <Suspense>
-      <section className="section">
-        <div className="wrap">
-          <div className="section-head" data-fx="" suppressHydrationWarning>
-            <span className="eyebrow">Simple et rapide</span>
-            <h2>Une minute pour être tranquille</h2>
-          </div>
-          <ol id="etapes" className="steps fx-stagger" data-fx="" suppressHydrationWarning style={{ marginTop: 0 }}>
-            <li>
-              <span className="step-ico" aria-hidden="true"><Icon name="pin" size={30} /></span>
-              <h3>Entrez votre trajet</h3>
-              <p className="muted">Départ, arrivée, date, heure : le prix ferme s'affiche tout de suite, sans créer de compte.</p>
-            </li>
-            <li>
-              <span className="step-ico" aria-hidden="true"><Icon name="lock" size={30} /></span>
-              <h3>Confirmez avec un acompte</h3>
-              <p className="muted">Paiement sécurisé par carte, confirmation immédiate par e-mail avec le nom du chauffeur et le véhicule.</p>
-            </li>
-            <li>
-              <span className="step-ico" aria-hidden="true"><Icon name="car" size={30} /></span>
-              <h3>Votre chauffeur arrive</h3>
-              <p className="muted">Je suis là à l'heure, devant chez vous ou en salle d'arrivée. Vous réglez le solde à bord, facture fournie.</p>
-            </li>
-          </ol>
-          <StepsTrack target="etapes" />
-        </div>
-      </section>
-      </Suspense>
 
-      <Suspense>
-      <section className="section alt">
+      <section className="section cv">
         <div className="wrap">
           <div className="section-head" data-fx="" suppressHydrationWarning>
             <span className="eyebrow">Tarifs indicatifs</span>
@@ -286,9 +239,7 @@ export default function Home() {
           <div style={{ display: "flex", justifyContent: "center", marginTop: 22 }}><PaymentBadges /></div>
         </div>
       </section>
-      </Suspense>
 
-      <Suspense>
       <section className="statement" data-fx="sticky" suppressHydrationWarning>
         <div className="statement-inner">
           {/* Mots rendus côté serveur (et non découpés après coup par un script) : évite l'erreur d'hydratation React #418. */}
@@ -301,12 +252,10 @@ export default function Home() {
           </p>
         </div>
       </section>
-      </Suspense>
 
-      <Suspense>
       <DriverCard />
 
-      <section className="section zones">
+      <section className="section zones cv">
         <div className="wrap">
           <span className="eyebrow">Zones d'intervention</span>
           <h2>Lille et sa métropole, mais aussi Paris, Bruxelles et le littoral</h2>
@@ -321,24 +270,28 @@ export default function Home() {
           </p>
         </div>
       </section>
-      </Suspense>
 
-      <Suspense>
-      <section className="section alt">
+      <section className="section alt cv">
         <div className="wrap" style={{ maxWidth: 820 }}>
           <span className="eyebrow">Vos questions</span>
           <h2>Questions fréquentes</h2>
-          <p className="muted">Tout ce qu'on nous demande le plus souvent, avant, pendant et après le trajet.</p>
-          <FaqList groups={FAQ_GROUPS} />
-          <p className="muted" style={{ marginTop: 18 }}>Vous ne trouvez pas votre réponse ? <Link href="/faq">Toutes les questions</Link> · <Link href="/contact">Nous écrire</Link></p>
+          <p className="muted">Les questions qu'on nous pose le plus souvent.</p>
+          <div className="faq faq-home">
+            <div className="faq-list">
+              {HOME_FAQ.map((f) => (
+                <details key={f.q}>
+                  <summary>{f.q}</summary>
+                  <p className="muted">{f.a}</p>
+                </details>
+              ))}
+            </div>
+          </div>
+          <p className="muted" style={{ marginTop: 18 }}><Link href="/faq">Les {ALL_FAQ.length} questions fréquentes</Link> · <Link href="/contact">Nous écrire</Link></p>
         </div>
       </section>
-      </Suspense>
 
-      <Suspense>
       <GoogleReviews />
       <CtaBand />
-      </Suspense>
     </>
   );
 }

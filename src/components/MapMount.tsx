@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { mountMap } from "@/lib/mapScene";
 
 // Carte animée de la métropole lilloise (trajet A → B au défilement).
-export default function MapMount({ target, near = false }: { target: string; near?: boolean }) {
+export default function MapMount({ target, near = false, margin = "150% 0px" }: { target: string; near?: boolean; margin?: string }) {
   useEffect(() => {
     const el = document.getElementById(target);
     if (!el) return;
@@ -17,12 +17,12 @@ export default function MapMount({ target, near = false }: { target: string; nea
     let io: IntersectionObserver | undefined;
     const arm = () => {
       if (!near || !("IntersectionObserver" in window)) return go();
-      io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { io?.disconnect(); go(); } }, { rootMargin: "150% 0px" });
+      io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { io?.disconnect(); go(); } }, { rootMargin: margin });
       io.observe(el);
     };
     if (document.readyState === "complete") arm();
     else window.addEventListener("load", arm, { once: true });
     return () => { cancelled = true; window.removeEventListener("load", arm); io?.disconnect(); stop?.(); };
-  }, [target, near]);
+  }, [target, near, margin]);
   return null;
 }

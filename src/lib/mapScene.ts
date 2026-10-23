@@ -42,6 +42,12 @@ function isDark() { const t = document.documentElement.dataset.theme; return t =
 export function mountMap(root) {
   const canvas = root.querySelector("canvas.map2d");
   if (!canvas) return;
+  // Navigateurs récents : la carte est téléchargée, lue et dessinée dans un Worker (OffscreenCanvas),
+  // le défilement reste fluide. Sinon, repli sur le dessin classique ci-dessous.
+  if (canvas.dataset.offscreen) return;
+  if (workerCanvasOk(canvas)) {
+    try { return mountMapWorker(root, canvas); } catch (e) { /* repli */ }
+  }
   const ctx = canvas.getContext("2d");
   const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const dpr = Math.min(devicePixelRatio || 1, 2);
@@ -216,4 +222,71 @@ export function mountMap(root) {
   if (reduced) addEventListener("scroll", kick, { passive: true });
   resize(); kick();
   return () => { cancelAnimationFrame(raf); ro.disconnect(); io.disconnect(); removeEventListener("pointermove", onMove); removeEventListener("scroll", kick); };
+}
+
+// Variante Worker : ici, seulement la progression du défilement, la place libre pour la carte (mobile),
+// la taille, le thème et la souris ; le Worker (public/map-worker.js) fait tout le reste.
+function mountMapWorker(root, canvas) {
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const coarse = matchMedia("(pointer: coarse)").matches;
+  const dprOf = () => Math.min(devicePixelRatio || 1, 2);
+  const progress = () => { const b = root.getBoundingClientRect(), lead = innerWidth < 900 ? innerHeight * 0.5 : 0; return clamp((lead - b.top) / Math.max(b.height - innerHeight + lead, 1), 0, 1); };
+  // Mobile : la carte se centre dans l'espace libre entre l'en-tête et le texte du chapitre.
+  const fit = () => {
+    const cr = canvas.getBoundingClientRect(); if (cr.width >= 800) return 0;
+    const hb = Math.max(0, (document.querySelector(".site-header")?.getBoundingClientRect().bottom ?? 0) - cr.top);
+    const chap = root.querySelector(".chap.on") || root.querySelector(".chap");
+    const ct = chap ? (chap.firstElementChild || chap).getBoundingClientRect().top - cr.top : cr.height * 0.6;
+    return clamp((hb + ct) / 2, cr.height * 0.2, cr.height * 0.45);
+  };
+  const worker = new Worker("/map-worker.js");
+  const off = canvas.transferControlToOffscreen();
+  canvas.dataset.offscreen = "1";
+  const r0 = canvas.getBoundingClientRect();
+  const url = new URL(root.getAttribute("data-map") || "/lille-map.bin", location.href).href;
+  const s0 = progress();
+  root.classList.toggle("is-started", s0 > 0.03);
+  worker.postMessage({ type: "init", canvas: off, w: r0.width, h: r0.height, dpr: dprOf(), reduced, coarse, dark: isDark(), price: String(prix("lesquin")), s: s0, fitT: fit(), url }, [off]);
+
+  let pending = 0, lastFit = 0;
+  const send = () => {
+    pending = 0;
+    const s = progress(), now = performance.now();
+    root.classList.toggle("is-started", s > 0.03);
+    let fitT = 0; if (now - lastFit > 120) { lastFit = now; fitT = fit(); }
+    worker.postMessage({ type: "state", s, fitT });
+  };
+  const onScroll = () => { if (!pending) pending = requestAnimationFrame(send); };
+  addEventListener("scroll", onScroll, { passive: true });
+  let lastW = r0.width, lastH = r0.height;
+  const ro = new ResizeObserver(() => {
+    const r = canvas.getBoundingClientRect();
+    if (Math.abs(r.width - lastW) < 1 && Math.abs(r.height - lastH) < lastH * 0.25) return;
+    lastW = r.width; lastH = r.height;
+    worker.postMessage({ type: "resize", w: r.width, h: r.height, dpr: dprOf() }); onScroll();
+  }); ro.observe(canvas);
+  const io = new IntersectionObserver((e) => worker.postMessage({ type: "visible", v: e[0].isIntersecting }), { rootMargin: "0px" }); io.observe(root);
+  let mv = 0, px = 0, py = 0;
+  const onMove = (e) => {
+    const r = root.getBoundingClientRect(); px = ((e.clientX - r.left) / r.width - 0.5) * 2; py = ((e.clientY - r.top) / r.height - 0.5) * 2;
+    if (!mv) mv = requestAnimationFrame(() => { mv = 0; worker.postMessage({ type: "pointer", px, py }); });
+  };
+  addEventListener("pointermove", onMove, { passive: true });
+  const onTheme = () => worker.postMessage({ type: "theme", dark: isDark() });
+  const mo = new MutationObserver(onTheme); mo.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme", "class"] });
+  const mq = matchMedia("(prefers-color-scheme: dark)"); mq.addEventListener?.("change", onTheme);
+  return () => {
+    worker.terminate(); ro.disconnect(); io.disconnect(); mo.disconnect(); mq.removeEventListener?.("change", onTheme);
+    if (pending) cancelAnimationFrame(pending); if (mv) cancelAnimationFrame(mv);
+    removeEventListener("scroll", onScroll); removeEventListener("pointermove", onMove);
+  };
+}
+
+// Safari / iPhone (moteur WebKit) : on garde le dessin classique, déjà éprouvé sur ces appareils.
+// Les autres navigateurs (Chrome, Android, Edge, Firefox) dessinent dans un Worker.
+function workerCanvasOk(canvas) {
+  if (typeof Worker === "undefined" || typeof OffscreenCanvas === "undefined" || !canvas.transferControlToOffscreen) return false;
+  const ua = navigator.userAgent || "";
+  const apple = /iP(hone|ad|od)/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1) || (/Safari\//.test(ua) && !/Chrome|Chromium|CriOS|Edg|OPR|Firefox|FxiOS|Android/.test(ua));
+  return !apple;
 }

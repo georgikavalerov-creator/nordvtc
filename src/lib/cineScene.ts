@@ -4,6 +4,11 @@
 export function mountCine(root) {
   const canvas = root.querySelector("canvas.cine-canvas");
   if (!canvas) return function () {};
+  // Navigateurs récents : dessin dans un Worker (OffscreenCanvas), le fil principal reste libre.
+  if (canvas.dataset.offscreen) return function () {};
+  if (workerCanvasOk(canvas)) {
+    try { return mountCineWorker(root, canvas); } catch (e) { /* repli : dessin classique ci-dessous */ }
+  }
   const ctx = canvas.getContext("2d");
   const mode = root.dataset.mode || "auto";
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -199,11 +204,109 @@ export function mountCine(root) {
     lastW = r.width; lastH = r.height; build(); kick();
   });
   ro.observe(canvas);
-  const io = new IntersectionObserver((es) => { visible = es[0].isIntersecting; if (visible) kick(); else if (raf) { cancelAnimationFrame(raf); raf = 0; } }, { rootMargin: "0px" });
+  const io = new IntersectionObserver((es) => { visible = es[0].isIntersecting; root.classList.toggle("in-view", visible); if (visible) kick(); else if (raf) { cancelAnimationFrame(raf); raf = 0; } }, { rootMargin: "0px" });
   io.observe(root);
   const onMove = (e) => { const b = root.getBoundingClientRect(); mx = clamp((e.clientX - b.left) / b.width, 0, 1); my = clamp((e.clientY - b.top) / b.height, 0, 1); };
   const onScroll = () => { if (reduce) kick(); };
   if (!coarse) root.addEventListener("pointermove", onMove, { passive: true });
   window.addEventListener("scroll", onScroll, { passive: true });
   return function () { cancelAnimationFrame(raf); ro.disconnect(); io.disconnect(); root.removeEventListener("pointermove", onMove); window.removeEventListener("scroll", onScroll); };
+}
+
+// Variante Worker : le Worker dessine (public/cine-worker.js) ; ici, seulement la taille, la visibilité,
+// la souris et, en mode défilement, la progression + chapitres + compteurs (texte de la page).
+function mountCineWorker(root, canvas) {
+  const mode = root.dataset.mode || "auto";
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const coarse = matchMedia("(pointer: coarse)").matches;
+  const chaps = Array.prototype.slice.call(root.querySelectorAll(".chap"));
+  const bar = root.querySelector(".story-bar i");
+  const num = root.querySelector(".story-num");
+  const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
+  const ease = (t) => 1 - Math.pow(1 - clamp(t, 0, 1), 3);
+  const small = () => coarse || window.innerWidth < 900;
+  const dprOf = () => Math.min(window.devicePixelRatio || 1, coarse || window.innerWidth < 700 ? 1.5 : 2);
+
+  const worker = new Worker("/cine-worker.js");
+  const off = canvas.transferControlToOffscreen();
+  canvas.dataset.offscreen = "1";
+
+  const paintBg = (r) => {
+    canvas.style.background = "radial-gradient(circle " + Math.round(Math.max(r.width, r.height) * 0.6) + "px at 72% 40%, rgba(70,110,255,.20), rgba(70,110,255,0))";
+  };
+
+  // Mode défilement : progression calculée ici (comme avant), envoyée au Worker.
+  let chap = -1, countRaf = 0;
+  const runCounters = (c) => {
+    if (countRaf) cancelAnimationFrame(countRaf);
+    const els = c ? Array.prototype.slice.call(c.querySelectorAll("[data-count]")) : [];
+    if (!els.length) return;
+    const start = performance.now();
+    const step = (now) => {
+      const k = ease((now - start) / 900);
+      els.forEach((el) => { el.textContent = String(Math.round(parseFloat(el.dataset.count) * k)); });
+      countRaf = k < 1 ? requestAnimationFrame(step) : 0;
+    };
+    countRaf = requestAnimationFrame(step);
+  };
+  const scrollProgress = () => {
+    const b = root.getBoundingClientRect(), vh = window.innerHeight;
+    const lead = window.innerWidth < 900 ? vh * 0.5 : 0;
+    return clamp((lead - b.top) / Math.max(b.height - vh + lead, 1), 0, 1);
+  };
+  let pending = 0;
+  const update = () => {
+    pending = 0;
+    const s = scrollProgress();
+    worker.postMessage({ type: "progress", s });
+    const i = clamp(Math.floor(s * chaps.length * 0.9999), 0, chaps.length - 1);
+    if (i !== chap) {
+      chap = i;
+      chaps.forEach((c, k) => c.classList.toggle("on", k === i));
+      if (num) num.textContent = "0" + (i + 1) + " / 0" + chaps.length;
+      runCounters(chaps[i]);
+    }
+    if (bar) bar.style.transform = `scaleX(${s.toFixed(4)})`;
+  };
+  const onScroll = () => { if (!pending) pending = requestAnimationFrame(update); };
+
+  const r0 = canvas.getBoundingClientRect();
+  paintBg(r0);
+  worker.postMessage({ type: "init", canvas: off, w: r0.width, h: r0.height, dpr: dprOf(), mode, xmin: parseFloat(root.dataset.xmin || "0.40"), small: small(), reduce, s: mode === "scroll" ? scrollProgress() : 0 }, [off]);
+  if (reduce) chaps.forEach((c) => (c.style.transition = "none"));
+  if (mode === "scroll") { update(); window.addEventListener("scroll", onScroll, { passive: true }); }
+
+  let lastW = r0.width, lastH = r0.height;
+  const ro = new ResizeObserver(() => {
+    const r = canvas.getBoundingClientRect();
+    if (Math.abs(r.width - lastW) < 1 && Math.abs(r.height - lastH) < lastH * 0.25) return;
+    lastW = r.width; lastH = r.height; paintBg(r);
+    worker.postMessage({ type: "resize", w: r.width, h: r.height, dpr: dprOf(), small: small() });
+    if (mode === "scroll") update();
+  });
+  ro.observe(canvas);
+  const io = new IntersectionObserver((es) => { const v = es[0].isIntersecting; root.classList.toggle("in-view", v); worker.postMessage({ type: "visible", v }); }, { rootMargin: "0px" });
+  io.observe(root);
+  let mvPending = 0, mx = 0.5, my = 0.5;
+  const onMove = (e) => {
+    const b = root.getBoundingClientRect();
+    mx = clamp((e.clientX - b.left) / b.width, 0, 1); my = clamp((e.clientY - b.top) / b.height, 0, 1);
+    if (!mvPending) mvPending = requestAnimationFrame(() => { mvPending = 0; worker.postMessage({ type: "pointer", mx, my }); });
+  };
+  if (!coarse) root.addEventListener("pointermove", onMove, { passive: true });
+  return function () {
+    worker.terminate(); ro.disconnect(); io.disconnect();
+    if (countRaf) cancelAnimationFrame(countRaf);
+    if (pending) cancelAnimationFrame(pending);
+    root.removeEventListener("pointermove", onMove); window.removeEventListener("scroll", onScroll);
+  };
+}
+
+// Safari / iPhone (moteur WebKit) : on garde le dessin classique, déjà éprouvé sur ces appareils.
+// Les autres navigateurs (Chrome, Android, Edge, Firefox) dessinent dans un Worker.
+function workerCanvasOk(canvas) {
+  if (typeof Worker === "undefined" || typeof OffscreenCanvas === "undefined" || !canvas.transferControlToOffscreen) return false;
+  const ua = navigator.userAgent || "";
+  const apple = /iP(hone|ad|od)/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1) || (/Safari\//.test(ua) && !/Chrome|Chromium|CriOS|Edg|OPR|Firefox|FxiOS|Android/.test(ua));
+  return !apple;
 }

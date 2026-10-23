@@ -17,31 +17,15 @@ const ROWS: [string, string, string, string][] = [
   ["receipt", "Facture", "Facture et bon de commande à votre nom ou au nom de l'entreprise", "Reçu standard"],
 ];
 
-const PERKS: [string, string][] = [
-  ["water", "Bouteille d'eau offerte"],
-  ["timer", "À l'heure, toujours"],
-  ["plug", "Chargeurs à bord"],
-  ["suitcase", "Aide aux bagages"],
-  ["baby", "Siège enfant sur demande"],
-  ["plane", "Suivi de vol gratuit"],
-  ["leaf", "Hybride silencieuse"],
-  ["receipt", "Facture fournie"],
-];
-
 export default function AppCompare() {
   return (
-    <section className="section compare">
+    <section className="section compare cv">
       <div className="wrap">
         <div className="section-head">
           <span className="eyebrow">Comparez</span>
           <h2>Un chauffeur privé, pas une application</h2>
           <p className="muted" style={{ maxWidth: 680 }}>Le même trajet, deux expériences très différentes. Voici ce que vous gagnez concrètement à réserver directement.</p>
         </div>
-        <ul className="perks" aria-label="Inclus dans chaque course">
-          {PERKS.map(([i, t]) => (
-            <li key={t}><Icon name={i} size={20} />{t}</li>
-          ))}
-        </ul>
         <div className="cmp" role="table" aria-label="Comparatif Nord VTC et applications de VTC">
           <div className="cmp-row cmp-head" role="row">
             <span role="columnheader" />

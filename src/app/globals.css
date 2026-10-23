@@ -318,7 +318,7 @@ img, svg { max-width: 100%; }
 .pass-bot .btn.small { align-self: end; }
 .hero h1, .hero .lead, .hero-actions, .hero .eyebrow { animation: rise .7s cubic-bezier(.2,.8,.2,1) both; }
 .hero .lead { animation-delay: .08s; } .hero-actions { animation-delay: .16s; }
-@keyframes rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+@keyframes rise { from { opacity: .01; transform: translateY(18px); } to { opacity: 1; transform: none; } }
 .rv { opacity: 0; transform: translateY(22px); transition: opacity .6s ease, transform .6s cubic-bezier(.2,.8,.2,1); }
 .rv.rv-in { opacity: 1; transform: none; }
 .iconbox .ico { transition: transform .3s; }
@@ -472,7 +472,7 @@ a.card.svc, .card.svc { display: flex; flex-direction: column; }
 .page-enter { animation: none; }
 /* Fondu d'entrée seulement lors d'un changement de page dans le site : au premier chargement, la page s'affiche immédiatement (meilleur LCP). */
 html.nav-ready .page-enter:not([data-seen]) { animation: pageIn .55s cubic-bezier(.2,.8,.2,1) both; }
-@keyframes pageIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes pageIn { from { opacity: .01; transform: translateY(14px); } to { opacity: 1; transform: none; } }
 
 /* Hero : le texte s'élève et s'efface, le billet recule en profondeur */
 .fx-on .hero .wrap > div:first-child { transform: translate3d(0, calc(var(--leave) * -80px), 0); opacity: calc(1 - var(--leave) * .9); will-change: transform, opacity; }
@@ -2908,7 +2908,7 @@ h2.bk-sub::before { content: ""; width: 4px; height: 1.1em; border-radius: 4px; 
 /* Espace réservé du formulaire chargé à l'approche */
 .when-near { border-radius: 22px; background: linear-gradient(180deg, #f6f7fb, #fff); }
 /* Vitesse : apparition du haut de page sans flou (le flou animé coûte très cher sur mobile), plus courte */
-@keyframes cineIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+@keyframes cineIn { from { opacity: .01; transform: translateY(16px); } to { opacity: 1; transform: none; } }
 .hero.cine h1 .ln { animation-duration: .7s; }
 .hero.cine h1 .ln2 { animation-delay: .12s; }
 .hero.cine .lead { animation-duration: .7s; animation-delay: .2s; }
@@ -4075,3 +4075,14 @@ html.over-canvas .edge-blur { display: none !important; }
 @media (max-width: 900px) {
   body:has(.ck) .chat-fab:not(.is-open) { opacity: 0 !important; pointer-events: none; }
 }
+
+/* Accueil : les blocs hors écran ne sont ni mis en page ni peints tant qu'on n'approche pas
+   (content-visibility). Taille réservée et mémorisée : pas de saut de la barre de défilement. */
+.faq-home .faq-list { margin-top: 8px; }
+/* Animations invisibles mises en pause : le sablier caché des boutons (flou + 12 barres) tournait en
+   permanence et forçait le navigateur à redessiner à chaque image ; idem pour l'invite de défilement hors écran. */
+.busy-label:not([data-busy]) .bl-busy * { animation-play-state: paused !important; }
+.story:not(.in-view) .story-scroll em, .story:not(.in-view) .story-hint .mouse i { animation-play-state: paused; }
+.hero-dests .hd-img { position: relative; overflow: hidden; }
+.hero-dests .hd-img > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: inherit; display: block; }
+.hero-dests .hd-img > .hd-stamp { z-index: 1; }
