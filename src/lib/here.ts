@@ -42,8 +42,8 @@ export async function suggestPlaces(q: string): Promise<Place[]> {
       return { label, lat: i.position!.lat, lng: i.position!.lng };
     })
     .filter((p) => {
-      // Même adresse renvoyée deux fois (doublon HERE) : une seule ligne dans la liste.
-      const key = `${p.label}|${p.lat.toFixed(4)}|${p.lng.toFixed(4)}`;
+      // Même adresse renvoyée deux fois (doublon HERE, parfois à quelques mètres près) : une seule ligne dans la liste.
+      const key = p.label.toLowerCase();
       if (seen.has(key)) return false;
       seen.add(key);
       return true;
@@ -59,6 +59,10 @@ export async function routeSummary(
   url.searchParams.set("origin", `${from.lat},${from.lng}`);
   url.searchParams.set("destination", `${to.lat},${to.lng}`);
   url.searchParams.set("return", "summary");
+  // Itinéraire de référence, sans la circulation du moment : la même adresse donne toujours la même distance,
+  // donc le même prix au devis, au paiement et dans les prix « dès » du site (sinon HERE changeait de route
+  // selon les bouchons et le prix pouvait varier de plus de 10 % entre l'affichage et le paiement).
+  url.searchParams.set("departureTime", "any");
   url.searchParams.set("apiKey", KEY());
   const res = await fetch(url, { cache: "no-store" });
   if (!res.ok) throw new Error(`HERE routing ${res.status}`);
@@ -84,6 +88,7 @@ export async function tollCostEur(
     url.searchParams.set("origin", `${from.lat},${from.lng}`);
     url.searchParams.set("destination", `${to.lat},${to.lng}`);
     url.searchParams.set("return", "summary,tolls");
+    url.searchParams.set("departureTime", "any"); // même itinéraire que le prix (voir routeSummary)
     url.searchParams.set("currency", "EUR");
     url.searchParams.set("apiKey", KEY());
     const res = await fetch(url, { cache: "no-store" });
