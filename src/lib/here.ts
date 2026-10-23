@@ -32,8 +32,13 @@ export async function suggestPlaces(q: string): Promise<Place[]> {
       const addr = i.address?.label;
       // « 10 Rue Pierre Mauroy (Rue de Paris) » + « 10 Rue Pierre Mauroy, 59800 Lille » : l'adresse suffit,
       // sinon le libellé répétait la rue deux fois. Le nom d'un lieu (gare, aéroport…) reste devant l'adresse.
-      const base = i.title.replace(/\s*\([^)]*\)\s*$/, "");
-      const label = !addr ? i.title : addr.startsWith(i.title) || addr.startsWith(base) ? addr : `${i.title}, ${addr}`;
+      // Titre sans les précisions entre parenthèses : « 10 Rue Pierre Mauroy (Rue de Paris), 59800 Lille, France »
+      // devient « 10 Rue Pierre Mauroy, 59800 Lille, France », identique à l'adresse.
+      const base = i.title.replace(/\s*\([^)]*\)/g, "").replace(/\s+/g, " ").trim();
+      const firstPart = base.split(",")[0].trim();
+      const label = !addr ? i.title
+        : addr.startsWith(i.title) || addr.startsWith(base) || base.startsWith(addr) || (firstPart.length > 3 && addr.startsWith(firstPart)) ? addr
+        : `${i.title}, ${addr}`;
       return { label, lat: i.position!.lat, lng: i.position!.lng };
     })
     .filter((p) => {

@@ -30,7 +30,7 @@ export const TRAJETS = {
   villeneuve: { km: 9.3, min: 13 },
   lens: { km: 37.8, min: 39 },
   dunkerque: { km: 78.6, min: 61 },
-  touquet: { km: 177.3, min: 118 }, // Lille → Le Touquet-Paris-Plage
+  touquet: { km: 151.5, min: 122 }, // Lille → Le Touquet-Paris-Plage
 } as const;
 
 export type TrajetKey = keyof typeof TRAJETS;

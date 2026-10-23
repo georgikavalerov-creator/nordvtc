@@ -48,7 +48,7 @@ export const CONTENT: Record<string, ServiceContent> = {
       { title: "Ferry et Eurotunnel à Calais", body: ["Pour une traversée vers l'Angleterre, indiquez le terminal et l'heure de départ : le trajet est prévu avec une marge adaptée aux contrôles."] },
     ],
     facts: [
-      { label: "Distance Lille - Le Touquet", value: "environ 175 km" },
+      { label: "Distance Lille - Le Touquet", value: "environ 150 km" },
       { label: "Durée habituelle", value: "1 h 45 à 2 h" },
       { label: "Prix", value: `dès ${prix("touquet")} € depuis Lille, fixé avant de confirmer` },
       { label: "Paiement", value: "acompte en ligne, solde à bord" },
